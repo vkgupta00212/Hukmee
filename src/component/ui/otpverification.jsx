@@ -4,6 +4,7 @@ import { X, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import RegisterUser from "../../backend/authentication/register";
 import GetUser from "../../backend/authentication/getuser";
+import Colors from "../../core/constant";
 
 const useWindowSize = () => {
   const [windowSize, setWindowSize] = useState({ width: undefined });
@@ -202,7 +203,7 @@ const OtpVerification = ({ onClose, onVerify }) => {
             </button>
 
             <div className="flex justify-center mb-4">
-              <span className="bg-indigo-100 p-3 rounded-full">📲</span>
+              <span className="bg-orange-100 p-3 rounded-full">📲</span>
             </div>
             <h2 className="text-xl font-semibold text-center mb-2">
               Enter verification code
@@ -247,7 +248,7 @@ const OtpVerification = ({ onClose, onVerify }) => {
               disabled={!isOtpComplete}
               className={`w-full py-3 rounded-lg font-semibold transition ${
                 isOtpComplete
-                  ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                  ? `bg-${Colors.primaryMain} text-white hover:bg-[#7A420C]`
                   : "bg-gray-300 text-gray-500"
               }`}
             >
@@ -281,7 +282,7 @@ const OtpVerification = ({ onClose, onVerify }) => {
             </button>
 
             <div className="flex justify-center mb-4">
-              <span className="bg-indigo-100 p-3 rounded-full">📲</span>
+              <span className="bg-orange-100 p-3 rounded-full">📲</span>
             </div>
             <h2 className="text-2xl font-semibold text-center mb-2">
               Enter verification code
@@ -326,7 +327,7 @@ const OtpVerification = ({ onClose, onVerify }) => {
               disabled={!isOtpComplete}
               className={`w-full py-3 rounded-lg font-semibold transition ${
                 isOtpComplete
-                  ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                  ? `bg-${Colors.primaryMain} text-white hover:bg-[#7A420C]`
                   : "bg-gray-300 text-gray-500"
               }`}
             >

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Phone, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Colors from "../../core/constant";
 
 // ✅ Hook to get window width (for mobile/desktop detection)
 const useWindowSize = () => {
@@ -118,7 +119,7 @@ const LoginCard = ({ onClose, onSubmit }) => {
 
             {/* Content */}
             <div className="mb-6">
-              <Phone className="w-8 h-8 mb-3 text-indigo-600" />
+              <Phone className="w-8 h-8 mb-3 text-[#FA7D09]" />
               <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 Enter your phone number
               </h2>
@@ -209,8 +210,10 @@ const LoginCard = ({ onClose, onSubmit }) => {
 
             {/* Content */}
             <div className="mb-6">
-              <Phone className="w-8 h-8 mb-3 text-indigo-600" />
-              <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <Phone className={`w-8 h-8 mb-3 text-${Colors.primaryMain}`} />
+              <h2
+                className={`text-2xl sm:text-3xl font-bold bg-${Colors.primaryMain} bg-clip-text text-transparent`}
+              >
                 Enter your phone number
               </h2>
               <p className="text-sm text-gray-600 mt-2">
@@ -233,7 +236,7 @@ const LoginCard = ({ onClose, onSubmit }) => {
                   setPhoneNumber(onlyNums.slice(0, 10));
                 }}
                 placeholder="Enter your phone number"
-                className="flex-1 border border-gray-200 rounded-r-lg px-4 py-2 text-sm bg-gray-50 focus:ring-2 focus:ring-indigo-500"
+                className="flex-1 border border-gray-200 rounded-r-lg px-4 py-2 text-sm bg-gray-50 focus:ring-2 focus:ring-orange-500"
               />
             </div>
 
@@ -243,7 +246,7 @@ const LoginCard = ({ onClose, onSubmit }) => {
               disabled={!isValid || loading}
               className={`w-full py-3 px-4 rounded-lg font-semibold transition-all ${
                 isValid && !loading
-                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700"
+                  ? `bg-${Colors.primaryMain} text-white hover:[#7A420C] hover:to-purple-700`
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
             >
