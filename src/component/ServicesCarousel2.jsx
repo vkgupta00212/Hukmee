@@ -99,7 +99,7 @@ const ServicesCarousel2 = () => {
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
         {/* Section Header */}
         <h2 className="text-3xl  sm:text-4xl font-bold text-gray-900 mb-3 text-Start md:text-left">
-          Women Services
+          Accessories
         </h2>
 
         {/* Error Message */}

@@ -47,6 +47,7 @@ const Index = () => {
           </Suspense>
         </div>
       </section>
+
       {/* Become WePretiffy Vendor Section */}
       <section
         className="py-1 sm:py-16 bg-pink-50"

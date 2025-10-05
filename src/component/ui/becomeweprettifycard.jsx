@@ -58,10 +58,10 @@ const BecomeWePretiffyCard = () => {
       <h2
         className={`text-2xl font-bold mb-2 ${Colors.textGrayDark} text-center`}
       >
-        Become a WePretiffy Vendor
+        Become a Hukmee Vendor
       </h2>
       <p className={`text-sm ${Colors.textMuted} text-center mb-6`}>
-        Fill out the form below and join our beauty community.
+        Fill out the form below and join our community.
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-5">
