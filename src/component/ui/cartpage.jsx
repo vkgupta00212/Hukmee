@@ -125,7 +125,7 @@ const CartPage = () => {
   const isMobile = window.innerWidth < 640;
 
   return (
-    <div className="w-full md:w-80 lg:w-96 mx-auto bg-white rounded-2xl shadow-lg overflow-hidden font-sans">
+    <div className="w-full md:w-80 lg:w-96 mx-auto items-center justiy-between bg-white rounded-2xl shadow-lg overflow-hidden font-sans">
       {/* Header */}
       <div className={`p-4 sm:p-6 border-b ${Colors.borderGray}`}>
         <h2

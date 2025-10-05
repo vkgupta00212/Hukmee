@@ -7,6 +7,7 @@ import ServicesCarousel4 from "../component/ServicesCarousel4";
 import BecomeWePretiffyCard from "../component/ui/becomeweprettifycard";
 import SpecialForYou from "../component/ui/specialyforyou";
 import Footer from "../component/Footer";
+import RatingScreen from "../component/ui/ratingscreen";
 
 const LazyServicesCarousel2 = lazy(() =>
   import("../component/ServicesCarousel2")
@@ -20,6 +21,45 @@ const LazyBecomeWePretiffyCard = lazy(() =>
 const LazySpecialForYou = lazy(() => import("../component/ui/specialyforyou"));
 
 const Index = () => {
+  // Dummy review data
+  const dummyReviews = [
+    {
+      ID: 1,
+      Name: "Vishal Gupta",
+      Rating: "4.5",
+      Review: "Great product! The quality exceeded my expectations.",
+      image: "https://randomuser.me/api/portraits/men/32.jpg",
+    },
+    {
+      ID: 2,
+      Name: "Ananya Sharma",
+      Rating: "5",
+      Review: "Absolutely loved it. Highly recommend to others!",
+      image: "https://randomuser.me/api/portraits/women/44.jpg",
+    },
+    {
+      ID: 3,
+      Name: "Rahul Verma",
+      Rating: "3.5",
+      Review: "It’s decent but could be improved in packaging.",
+      image: "https://randomuser.me/api/portraits/men/12.jpg",
+    },
+    {
+      ID: 4,
+      Name: "Priya Singh",
+      Rating: "4",
+      Review: "Very useful and affordable. Will buy again.",
+      image: "https://randomuser.me/api/portraits/women/68.jpg",
+    },
+    {
+      ID: 5,
+      Name: "Aman Yadav",
+      Rating: "2.5",
+      Review: "Not satisfied, the product didn’t match the description.",
+      image: "https://randomuser.me/api/portraits/men/76.jpg",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50">
       <section className="relative bg-white">
@@ -45,6 +85,12 @@ const Index = () => {
               <LazyServicesCarousel4 />
             </div>
           </Suspense>
+        </div>
+      </section>
+
+      <section className="bg-white">
+        <div className="">
+          <RatingScreen reviews={dummyReviews} />
         </div>
       </section>
 

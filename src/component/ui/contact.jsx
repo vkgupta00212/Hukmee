@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import GetInTouch from "../../backend/footer/getintouch";
+import Colors from "../../core/constant";
 
 const ContactInfo = () => {
   const [contact, setContact] = useState(null);
@@ -42,8 +43,10 @@ const ContactInfo = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 py-10 font-sans">
-      <div className="max-w-2xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-200">
-        <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent p-6">
+      <div className="max-w-2xl md:mt-[50px] mx-auto bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-200">
+        <h2
+          className={`text-2xl md:text-3xl font-bold bg-${Colors.primaryMain} bg-clip-text text-transparent p-6`}
+        >
           Contact Information
         </h2>
         <div className="p-6">

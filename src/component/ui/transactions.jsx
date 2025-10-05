@@ -54,7 +54,7 @@ const TransactionHistory = () => {
     <div
       className={`min-h-screen ${Colors.bgGrayLight} flex justify-center p-4 sm:p-6 lg:p-8`}
     >
-      <div className="w-full max-w-5xl bg-white shadow-xl rounded-3xl overflow-hidden">
+      <div className="w-full max-w-5xl bg-white md:mt-[60px] shadow-xl rounded-3xl overflow-hidden">
         {/* Wallet Section */}
         <div
           className={`p-6 sm:p-8 border-b ${Colors.borderGray} flex justify-between items-center`}

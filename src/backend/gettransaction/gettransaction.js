@@ -26,7 +26,7 @@ const GetTransaction = async (phone) => {
 
   try {
     const response = await axios.post(
-      "https://api.hukmee.in/APIs/APIs.asmx/GetTransactions",
+      "https://api.weprettify.com/APIs/APIs.asmx/GetTransactions",
       formData,
       { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
     );

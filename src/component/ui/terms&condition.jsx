@@ -33,7 +33,7 @@ const TermsPage = () => {
 
   return (
     <div
-      className={`bg-gradient-to-b from-blue-50 to-gray-100 flex flex-col items-center justify-center p-2 sm:p-6`}
+      className={`bg-gradient-to-b from-blue-50 to-gray-100 md:mt-[80px] flex flex-col items-center justify-center p-2 sm:p-6`}
     >
       <div
         className={`w-full max-w-4xl bg-white rounded-2xl shadow-xl p-6 sm:p-10 transition-all duration-300 hover:shadow-2xl`}

@@ -41,7 +41,7 @@ const PersonalDetails = () => {
   };
 
   const handleSave = async () => {
-    const requiredFields = ["Fullname", "PhoneNumber"];
+    const requiredFields = ["Fullname"];
     const emptyFields = requiredFields.filter(
       (key) => !editedDetails[key] || editedDetails[key].trim() === ""
     );
@@ -55,7 +55,7 @@ const PersonalDetails = () => {
         "", // image
         "Edit Profile", // type
         editedDetails.Fullname, // fullname
-        editedDetails.PhoneNumber, // phone
+        number,
         editedDetails.Email, // email
         editedDetails.Gender, // gender
         editedDetails.DOB // dob
@@ -106,11 +106,22 @@ const PersonalDetails = () => {
                 >
                   {item.label}
                 </span>
-                <span
-                  className={`text-base font-medium ${Colors.textGrayDark} mt-1`}
-                >
-                  {userDetails[item.key] || "-"}
-                </span>
+
+                {item.label === "Mobile No." || item.editable === false ? (
+                  // Static display for Mobile No.
+                  <span
+                    className={`text-base font-medium ${Colors.textGrayDark} mt-1`}
+                  >
+                    +91 {number}
+                  </span>
+                ) : (
+                  // Normal editable/display case
+                  <span
+                    className={`text-base font-medium ${Colors.textGrayDark} mt-1`}
+                  >
+                    {userDetails[item.key] || "-"}
+                  </span>
+                )}
               </div>
             ))}
           </div>
@@ -140,19 +151,25 @@ const PersonalDetails = () => {
                 >
                   {item.label}
                 </label>
-                <input
-                  type="text"
-                  value={editedDetails[item.key] || ""}
-                  onChange={(e) => handleInputChange(item.key, e.target.value)}
-                  disabled={!item.editable}
-                  className={`w-full border ${
-                    Colors.borderGray
-                  } rounded-lg px-4 py-2 text-base focus:outline-none ${
-                    !item.editable
-                      ? "bg-gray-100 text-gray-500 cursor-not-allowed"
-                      : `focus:ring-2 focus:ring-orange-500 bg-white shadow-sm`
-                  }`}
-                />
+
+                {!item.editable ? (
+                  // 🔒 Non-editable (Mobile No.)
+                  <span
+                    className={`w-full border ${Colors.borderGray} rounded-lg px-4 py-2 text-base bg-gray-100 text-gray-600`}
+                  >
+                    +91 {number}
+                  </span>
+                ) : (
+                  // ✏️ Editable input
+                  <input
+                    type="text"
+                    value={editedDetails[item.key] || ""}
+                    onChange={(e) =>
+                      handleInputChange(item.key, e.target.value)
+                    }
+                    className={`w-full border ${Colors.borderGray} rounded-lg px-4 py-2 text-base focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white shadow-sm`}
+                  />
+                )}
               </div>
             ))}
           </div>
