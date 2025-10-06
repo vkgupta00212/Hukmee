@@ -88,7 +88,7 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="bg-white">
+      <section className="bg-white mb-[15px]">
         <div className="">
           <RatingScreen reviews={dummyReviews} />
         </div>

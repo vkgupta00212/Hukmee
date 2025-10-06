@@ -12,6 +12,7 @@ import InsertOrder from "../../backend/order/insertorder";
 import GetOrder from "../../backend/order/getorderid";
 import LoginCard from "./loginCard";
 import OtpVerification from "./otpverification";
+import Colors from "../../core/constant";
 
 const ProductMainPage = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -430,7 +431,9 @@ const ProductMainPage = () => {
         </div>
         <div className="md:w-1/2 w-full p-[10px] flex flex-col justify-between">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <h2
+              className={`text-2xl md:text-3xl font-bold bg-${Colors.primaryMain} bg-clip-text text-transparent`}
+            >
               {product.ProductName}
             </h2>
             <p className="text-gray-600 mt-[1px] text-sm md:text-base leading-relaxed">
@@ -443,7 +446,7 @@ const ProductMainPage = () => {
             </p>
             <button
               onClick={() => addToCart(product)}
-              className="w-full mt-[10px] py-[11px] bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold shadow-md hover:shadow-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300"
+              className={`w-full mt-[10px] py-[11px] bg-${Colors.primaryMain} text-white rounded-lg font-semibold shadow-md hover:shadow-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300`}
               aria-label="Add to cart"
             >
               Add to Cart

@@ -134,10 +134,8 @@ const BecomeWePretiffyCard = () => {
             required
           >
             <option value="">Select Type</option>
-            <option value="Salon">Salon</option>
-            <option value="Makeup Artist">Makeup Artist</option>
-            <option value="Spa">Spa</option>
-            <option value="Other">Other</option>
+            <option value="ShopOwner">Shop Owner</option>
+            <option value="Individual">Individual</option>
           </select>
           <label
             className={`absolute left-3 -top-2.5 text-xs ${Colors.textGray} bg-white px-1 transition-all

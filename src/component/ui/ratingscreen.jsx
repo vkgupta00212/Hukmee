@@ -1,4 +1,5 @@
 import React from "react";
+import Colors from "../../core/constant";
 
 // Star rating component
 const StarRating = ({ rating }) => {
@@ -57,7 +58,9 @@ const RatingScreen = ({ reviews }) => {
 
   return (
     <div className="bg-white shadow-xl border border-gray-200 rounded-2xl p-6 max-w-6xl mx-auto">
-      <h3 className="text-xl md:text-2xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
+      <h3
+        className={`text-xl md:text-2xl font-semibold bg-${Colors.primaryMain} bg-clip-text text-transparent mb-4`}
+      >
         Reviews
       </h3>
 
