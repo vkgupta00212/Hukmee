@@ -45,7 +45,7 @@ const WomensSalonCard = ({ onClose, service }) => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const data = await GetSubCategory(service.id, "SubCategory");
+      const data = await GetSubCategory(service.id, "Brand");
       setSubServices(data);
       setLoading(false);
     };
