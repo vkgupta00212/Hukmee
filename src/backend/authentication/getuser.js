@@ -31,7 +31,7 @@ const GetUser = async (phone) => {
 
   try {
     const response = await axios.post(
-      "https://api.weprettify.com/APIs/APIs.asmx/GetProfile",
+      "https://api.hukmee.in/APIs/APIs.asmx/GetProfile",
       formData,
       {
         headers: {
