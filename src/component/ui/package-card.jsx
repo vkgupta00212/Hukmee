@@ -90,17 +90,18 @@ const PackageCardItem = ({
   );
 };
 
-const PackageCard = ({ addToCart, selectedServiceTab }) => {
+const PackageCard = ({ addToCart }) => {
   const [servicePackages, setServicePackages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const selectedServiceTab = 1;
 
   const fetchPackages = useCallback(async () => {
-    if (!selectedServiceTab?.SubCatid) return;
+    if (!selectedServiceTab) return;
     setLoading(true);
     setError(null);
     try {
-      const data = await GetServicePack(selectedServiceTab.SubCatid);
+      const data = await GetServicePack(selectedServiceTab.toString());
       setServicePackages(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error fetching packages:", err);

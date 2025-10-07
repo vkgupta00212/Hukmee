@@ -18,9 +18,10 @@ class GetProductModel {
   }
 }
 
-const GetProduct = async () => {
+const GetProduct = async (type) => {
   const formData = new URLSearchParams();
   formData.append("token", "SWNCMPMSREMXAMCKALVAALI");
+  formData.append("Type", type);
 
   try {
     const response = await axios.post(

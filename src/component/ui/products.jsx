@@ -24,7 +24,7 @@ const ProductScreen = () => {
     const fetchServicesWithImages = async () => {
       try {
         setIsLoading(true);
-        const products = await GetProduct();
+        const products = await GetProduct("Old");
 
         if (!products || products.length === 0) {
           setServices([]);
