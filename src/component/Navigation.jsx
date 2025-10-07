@@ -167,7 +167,7 @@ const Navigation = () => {
                 { to: "/", label: "Home" },
                 { to: "/course", label: "Career" },
                 { to: "/productscreen", label: "New" },
-                { to: "/productscreen", label: "Used" },
+                { to: "/usedproduct", label: "Used" },
               ].map((item) =>
                 item.to.startsWith("#") ? (
                   <a

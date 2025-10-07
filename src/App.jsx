@@ -23,6 +23,7 @@ import ProductMainPage from "./component/ui/productmainpage";
 import CartPage from "./component/ui/cartmainpage";
 import ContactInfo from "./component/ui/contact";
 import ScrollToTop from "./component/context/scrolltop";
+import UsedProduct from "./component/ui/usedproduct";
 
 const queryClient = new QueryClient();
 
@@ -96,6 +97,7 @@ const App = () => {
               <Route path="/productmainpage" element={<ProductMainPage />} />
               <Route path="/cartpage" element={<CartPage />} />
               <Route path="/contact" element={<ContactInfo />} />
+              <Route path="/usedproduct" element={<UsedProduct />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Layout>

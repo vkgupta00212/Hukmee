@@ -9,7 +9,7 @@ import { AlertCircle, ShoppingCart } from "lucide-react";
 import { FiSearch } from "react-icons/fi";
 import SearchCard from "./searchcard";
 
-const ProductScreen = () => {
+const UsedProduct = () => {
   const [services, setServices] = useState([]);
   const [filteredServices, setFilteredServices] = useState([]);
   const [error, setError] = useState(null);
@@ -24,7 +24,7 @@ const ProductScreen = () => {
     const fetchServicesWithImages = async () => {
       try {
         setIsLoading(true);
-        const products = await GetProduct("New");
+        const products = await GetProduct("Old");
 
         if (!products || products.length === 0) {
           setServices([]);
@@ -78,7 +78,6 @@ const ProductScreen = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Filter services based on search term
   useEffect(() => {
     if (!searchTerm) {
       setFilteredServices(services);
@@ -94,7 +93,6 @@ const ProductScreen = () => {
     navigate("/productmainpage", { state: { subService: service } });
   };
 
-  // Skeleton card
   const SkeletonCard = () => (
     <Card className="flex flex-col h-[360px] rounded-lg shadow-lg border animate-pulse">
       <CardContent className="p-0 flex-grow">
@@ -309,4 +307,4 @@ const ProductScreen = () => {
   );
 };
 
-export default ProductScreen;
+export default UsedProduct;

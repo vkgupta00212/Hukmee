@@ -1,30 +1,32 @@
 import React, { useState } from "react";
 import Home from "../pages/Index";
-import SkinAnalyzer from "./ui/skinanalyzer";
-import Services from "../pages/Index";
+import UsedProduct from "./ui/usedproduct";
 import ProductScreen from "./ui/products";
 import UserProfile from "./ui/userprofile";
 import skin from "../assets/skinanalyze.jpg";
+import Colors from "../core/constant";
 
 const navItems = [
   {
-    label: "WP",
+    label: "HM",
     icon: (
-      <div className="text-[10px] w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 text-white flex items-center justify-center rounded-full font-bold text-lg transition-all duration-300 group-hover:scale-110">
-        WP
+      <div
+        className={`text-[10px] w-8 h-8 bg-${Colors.primaryMain} text-white flex items-center justify-center rounded-full font-bold text-lg transition-all duration-300 group-hover:scale-110`}
+      >
+        HM
       </div>
     ),
     component: <Home />,
     notification: false,
   },
   {
-    label: "Skin Analyzer",
+    label: "New",
     icon: <img src={skin} className="h-10" />,
-    component: <SkinAnalyzer />,
+    component: <ProductScreen />,
     notification: false,
   },
   {
-    label: "Products",
+    label: "Used",
     icon: (
       <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
@@ -33,7 +35,7 @@ const navItems = [
         </svg>
       </div>
     ),
-    component: <ProductScreen />,
+    component: <UsedProduct />,
     notification: true,
   },
   {
@@ -83,8 +85,10 @@ const MobileNavbar = () => {
             </div>
             <span
               className={`text-xs mt-2 font-medium transition-colors duration-300 ${
-                activeTab === index ? "font-semibold text-indigo-700" : ""
-              } group-hover:text-indigo-700`}
+                activeTab === index
+                  ? `font-semibold text-${Colors.primaryMain}`
+                  : ""
+              } group-hover:text-${Colors.primaryMain}`}
             >
               {item.label}
             </span>
