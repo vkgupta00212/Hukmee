@@ -90,18 +90,18 @@ const PackageCardItem = ({
   );
 };
 
-const PackageCard = ({ addToCart }) => {
+const PackageCard = ({ addToCart, subService }) => {
   const [servicePackages, setServicePackages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const selectedServiceTab = 1;
+  console.log("recieved subService in PackageCard:", subService);
 
   const fetchPackages = useCallback(async () => {
-    if (!selectedServiceTab) return;
+    if (!subService?.id) return;
     setLoading(true);
     setError(null);
     try {
-      const data = await GetServicePack(selectedServiceTab.toString());
+      const data = await GetServicePack(subService.id || "1");
       setServicePackages(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error fetching packages:", err);
@@ -109,7 +109,7 @@ const PackageCard = ({ addToCart }) => {
     } finally {
       setLoading(false);
     }
-  }, [selectedServiceTab]);
+  }, []);
 
   useEffect(() => {
     fetchPackages();
