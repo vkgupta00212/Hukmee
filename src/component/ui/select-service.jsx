@@ -1,4 +1,3 @@
-// SelectColorCardSection.jsx
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "../ui/card";
 import GetColortab from "../../backend/selectcolor/getcolortab";
@@ -34,26 +33,36 @@ const SelectColorCardItem = ({ color, label, isActive, onClick }) => {
   );
 };
 
-const SelectColorCardSection = ({ subService, onColorSelect }) => {
-  const [selectedColor, setSelectedColor] = useState("");
+const SelectColorCardSection = ({
+  subService,
+  onChangeSubService,
+  selectedSubService,
+}) => {
   const [colorTabs, setColorTabs] = useState([]);
+  const [selectedColor, setSelectedColor] = useState("");
 
   useEffect(() => {
     const fetchColorTabs = async () => {
       try {
         const data = await GetColortab(subService?.id || 0);
         setColorTabs(data || []);
+
+        if (data && data.length > 0 && !selectedSubService) {
+          onChangeSubService(data[0]);
+          setSelectedColor(data[0].Colors);
+        }
       } catch (error) {
         console.log("Error fetching color tabs", error);
       }
     };
     fetchColorTabs();
-  }, [subService]);
+  }, [subService, selectedSubService, onChangeSubService]);
 
-  const handleColorSelect = (color) => {
-    setSelectedColor(color);
-    if (onColorSelect) onColorSelect(color); // ✅ send selected color to parent
-  };
+  useEffect(() => {
+    if (selectedSubService) {
+      setSelectedColor(selectedSubService.Colors);
+    }
+  }, [selectedSubService]);
 
   return (
     <div className="w-full sm:w-[350px] md:w-[300px] lg:w-[280px] mx-auto sm:mx-0 bg-white rounded-xl shadow-lg p-4 sm:p-6">
@@ -70,7 +79,10 @@ const SelectColorCardSection = ({ subService, onColorSelect }) => {
             color={item.Colors}
             label={item.label}
             isActive={selectedColor === item.Colors}
-            onClick={() => handleColorSelect(item.Colors)}
+            onClick={() => {
+              setSelectedColor(item.Colors);
+              onChangeSubService(item);
+            }}
           />
         ))}
       </div>

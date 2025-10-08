@@ -90,26 +90,32 @@ const PackageCardItem = ({
   );
 };
 
-const PackageCard = ({ addToCart, subService }) => {
+const PackageCard = ({ addToCart, selectedServiceTab }) => {
   const [servicePackages, setServicePackages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  console.log("recieved subService in PackageCard:", subService);
+
+  console.log(
+    "Received selectedServiceTab in PackageCard:",
+    selectedServiceTab
+  );
 
   const fetchPackages = useCallback(async () => {
-    if (!subService?.id) return;
+    if (!selectedServiceTab?.id) return; // Safety check
     setLoading(true);
     setError(null);
+
     try {
-      const data = await GetServicePack(subService.id || "1");
+      const data = await GetServicePack(selectedServiceTab.id);
       setServicePackages(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error fetching packages:", err);
       setError("Failed to load packages. Please try again later.");
+      setServicePackages([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [selectedServiceTab]);
 
   useEffect(() => {
     fetchPackages();
@@ -128,16 +134,14 @@ const PackageCard = ({ addToCart, subService }) => {
 
         {/* Loading */}
         {loading ? (
-          <div className="flex justify-center items-center h-40 sm:h-48 md:h-56">
+          <div className="flex justify-center items-center h-40 sm:h-48 md:h-56 gap-2">
             <div
               className={`animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-t-2 border-b-2 ${Colors.primaryFrom.replace(
                 "from",
                 "border"
               )}`}
             ></div>
-            <p
-              className={`ml-2 sm:ml-3 ${Colors.textMuted} text-base sm:text-lg`}
-            >
+            <p className={`text-base sm:text-lg ${Colors.textMuted}`}>
               Loading packages...
             </p>
           </div>

@@ -314,13 +314,16 @@ const WomenSaloonIn = () => {
 
         <div className="flex flex-col md:flex-row lg:flex-row gap-4 lg:gap-6 h-full">
           <div className="flex flex-col gap-4 flex-shrink-0">
-            <SelectServiceCardSection subService={subService} />
+            <SelectServiceCardSection
+              subService={subService}
+              selectedSubService={selectedServiceTab}
+              onChangeSubService={(newTab) => setSelectedServiceTab(newTab)}
+            />
 
             {isMobile && (
               <PackageMain
                 addToCart={addToCart}
                 selectedServiceTab={selectedServiceTab}
-                subService={subService}
               />
             )}
 
@@ -339,7 +342,6 @@ const WomenSaloonIn = () => {
               <PackageMain
                 addToCart={addToCart}
                 selectedServiceTab={selectedServiceTab}
-                subService={subService}
               />
             )}
           </div>
