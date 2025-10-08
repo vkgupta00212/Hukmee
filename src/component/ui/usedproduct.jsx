@@ -38,7 +38,10 @@ const UsedProduct = () => {
               const images = await GetProductImage(product.ProID);
               return {
                 ...product,
-                imageUrl: images.length > 0 ? images[0].productImage : spaImage,
+                imageUrl:
+                  images.length > 0
+                    ? `https://api.hukmee.in/${images[0].productImage}`
+                    : spaImage,
               };
             } catch (err) {
               console.error(
