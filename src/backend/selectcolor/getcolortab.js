@@ -1,17 +1,19 @@
 import axios from "axios";
 
-class GetServicesTabModel {
-  constructor(id, Tabname, SubCatid) {
+class GetColorTabModel {
+  constructor(id, Colors, label, colorId) {
     this.id = id;
-    this.Tabname = Tabname;
-    this.SubCatid = SubCatid;
+    this.Colors = Colors;
+    this.label = label;
+    this.colorId = colorId;
   }
 
   static fromJson(json) {
-    return new GetServicesTabModel(
+    return new GetColorTabModel(
       json.id || 0,
-      json.Tabname || "",
-      json.SubCatid || 0
+      json.Colors || "",
+      json.label || 0,
+      json.colorid || ""
     );
   }
 }
@@ -19,12 +21,11 @@ class GetServicesTabModel {
 const GetServicesTab = async (Id) => {
   const formData = new URLSearchParams();
   formData.append("token", "SWNCMPMSREMXAMCKALVAALI");
-  formData.append("id", Id);
-  formData.append("type", "1");
+  formData.append("colorid", Id);
 
   try {
     const response = await axios.post(
-      "https://api.hukmee.in/APIs/APIs.asmx/GetTabs",
+      "https://api.hukmee.in/APIs/APIs.asmx/ShowColors",
       formData,
       {
         headers: {
@@ -41,9 +42,7 @@ const GetServicesTab = async (Id) => {
     }
 
     // Map JSON to model instances
-    const serviceTab = rawData.map((item) =>
-      GetServicesTabModel.fromJson(item)
-    );
+    const serviceTab = rawData.map((item) => GetColorTabModel.fromJson(item));
 
     return serviceTab;
   } catch (error) {

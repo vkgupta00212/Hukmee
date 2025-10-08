@@ -95,7 +95,7 @@ const WomensSalonCard = ({ onClose, service }) => {
             {subServices.map((subService) => (
               <WomensCard
                 key={subService.id}
-                icon={`https://api.weprettify.com/Images/${subService.image}`}
+                icon={`https://api.hukmee.in/${subService.image}`}
                 label={subService.text}
                 onClick={() => handleServiceClick(subService)}
               />

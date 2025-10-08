@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+// SelectColorCardSection.jsx
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "../ui/card";
+import GetColortab from "../../backend/selectcolor/getcolortab";
 import Colors from "../../core/constant";
 
-// Individual color card
 const SelectColorCardItem = ({ color, label, isActive, onClick }) => {
   return (
     <div
@@ -33,20 +34,26 @@ const SelectColorCardItem = ({ color, label, isActive, onClick }) => {
   );
 };
 
-// Main component
-const SelectColorCardSection = () => {
-  const dummyColors = [
-    { color: "red", label: "Red" },
-    { color: "blue", label: "Blue" },
-    { color: "green", label: "Green" },
-    { color: "yellow", label: "Yellow" },
-    { color: "pink", label: "Pink" },
-    { color: "purple", label: "Purple" },
-    { color: "orange", label: "Orange" },
-    { color: "cyan", label: "Cyan" },
-  ];
+const SelectColorCardSection = ({ subService, onColorSelect }) => {
+  const [selectedColor, setSelectedColor] = useState("");
+  const [colorTabs, setColorTabs] = useState([]);
 
-  const [selectedColor, setSelectedColor] = useState(null);
+  useEffect(() => {
+    const fetchColorTabs = async () => {
+      try {
+        const data = await GetColortab(subService?.id || 0);
+        setColorTabs(data || []);
+      } catch (error) {
+        console.log("Error fetching color tabs", error);
+      }
+    };
+    fetchColorTabs();
+  }, [subService]);
+
+  const handleColorSelect = (color) => {
+    setSelectedColor(color);
+    if (onColorSelect) onColorSelect(color); // ✅ send selected color to parent
+  };
 
   return (
     <div className="w-full sm:w-[350px] md:w-[300px] lg:w-[280px] mx-auto sm:mx-0 bg-white rounded-xl shadow-lg p-4 sm:p-6">
@@ -57,13 +64,13 @@ const SelectColorCardSection = () => {
       </h1>
 
       <div className="grid grid-cols-4 sm:grid-cols-3 gap-3">
-        {dummyColors.map((item, index) => (
+        {colorTabs.map((item, index) => (
           <SelectColorCardItem
             key={index}
-            color={item.color}
+            color={item.Colors}
             label={item.label}
-            isActive={selectedColor === item.color}
-            onClick={() => setSelectedColor(item.color)}
+            isActive={selectedColor === item.Colors}
+            onClick={() => handleColorSelect(item.Colors)}
           />
         ))}
       </div>

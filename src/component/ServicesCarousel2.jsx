@@ -79,7 +79,7 @@ const ServicesCarousel2 = () => {
     navigate("/womensaloonIn", { state: { subService: service } });
   };
 
-  const imageBaseUrl = "https://api.weprettify.com/Images/";
+  const imageBaseUrl = "https://api.hukmee.in/";
 
   const SkeletonCard = () => (
     <div className="keen-slider__slide px-2">

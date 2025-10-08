@@ -111,7 +111,7 @@ const PromocardSection = () => {
                 <ServicePromoCard
                   title={service.ServiceName}
                   subtitle={service.duration}
-                  image={spaImage}
+                  image={`https://api.hukmee.in/${service.Image}`}
                 />
               </div>
             ))}

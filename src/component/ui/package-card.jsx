@@ -157,6 +157,7 @@ const PackageCard = ({ addToCart, subService }) => {
               <PackageCardItem
                 key={pkg.id}
                 {...pkg}
+                image={`https://api.hukmee.in/${pkg?.image}`}
                 onAdd={() => addToCart(pkg)}
                 refreshPackages={fetchPackages}
               />
