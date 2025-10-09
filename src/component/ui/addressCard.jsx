@@ -103,13 +103,13 @@ const AddressFormCard = ({ onClose, onSelectAddress }) => {
       }`}
     >
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+        <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent">
           Add New Address
         </h2>
         {!showForm && (
           <button
             onClick={() => setShowForm(true)}
-            className="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="p-2 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
             title="Add New Address"
           >
             <svg
@@ -153,7 +153,7 @@ const AddressFormCard = ({ onClose, onSelectAddress }) => {
                   type="text"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300"
+                  className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
                   required
                 />
               </div>
@@ -167,7 +167,7 @@ const AddressFormCard = ({ onClose, onSelectAddress }) => {
                   rows={3}
                   value={formData.address}
                   onChange={handleChange}
-                  className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300"
+                  className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
                   required
                 ></textarea>
               </div>
@@ -182,7 +182,7 @@ const AddressFormCard = ({ onClose, onSelectAddress }) => {
                     type="text"
                     value={formData.state}
                     onChange={handleChange}
-                    className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300"
+                    className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
                     required
                   />
                 </div>
@@ -196,7 +196,7 @@ const AddressFormCard = ({ onClose, onSelectAddress }) => {
                     type="text"
                     value={formData.city}
                     onChange={handleChange}
-                    className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300"
+                    className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
                     required
                   />
                 </div>
@@ -211,7 +211,7 @@ const AddressFormCard = ({ onClose, onSelectAddress }) => {
                   type="text"
                   value={formData.pincode}
                   onChange={handleChange}
-                  className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300"
+                  className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
                   required
                 />
               </div>
@@ -220,7 +220,7 @@ const AddressFormCard = ({ onClose, onSelectAddress }) => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className={`py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 flex items-center justify-center ${
+                  className={`py-3 px-4 bg-gradient-to-r from-orange-600 to-orange-700 text-white font-semibold rounded-lg hover:from-orange-700 hover:to-orange-800 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-400 flex items-center justify-center ${
                     isLoading ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                 >
@@ -255,7 +255,7 @@ const AddressFormCard = ({ onClose, onSelectAddress }) => {
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="py-3 px-4 text-sm font-medium text-indigo-600 hover:text-indigo-800 bg-indigo-50/50 hover:bg-indigo-100 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                  className="py-3 px-4 text-sm font-medium text-orange-600 hover:text-orange-800 bg-orange-50/50 hover:bg-orange-100 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-300"
                 >
                   Cancel
                 </button>
@@ -277,8 +277,8 @@ const AddressFormCard = ({ onClose, onSelectAddress }) => {
                   key={address.id}
                   className={`p-4 bg-gray-50/50 border rounded-lg shadow-sm cursor-pointer transition-all duration-300 ${
                     selectedAddressId === address.id
-                      ? "border-indigo-500 bg-indigo-50/50"
-                      : "border-gray-200 hover:border-indigo-300"
+                      ? "border-orange-500 bg-orange-50/50"
+                      : "border-gray-200 hover:border-orange-300"
                   }`}
                   onClick={() => handleSelectAddress(address)}
                 >
@@ -303,7 +303,7 @@ const AddressFormCard = ({ onClose, onSelectAddress }) => {
                     </div>
                     {selectedAddressId === address.id && (
                       <svg
-                        className="h-5 w-5 text-indigo-600"
+                        className="h-5 w-5 text-orange-600"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg"
@@ -325,5 +325,4 @@ const AddressFormCard = ({ onClose, onSelectAddress }) => {
     </div>
   );
 };
-
 export default AddressFormCard;

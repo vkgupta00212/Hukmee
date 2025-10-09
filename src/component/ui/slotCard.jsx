@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Colors from "../../core/constant";
 
 const days = [
   { label: "Fri", date: "18", recommended: true },
@@ -23,7 +24,9 @@ const SlotCard = ({ onSelectSlot }) => {
 
   return (
     <div className="bg-white shadow-xl rounded-2xl p-6 sm:p-8 w-full max-w-md mx-auto font-sans transition-all duration-300 hover:shadow-2xl">
-      <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+      <h2
+        className={`text-2xl font-bold mb-6 bg-${Colors.primaryMain} bg-clip-text text-transparent`}
+      >
         When should the professional arrive?
       </h2>
 
@@ -44,14 +47,14 @@ const SlotCard = ({ onSelectSlot }) => {
               onClick={() => setSelectedDay(day.date)}
               className={`flex flex-col items-center px-5 py-3 rounded-lg border transition-all duration-300 hover:scale-105 ${
                 selectedDay === day.date
-                  ? "border-indigo-500 bg-indigo-50 text-indigo-600 shadow-md"
+                  ? "border-orange-500 bg-orange-50 text-orange-600 shadow-md"
                   : "border-gray-200 text-gray-800 hover:bg-gray-50"
               }`}
             >
               <span className="text-sm font-semibold">{day.label}</span>
               <span className="text-lg font-bold">{day.date}</span>
               {day.recommended && (
-                <span className="text-xs text-yellow-500 mt-1 animate-pulse">
+                <span className="text-xs text-orange-500 mt-1 animate-pulse">
                   ★ Recommended
                 </span>
               )}
@@ -71,7 +74,7 @@ const SlotCard = ({ onSelectSlot }) => {
                 onClick={() => setSelectedTime(slot.time)}
                 className={`px-5 py-2.5 rounded-lg border flex items-center justify-center transition-all duration-300 hover:scale-105 ${
                   selectedTime === slot.time
-                    ? "border-indigo-500 bg-indigo-50 text-indigo-600 shadow-md"
+                    ? "border-orange-500 bg-orange-50 text-orange-600 shadow-md"
                     : "border-gray-200 text-gray-800 hover:bg-gray-50"
                 }`}
               >
@@ -85,7 +88,7 @@ const SlotCard = ({ onSelectSlot }) => {
       {/* Proceed Button */}
       <button
         onClick={handleProceed}
-        className="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        className={`w-full py-3 px-4 bg-${Colors.primaryMain} text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-400`}
       >
         Proceed to Checkout
       </button>

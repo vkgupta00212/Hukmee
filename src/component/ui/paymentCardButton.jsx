@@ -2,6 +2,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { Sparkles } from "lucide-react";
 import GetOrder from "../../backend/order/getorderid";
+import Colors from "../../core/constant";
 
 const PaymentCardButton = ({
   itemTotal = 0,
@@ -61,8 +62,8 @@ const PaymentCardButton = ({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50">
-            <Sparkles className="w-5 h-5 text-indigo-600" />
+          <div className={`p-3 rounded-xl bg-orange-50`}>
+            <Sparkles className="w-5 h-5 text-orange-600" />
           </div>
           <div>
             <h3 className="text-lg font-bold text-gray-900">Payment Summary</h3>
@@ -71,7 +72,7 @@ const PaymentCardButton = ({
         </div>
         <div className="text-right">
           <div className="text-sm text-gray-500">Subtotal</div>
-          <div className="text-lg font-semibold text-indigo-600">
+          <div className="text-lg font-semibold text-orange-600">
             {fmt(finalTotal)}
           </div>
         </div>
@@ -90,7 +91,7 @@ const PaymentCardButton = ({
           <div className="text-sm text-gray-500">
             Subtotal ({totalItems} items)
           </div>
-          <div className="text-lg font-semibold text-indigo-600">
+          <div className="text-lg font-semibold text-orange-600">
             {fmt(finalTotal)}
           </div>
         </div>

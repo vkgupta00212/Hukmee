@@ -302,7 +302,7 @@ const PaymentPage = () => {
                 <div className="mt-4 flex justify-end">
                   <button
                     onClick={() => setShowAddressModal(false)}
-                    className="px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition"
+                    className="px-4 py-2 text-sm font-medium text-orange-600 hover:text-orange-800 bg-orange-50 hover:bg-orange-100 rounded-lg transition"
                   >
                     Cancel
                   </button>
@@ -336,7 +336,7 @@ const PaymentPage = () => {
                 <div className="mt-4 flex justify-end">
                   <button
                     onClick={() => setShowSlotModal(false)}
-                    className="px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition"
+                    className="px-4 py-2 text-sm font-medium text-orange-600 hover:text-orange-800 bg-orange-50 hover:bg-orange-100 rounded-lg transition"
                   >
                     Close
                   </button>

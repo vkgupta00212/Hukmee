@@ -5,6 +5,7 @@ import { IoIosTime } from "react-icons/io";
 import { MdPayment } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { MdEdit } from "react-icons/md";
+import Colors from "../../core/constant";
 
 const PaymentCard = ({
   onSelectAddress,
@@ -34,7 +35,7 @@ const PaymentCard = ({
     <div className="flex items-center gap-4 mb-3">
       <Card className="w-12 h-12 rounded-xl border border-gray-100 shadow-sm bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center">
         <CardContent className="p-0 w-full h-full flex items-center justify-center">
-          <Icon className="w-6 h-6 text-indigo-600" />
+          <Icon className={`w-6 h-6 text-${Colors.primaryMain}`} />
         </CardContent>
       </Card>
       <span className="text-lg font-semibold text-gray-900">{title}</span>
@@ -56,7 +57,7 @@ const PaymentCard = ({
         <div className="flex items-center gap-4">
           <Card className="w-12 h-12 rounded-xl border border-gray-100 bg-gradient-to-br from-green-50 to-teal-50 flex items-center justify-center">
             <CardContent className="p-0 w-full h-full flex items-center justify-center">
-              <FaLocationDot className="w-6 h-6 text-green-600" />
+              <FaLocationDot className={`w-6 h-6 text-green-600`} />
             </CardContent>
           </Card>
           <div>
@@ -77,7 +78,7 @@ const PaymentCard = ({
           {selectedAddress ? (
             <div
               onClick={onSelectAddress}
-              className="mt-3 p-4 bg-white border border-indigo-200 rounded-lg shadow-sm cursor-pointer hover:shadow-md hover:border-indigo-400 transition-all duration-300"
+              className="mt-3 p-4 bg-white border border-orange-200 rounded-lg shadow-sm cursor-pointer hover:shadow-md hover:border-orange-400 transition-all duration-300"
             >
               <p className="text-sm font-medium text-gray-800">
                 <strong>Name:</strong> {selectedAddress.Name}
@@ -89,7 +90,7 @@ const PaymentCard = ({
           ) : (
             <button
               onClick={onSelectAddress}
-              className="w-full mt-3 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-medium shadow hover:shadow-lg hover:from-indigo-700 hover:to-purple-700 focus:ring-2 focus:ring-indigo-300 transition-all"
+              className={`w-full mt-3 py-3 bg-${Colors.primaryMain} text-white rounded-lg font-medium shadow hover:shadow-lg hover:from-indigo-700 hover:to-purple-700 focus:ring-2 focus:ring-indigo-300 transition-all`}
             >
               Select an Address
             </button>
@@ -126,7 +127,7 @@ const PaymentCard = ({
               className={`w-full mt-3 py-3 rounded-lg font-medium shadow transition-all focus:ring-2 focus:ring-indigo-300 ${
                 isSlotButtonDisabled
                   ? "bg-gray-300 cursor-not-allowed text-gray-500"
-                  : "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-lg hover:from-indigo-700 hover:to-purple-700"
+                  : `bg-${Colors.primaryMain} text-white hover:shadow-lg hover:from-indigo-700 hover:to-purple-700`
               }`}
             >
               Select Slot
@@ -145,7 +146,7 @@ const PaymentCard = ({
             className={`w-full mt-3 py-3 rounded-lg font-medium shadow transition-all focus:ring-2 focus:ring-indigo-300 ${
               isPaymentButtonDisabled
                 ? "bg-gray-300 cursor-not-allowed text-gray-500"
-                : "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-lg hover:from-indigo-700 hover:to-purple-700"
+                : `bg-${Colors.primaryMain} text-white hover:shadow-lg hover:from-indigo-700 hover:to-purple-700`
             }`}
           >
             {getPaymentButtonLabel()}
@@ -205,7 +206,7 @@ const PaymentCard = ({
               onProceedPayment();
             }
           }}
-          className={`w-full py-3 rounded-lg font-medium shadow transition-all focus:ring-2 focus:ring-indigo-300 ${"bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-lg hover:from-indigo-700 hover:to-purple-700"}`}
+          className={`w-full py-3 rounded-lg font-medium shadow transition-all focus:ring-2 focus:ring-orange-300 ${`bg-${Colors.primaryMain} text-white hover:shadow-lg hover:from-indigo-700 hover:to-purple-700`}`}
         >
           {getPaymentButtonLabel()}
         </button>

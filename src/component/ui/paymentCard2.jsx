@@ -4,6 +4,7 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import GetOrder from "../../backend/order/getorderid";
 import UpdateQuantity from "../../backend/order/updateorder";
 import DeleteOrder from "../../backend/order/deleteorder";
+import Colors from "../../core/constant";
 
 const PaymentCard2 = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -72,7 +73,9 @@ const PaymentCard2 = () => {
 
   return (
     <div className="w-full max-w-md mx-auto p-4 sm:p-5 bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
-      <h2 className="text-lg sm:text-xl font-bold mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+      <h2
+        className={`text-lg sm:text-xl font-bold mb-4 bg-${Colors.primaryMain} bg-clip-text text-transparent`}
+      >
         Your Cart
       </h2>
 
@@ -104,7 +107,7 @@ const PaymentCard2 = () => {
             </div>
 
             <div className="flex flex-col items-end">
-              <div className="flex items-center border border-indigo-200 bg-indigo-50 rounded-full px-2 py-1 gap-2 text-xs font-medium hover:border-indigo-300 transition-all">
+              <div className="flex items-center border border-orange-200 bg-orange-50 rounded-full px-2 py-1 gap-2 text-xs font-medium hover:border-indigo-300 transition-all">
                 <span className="w-5 text-center font-semibold">
                   {item.Quantity}
                 </span>
@@ -125,7 +128,7 @@ const PaymentCard2 = () => {
       {cartItems.length > 0 && (
         <div className="mt-4 text-right">
           <p className="text-lg font-semibold">
-            Total: <span className="text-indigo-600">₹{totalPrice}</span>
+            Total: <span className="text-orange-600">₹{totalPrice}</span>
           </p>
         </div>
       )}
