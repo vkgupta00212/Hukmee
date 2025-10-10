@@ -6,6 +6,7 @@ import MainImage from "./ui/image-grid";
 import WomensSalonCard from "./ui/womensaloonCard";
 import MobileHeader from "./ui/mobileheader";
 import SpecialForYou from "./ui/specialyforyou";
+import MobileDetect from "./ui/mobiledetect";
 
 const HeroSection = () => {
   const [activeModal, setActiveModal] = useState(null);
@@ -39,6 +40,7 @@ const HeroSection = () => {
           {/* Left */}
           <div className="w-full lg:w-[95%] flex flex-col items-center lg:items-start text-center lg:text-left gap-1 ">
             {isMobile && <MobileHeader />}
+            <MobileDetect />
             <ServiceCard onServiceSelect={handleServiceClick} />
           </div>
 

@@ -69,7 +69,7 @@ const ServiceCardSection = ({ onServiceSelect }) => {
 
   return (
     <div
-      className={`w-full flex flex-col items-start sm:px-6 md:px-8 lg:px-12 font-sans ${Colors.bgGray} py-1`}
+      className={`w-full flex flex-col items-start sm:px-6 md:px-8 lg:px-12 font-sans border border-gray-300 rounded-[10px] py-1`}
     >
       <div className="w-full max-w-7xl">
         <div
