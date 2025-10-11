@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Colors from "../../core/constant";
 import { MdVerified, MdBuild, MdSchedule, MdShield } from "react-icons/md";
-import { RiUserSettingsFill, GrShieldSecurity } from "react-icons/ri";
+import { RiUserSettingsFill } from "react-icons/ri";
+import { GrShieldSecurity } from "react-icons/gr";
 
 const WhyUs = () => {
   const [isMobile, setIsMobile] = useState(false);
