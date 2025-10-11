@@ -8,6 +8,7 @@ import BecomeWePretiffyCard from "../component/ui/becomeweprettifycard";
 import SpecialForYou from "../component/ui/specialyforyou";
 import Footer from "../component/Footer";
 import RatingScreen from "../component/ui/ratingscreen";
+import WhyUs from "../component/ui/whyus";
 
 const LazyServicesCarousel2 = lazy(() =>
   import("../component/ServicesCarousel2")
@@ -64,6 +65,11 @@ const Index = () => {
     <div className="min-h-screen">
       <section className="relative bg-white">
         <HeroSection />
+      </section>
+      <section className="bg-white">
+        <div className="">
+          <WhyUs />
+        </div>
       </section>
 
       {/* Promotions Section */}
