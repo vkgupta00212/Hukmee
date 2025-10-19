@@ -61,7 +61,7 @@ const PromocardSection = () => {
         <div className="max-w-7xl mx-auto px-6">
           <div className="mb-10">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 tracking-tight">
-              Explore Popular Accessories & Services
+              Explore Popular Services
             </h2>
           </div>
           <div>No services available</div>
@@ -79,7 +79,7 @@ const PromocardSection = () => {
         {/* Section Header */}
         <div className="mb-3">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800 tracking-tight">
-            Explore Popular Accessories & Services
+            Explore Popular Services
           </h2>
         </div>
 
@@ -111,7 +111,13 @@ const PromocardSection = () => {
                 <ServicePromoCard
                   title={service.servicename}
                   subtitle={service.duration}
-                  image={`https://api.hukmee.in/${service.image}`}
+                  image={
+                    service.image
+                      ? service.image.startsWith("http")
+                        ? service.image
+                        : `https://api.hukmee.in/${service.image}`
+                      : spaImage
+                  }
                 />
               </div>
             ))}

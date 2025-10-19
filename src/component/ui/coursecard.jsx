@@ -4,6 +4,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import GetServicePack from "../../backend/servicepack/getservicepack";
 import Colors from "../../core/constant";
 
+// Base API image URL
+const imageBaseUrl = "https://api.hukmee.in/";
+const fallbackImage = "https://via.placeholder.com/400x300?text=Course+Image"; // fallback image
+
 // Package Card Component
 const PackageCardItem = ({
   image,
@@ -28,16 +32,21 @@ const PackageCardItem = ({
     >
       <div className="relative overflow-hidden">
         <img
-          src={image}
+          src={image || fallbackImage}
           alt={servicename}
           className="w-full h-40 sm:h-48 md:h-52 lg:h-56 object-cover transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
+          onError={(e) => {
+            e.currentTarget.src = fallbackImage;
+          }}
         />
-        <div
-          className={`absolute top-2 right-2 bg-${Colors.primaryMain} text-white px-2 py-1 rounded-full text-xs font-medium shadow-sm`}
-        >
-          {duration}
-        </div>
+        {duration && (
+          <div
+            className={`absolute top-2 right-2 bg-${Colors.primaryMain} text-white px-2 py-1 rounded-full text-xs font-medium shadow-sm`}
+          >
+            {duration}
+          </div>
+        )}
         {discountfee && (
           <div className="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium shadow-sm">
             Save ₹{Number(fees - discountfee).toFixed(0)}
@@ -83,7 +92,14 @@ const CourseCard = () => {
       setLoading(true);
       try {
         const data = await GetServicePack("1", "Courses");
-        setServicePackages(data);
+
+        // 🟢 Attach full image URL to each package
+        const updatedData = data.map((pkg) => ({
+          ...pkg,
+          image: pkg.image ? `${imageBaseUrl}${pkg.image}` : fallbackImage,
+        }));
+
+        setServicePackages(updatedData);
       } catch (error) {
         console.error("Error fetching packages:", error);
       } finally {
@@ -106,7 +122,7 @@ const CourseCard = () => {
   };
 
   return (
-    <section className="w-full bg-gradient-to-b from-blue-50 to-gray-50 p-5 ">
+    <section className="w-full bg-gradient-to-b from-blue-50 to-gray-50 p-5">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           variants={headerVariants}

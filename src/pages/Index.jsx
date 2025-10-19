@@ -13,9 +13,9 @@ import WhyUs from "../component/ui/whyus";
 const LazyServicesCarousel2 = lazy(() =>
   import("../component/ServicesCarousel2")
 );
-const LazyServicesCarousel4 = lazy(() =>
-  import("../component/ServicesCarousel4")
-);
+// const LazyServicesCarousel4 = lazy(() =>
+//   import("../component/ServicesCarousel4")
+// );
 const LazyBecomeWePretiffyCard = lazy(() =>
   import("../component/ui/becomeweprettifycard")
 );
@@ -182,7 +182,7 @@ const Index = () => {
       <section className="py-1 sm:py-16 bg-gray-50">
         <Suspense fallback={<div />}>
           <LazyServicesCarousel2 />
-          <LazyServicesCarousel4 />
+          {/* <LazyServicesCarousel4 /> */}
         </Suspense>
       </section>
 
