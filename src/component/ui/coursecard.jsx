@@ -82,7 +82,7 @@ const CourseCard = () => {
     const fetchPackages = async () => {
       setLoading(true);
       try {
-        const data = await GetServicePack("2");
+        const data = await GetServicePack("1", "Courses");
         setServicePackages(data);
       } catch (error) {
         console.error("Error fetching packages:", error);
