@@ -33,7 +33,7 @@ const OtpVerification = ({ onClose, onVerify }) => {
     return () => document.body.classList.remove("overflow-hidden");
   }, []);
 
-  // Focus trap
+  // Focus trap for modal
   useEffect(() => {
     if (!modalRef.current) return;
     const modalElement = modalRef.current;
@@ -59,14 +59,13 @@ const OtpVerification = ({ onClose, onVerify }) => {
     return () => modalElement.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Timer
+  // Timer countdown
   useEffect(() => {
     if (timeLeft <= 0) return;
     const timer = setInterval(() => setTimeLeft((t) => t - 1), 1000);
     return () => clearInterval(timer);
   }, [timeLeft]);
 
-  // Handle input change
   const handleChange = (element, index) => {
     const value = element.value.replace(/\D/, "");
     let newOtp = [...otp];
@@ -78,7 +77,6 @@ const OtpVerification = ({ onClose, onVerify }) => {
     }
   };
 
-  // Handle backspace
   const handleKeyDown = (e, index) => {
     if (e.key === "Backspace") {
       e.preventDefault();
@@ -94,7 +92,6 @@ const OtpVerification = ({ onClose, onVerify }) => {
     }
   };
 
-  // Resend OTP
   const handleResend = () => {
     setOtp(new Array(6).fill(""));
     setTimeLeft(30);
@@ -118,25 +115,23 @@ const OtpVerification = ({ onClose, onVerify }) => {
     try {
       const userData = await GetUser(phone);
 
-      if (userData && userData.length > 0) {
-        console.log("User already registered");
+      if (userData && userData.length > 0 && userData[0].Fullname) {
+        // ✅ Existing user found
+        console.log("User already registered:", userData[0]);
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userPhone", phone);
+        alert("✅ Welcome back, " + userData[0].Fullname + "!");
+        window.location.reload();
       } else {
+        // 🆕 New user — register them
         await RegisterUser(phone);
         console.log("Registration successful");
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userPhone", phone);
+        alert("✅ Login successful! Please complete your registration.");
+        navigate("/register"); // 🔹 redirect to registration page
       }
 
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userPhone", phone);
-
-      alert("✅ Login successful!");
-
-      // 🔴 This line needs to be updated:
-      // navigate("/", { replace: true });
-
-      // ✅ Replace with:
-      window.location.href = "/";
-
-      // Close modal if using popup
       onClose && onClose();
     } catch (error) {
       console.error("Error during verification:", error);
@@ -175,10 +170,11 @@ const OtpVerification = ({ onClose, onVerify }) => {
     );
   }
 
+  // 🟢 Modal / Bottom Sheet rendering (same as before)
   return (
     <AnimatePresence>
       {isMobile ? (
-        // Mobile bottom sheet
+        // --- Mobile bottom sheet ---
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -258,7 +254,7 @@ const OtpVerification = ({ onClose, onVerify }) => {
           </motion.div>
         </motion.div>
       ) : (
-        // Desktop modal
+        // --- Desktop modal ---
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

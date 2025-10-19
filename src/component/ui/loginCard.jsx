@@ -29,7 +29,6 @@ const LoginCard = ({ onClose, onSubmit }) => {
   const isMobile = width < 640; // Tailwind 'sm' breakpoint
   const modalRef = useRef(null);
 
-  // ✅ Trap focus inside modal
   useEffect(() => {
     const modalElement = modalRef.current;
     if (!modalElement) return;
@@ -165,7 +164,7 @@ const LoginCard = ({ onClose, onSubmit }) => {
               disabled={!isValid || loading}
               className={`w-full py-3 px-4 rounded-lg font-semibold transition-all ${
                 isValid && !loading
-                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700"
+                  ? `bg-${Colors.primaryMain} text-white hover:from-indigo-700 hover:to-purple-700`
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
             >
