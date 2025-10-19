@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import RegisterUser from "../../backend/authentication/register";
 import Color from "../../core/constant";
+import Colors from "../../core/constant";
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -12,8 +13,6 @@ const RegisterPage = () => {
     dob: "",
   });
   const [errors, setErrors] = useState({});
-  const [preview, setPreview] = useState(null);
-  const [imageBase64, setImageBase64] = useState("");
   const formRef = useRef(null);
   const navigate = useNavigate();
   const phone = localStorage.getItem("userPhone");
@@ -46,31 +45,13 @@ const RegisterPage = () => {
     return () => formElement.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Handle text input changes
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle image upload
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const previewUrl = URL.createObjectURL(file);
-      const reader = new FileReader();
-      reader.onload = () => {
-        const base64String = reader.result.replace(
-          /^data:image\/[a-zA-Z]+;base64,/,
-          ""
-        );
-        setImageBase64(base64String);
-        setPreview(previewUrl);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  // Validate input fields
+  // Validate form
   const validateForm = () => {
     const newErrors = {};
     if (!formData.fullname.trim()) newErrors.fullname = "Full name is required";
@@ -78,7 +59,6 @@ const RegisterPage = () => {
       newErrors.email = "Valid email is required";
     if (!formData.gender) newErrors.gender = "Gender is required";
     if (!formData.dob.trim()) newErrors.dob = "Date of birth is required";
-    if (!imageBase64) newErrors.image = "Image is required";
     return newErrors;
   };
 
@@ -92,8 +72,10 @@ const RegisterPage = () => {
     }
 
     try {
+      console.log("Submitting data:", formData);
+
       const result = await RegisterUser(
-        "",
+        "", // No image for now
         "Register",
         formData.fullname,
         phone,
@@ -104,12 +86,12 @@ const RegisterPage = () => {
 
       console.log("Register API Response:", result);
 
-      if (result?.includes("success") || result?.includes("Success")) {
+      // ✅ Handle JSON response
+      if (result?.message === "Successfully Registered!") {
         alert("Registered successfully!");
-        navigate("/");
         window.location.reload();
       } else {
-        alert("Registration failed. Please try again.");
+        alert(result?.message || "Registration failed. Please try again.");
       }
     } catch (error) {
       console.error("Submit Error:", error);
@@ -133,7 +115,7 @@ const RegisterPage = () => {
 
         {/* Title */}
         <h2
-          className={`text-2xl sm:text-3xl font-bold text-center bg-${Color.primaryMain} bg-clip-text text-transparent mb-6`}
+          className={`text-2xl sm:text-3xl font-bold text-center text-[${Color.primaryMain}] mb-6`}
         >
           Register
         </h2>
@@ -142,9 +124,7 @@ const RegisterPage = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Full Name */}
           <div>
-            <label
-              className={`block text-sm font-medium text-${Color.primaryMain}`}
-            >
+            <label className="block text-sm font-medium text-gray-700">
               Full Name
             </label>
             <input
@@ -153,7 +133,7 @@ const RegisterPage = () => {
               value={formData.fullname}
               onChange={handleChange}
               placeholder="Enter full name"
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {errors.fullname && (
               <p className="text-red-600 text-sm">{errors.fullname}</p>
@@ -162,9 +142,7 @@ const RegisterPage = () => {
 
           {/* Email */}
           <div>
-            <label
-              className={`block text-sm font-medium text-${Color.primaryMain}`}
-            >
+            <label className="block text-sm font-medium text-gray-700">
               Email
             </label>
             <input
@@ -173,7 +151,7 @@ const RegisterPage = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="Enter email"
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {errors.email && (
               <p className="text-red-600 text-sm">{errors.email}</p>
@@ -182,16 +160,14 @@ const RegisterPage = () => {
 
           {/* Gender */}
           <div>
-            <label
-              className={`block text-sm font-medium text-${Color.primaryMain}`}
-            >
+            <label className="block text-sm font-medium text-gray-700">
               Gender
             </label>
             <select
               name="gender"
               value={formData.gender}
               onChange={handleChange}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select gender</option>
               <option value="male">Male</option>
@@ -205,9 +181,7 @@ const RegisterPage = () => {
 
           {/* Date of Birth */}
           <div>
-            <label
-              className={`block text-sm font-medium text-${Color.primaryMain}`}
-            >
+            <label className="block text-sm font-medium text-gray-700">
               Date of Birth
             </label>
             <input
@@ -215,7 +189,7 @@ const RegisterPage = () => {
               name="dob"
               value={formData.dob}
               onChange={handleChange}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {errors.dob && <p className="text-red-600 text-sm">{errors.dob}</p>}
           </div>
@@ -223,7 +197,7 @@ const RegisterPage = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className={`w-full py-3 bg-${Color.primaryMain} text-white rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300`}
+            className={`w-full py-3 bg-${Colors.primaryMain} text-white rounded-lg font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg transition-all duration-300`}
           >
             Register
           </button>
