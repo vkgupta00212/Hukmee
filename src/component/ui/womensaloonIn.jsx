@@ -10,7 +10,7 @@ import GetOrderid from "../../backend/order/getorderid";
 import InsertOrder from "../../backend/order/insertorder";
 import LoginCard from "./loginCard";
 import OtpVerification from "./otpverification";
-import colors from "../../core/constant";
+import Accesories from "./accessories";
 import Colors from "../../core/constant";
 
 const WomenSaloonIn = () => {
@@ -285,11 +285,11 @@ const WomenSaloonIn = () => {
     <div className="pt-[20px] px-1 md:px-6 lg:px-[120px] md:mt-[100px] lg:mt-[130px]">
       <div className="relative flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 px-4 sm:px-6 pt-16">
         {/* Header with Back Button and Title */}
-        <div className="fixed top-0 left-0 w-full bg-white shadow-md z-10 border-b border-gray-200">
+        <div className="md:hidden fixed top-0 left-0 w-full bg-white shadow-md z-10 border-b border-gray-200">
           <div className="flex items-center justify-start px-4 py-3 sm:px-6">
             <button
               onClick={() => navigate(-1)}
-              className="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-400"
               aria-label="Go back"
             >
               <svg
@@ -307,7 +307,9 @@ const WomenSaloonIn = () => {
                 />
               </svg>
             </button>
-            <h2 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <h2
+              className={`text-xl sm:text-3xl font-bold bg-${Colors.primaryMain} bg-clip-text text-transparent`}
+            >
               Packages
             </h2>
           </div>
@@ -338,13 +340,24 @@ const WomenSaloonIn = () => {
             )}
           </div>
 
-          <div className="flex-grow max-h-[calc(100vh-200px)] overflow-y-auto hide-scrollbar px-[1px] sm:px-[1px]">
-            {!isMobile && (
-              <PackageMain
-                addToCart={addToCart}
-                selectedServiceTab={selectedServiceTab}
-              />
-            )}
+          <div className="flex flex-col gap-5">
+            <div className="flex-grow max-h-[calc(100vh-200px)] overflow-y-auto hide-scrollbar px-[1px] sm:px-[1px]">
+              {!isMobile && (
+                <PackageMain
+                  addToCart={addToCart}
+                  selectedServiceTab={selectedServiceTab}
+                />
+              )}
+            </div>
+
+            <div className="flex-grow max-h-[calc(100vh-200px)] overflow-y-auto hide-scrollbar px-[1px] sm:px-[1px]">
+              {!isMobile && (
+                <Accesories
+                  addToCart={addToCart}
+                  selectedServiceTab={selectedServiceTab}
+                />
+              )}
+            </div>
           </div>
 
           {isLaptop && (

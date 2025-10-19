@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "./card";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import spaImage from "../../assets/facialimg.png";
+import spaImage from "../../assets/imageforback.jpg";
 import GetProduct from "../../backend/getproduct/getproduct";
 import GetProductImage from "../../backend/getproduct/getproductimage";
 import { AlertCircle, ShoppingCart } from "lucide-react";
 import { FiSearch } from "react-icons/fi";
 import SearchCard from "./searchcard";
+import Colors from "../../core/constant";
 
 const ProductScreen = () => {
   const [services, setServices] = useState([]);
@@ -130,7 +131,7 @@ const ProductScreen = () => {
       <div className="max-w-7xl mx-auto px-1 sm:px-6 lg:px-8">
         {/* Header + Search Card */}
         {isMobile && (
-          <div className="fixed top-0 left-0 w-full bg-white shadow-md z-10 border-b border-gray-200">
+          <div className="md:hidden fixed top-0 left-0 w-full bg-white shadow-md z-10 border-b border-gray-200">
             <div className="flex items-center justify-start p-3 sm:px-6">
               <motion.button
                 whileHover={{ scale: 1.1 }}
@@ -154,7 +155,9 @@ const ProductScreen = () => {
                   />
                 </svg>
               </motion.button>
-              <h2 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <h2
+                className={`text-xl sm:text-3xl font-bold bg-${Colors.primaryMain} bg-clip-text text-transparent`}
+              >
                 Products
               </h2>
             </div>
