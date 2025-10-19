@@ -4,7 +4,7 @@ import "keen-slider/keen-slider.min.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import spaImage from "../assets/women_sal.png";
 import ServicePromoCard from "./ui/promocard-section";
-import GetPopularServices from "../backend/men_women_popular/getpopularservices";
+import GetServicePack from "../backend/servicepack/getservicepack";
 
 const PromocardSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -14,7 +14,7 @@ const PromocardSection = () => {
 
   useEffect(() => {
     const fetchPopularServices = async () => {
-      const response = await GetPopularServices();
+      const response = await GetServicePack("1", "Service");
       setServices(response ?? []);
     };
     fetchPopularServices();
@@ -61,7 +61,7 @@ const PromocardSection = () => {
         <div className="max-w-7xl mx-auto px-6">
           <div className="mb-10">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 tracking-tight">
-              Explore Popular Services
+              Explore Popular Accessories & Services
             </h2>
           </div>
           <div>No services available</div>
@@ -79,7 +79,7 @@ const PromocardSection = () => {
         {/* Section Header */}
         <div className="mb-3">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800 tracking-tight">
-            Explore Popular Services
+            Explore Popular Accessories & Services
           </h2>
         </div>
 
@@ -109,9 +109,9 @@ const PromocardSection = () => {
             {services.map((service, index) => (
               <div key={index} className="keen-slider__slide">
                 <ServicePromoCard
-                  title={service.ServiceName}
+                  title={service.servicename}
                   subtitle={service.duration}
-                  image={`https://api.hukmee.in/${service.Image}`}
+                  image={`https://api.hukmee.in/${service.image}`}
                 />
               </div>
             ))}

@@ -5,7 +5,7 @@ import { Card, CardContent } from "../component/ui/card";
 import { ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import spaImage from "../assets/facialimg.png";
-import GetWomenServices from "../backend/men_women_popular/getwomenservices";
+import GetServicePack from "../backend/servicepack/getservicepack";
 
 const ServicesCarousel2 = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -60,7 +60,7 @@ const ServicesCarousel2 = () => {
     const fetchServices = async () => {
       try {
         setIsLoading(true);
-        const data = await GetWomenServices();
+        const data = await GetServicePack("1", "Accesories");
         setServices(data || []);
         setError(null);
       } catch (err) {
@@ -165,7 +165,7 @@ const ServicesCarousel2 = () => {
                       </CardContent>
                       <div className="px-4 py-3">
                         <span className="text-base font-medium text-gray-900 truncate block">
-                          {service.text}
+                          {service.servicename}
                         </span>
                       </div>
                     </Card>

@@ -89,6 +89,7 @@ const RegisterPage = () => {
       // ✅ Handle JSON response
       if (result?.message === "Successfully Registered!") {
         alert("Registered successfully!");
+        navigate("/");
         window.location.reload();
       } else {
         alert(result?.message || "Registration failed. Please try again.");
@@ -133,7 +134,7 @@ const RegisterPage = () => {
               value={formData.fullname}
               onChange={handleChange}
               placeholder="Enter full name"
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-${Color.primaryMain}`}
             />
             {errors.fullname && (
               <p className="text-red-600 text-sm">{errors.fullname}</p>
@@ -151,7 +152,7 @@ const RegisterPage = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="Enter email"
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-${Color.primaryMain}`}
             />
             {errors.email && (
               <p className="text-red-600 text-sm">{errors.email}</p>
@@ -167,7 +168,7 @@ const RegisterPage = () => {
               name="gender"
               value={formData.gender}
               onChange={handleChange}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-${Color.primaryMain}`}
             >
               <option value="">Select gender</option>
               <option value="male">Male</option>
@@ -189,7 +190,7 @@ const RegisterPage = () => {
               name="dob"
               value={formData.dob}
               onChange={handleChange}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-${Color.primaryMain}`}
             />
             {errors.dob && <p className="text-red-600 text-sm">{errors.dob}</p>}
           </div>
@@ -197,7 +198,7 @@ const RegisterPage = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className={`w-full py-3 bg-${Colors.primaryMain} text-white rounded-lg font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg transition-all duration-300`}
+            className={`w-full py-3 bg-${Colors.primaryMain} text-white rounded-lg font-semibold shadow-md hover:bg-${Colors.primaryMain} hover:shadow-lg transition-all duration-300`}
           >
             Register
           </button>

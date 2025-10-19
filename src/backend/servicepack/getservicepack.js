@@ -24,11 +24,11 @@ class GetServicePackModel {
   }
 }
 
-const GetServicePack = async (id) => {
+const GetServicePack = async (id, type) => {
   const formData = new URLSearchParams();
   formData.append("token", "SWNCMPMSREMXAMCKALVAALI");
-  formData.append("id", id); // You can replace with dynamic value if needed
-  formData.append("type", "1");
+  formData.append("id", id);
+  formData.append("type", type);
 
   try {
     const response = await axios.post(

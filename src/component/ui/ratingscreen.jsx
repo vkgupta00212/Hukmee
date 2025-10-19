@@ -1,7 +1,6 @@
 import React from "react";
 import Colors from "../../core/constant";
 
-// Star rating component
 const StarRating = ({ rating }) => {
   const numericRating = parseFloat(rating) || 0;
   const fullStars = Math.floor(numericRating);
@@ -26,7 +25,7 @@ const StarRating = ({ rating }) => {
           fill="currentColor"
           viewBox="0 0 20 20"
         >
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.357 2.44a1 1 0 00-.364 1.118l1.287 3.957c.3.921-.755 1.688-1.539 1.118l-3.357-2.44a1 1 0 00-.588-.176V2.927z" />
+          <path d="M9.049 2.927v14.146l3.357-2.44c.784-.57 1.839.197 1.539 1.118l-1.287-3.957a1 1 0 01.364-1.118l3.357-2.44c.783-.57.381-1.81-.588-1.81h-4.162a1 1 0 01-.95-.69L9.049 2.927z" />
         </svg>
       )}
       {[...Array(emptyStars)].map((_, i) => (
@@ -46,7 +45,6 @@ const StarRating = ({ rating }) => {
   );
 };
 
-// Rating screen
 const RatingScreen = ({ reviews }) => {
   const averageRating =
     reviews.length > 0
@@ -57,9 +55,9 @@ const RatingScreen = ({ reviews }) => {
       : "No ratings";
 
   return (
-    <div className="bg-white shadow-xl border border-gray-200 rounded-2xl p-6 max-w-6xl mx-auto">
+    <div className="bg-white shadow-xl border border-gray-200 rounded-2xl p-6 max-w-7xl mx-auto">
       <h3
-        className={`text-xl md:text-2xl font-semibold bg-${Colors.primaryMain} bg-clip-text text-transparent mb-4`}
+        className={`text-xl md:text-2xl font-semibold text-${Colors.primaryMain} mb-4`}
       >
         Reviews
       </h3>
@@ -69,21 +67,16 @@ const RatingScreen = ({ reviews }) => {
         {averageRating === "No ratings" ? (
           <p className="text-gray-600 text-sm">No ratings yet</p>
         ) : (
-          <>
-            <StarRating rating={averageRating} />
-            <span className="ml-2 text-gray-600 text-sm">
-              ({reviews.length} {reviews.length === 1 ? "review" : "reviews"})
-            </span>
-          </>
+          <StarRating rating={averageRating} />
         )}
       </div>
 
-      {/* Individual reviews */}
-      <div className="space-y-4">
+      {/* Scrollable reviews (5 visible at once) */}
+      <div className="flex space-x-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4">
         {reviews.map((review) => (
           <div
             key={review.ID}
-            className="border border-gray-200 rounded-lg p-4"
+            className="flex-shrink-0 snap-center w-[33.3333%] md:w-1/3 border border-gray-200 rounded-lg p-4 bg-white shadow-sm"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
@@ -101,7 +94,7 @@ const RatingScreen = ({ reviews }) => {
               </div>
               <StarRating rating={review.Rating} />
             </div>
-            <p className="text-gray-600 mt-2">{review.Review}</p>
+            <p className="text-gray-600 mt-2 text-sm">{review.Review}</p>
           </div>
         ))}
       </div>

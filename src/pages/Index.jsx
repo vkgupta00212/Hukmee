@@ -22,42 +22,146 @@ const LazyBecomeWePretiffyCard = lazy(() =>
 const LazySpecialForYou = lazy(() => import("../component/ui/specialyforyou"));
 
 const Index = () => {
-  // Dummy review data
   const dummyReviews = [
     {
       ID: 1,
       Name: "Vishal Gupta",
-      Rating: "4.5",
+      Rating: "4.9",
       Review: "Great product! The quality exceeded my expectations.",
       image: "https://randomuser.me/api/portraits/men/32.jpg",
     },
     {
       ID: 2,
       Name: "Ananya Sharma",
-      Rating: "5",
+      Rating: "4.9",
       Review: "Absolutely loved it. Highly recommend to others!",
       image: "https://randomuser.me/api/portraits/women/44.jpg",
     },
     {
       ID: 3,
       Name: "Rahul Verma",
-      Rating: "3.5",
+      Rating: "4.9",
       Review: "It’s decent but could be improved in packaging.",
       image: "https://randomuser.me/api/portraits/men/12.jpg",
     },
     {
       ID: 4,
       Name: "Priya Singh",
-      Rating: "4",
+      Rating: "4.9",
       Review: "Very useful and affordable. Will buy again.",
       image: "https://randomuser.me/api/portraits/women/68.jpg",
     },
     {
       ID: 5,
       Name: "Aman Yadav",
-      Rating: "2.5",
-      Review: "Not satisfied, the product didn’t match the description.",
+      Rating: "4.9",
+      Review: "The product works exactly as advertised. Worth the price!",
       image: "https://randomuser.me/api/portraits/men/76.jpg",
+    },
+    {
+      ID: 6,
+      Name: "Simran Kaur",
+      Rating: "4.9",
+      Review: "Excellent service and great product quality.",
+      image: "https://randomuser.me/api/portraits/women/31.jpg",
+    },
+    {
+      ID: 7,
+      Name: "Rohit Sharma",
+      Rating: "4.9",
+      Review: "Superb experience! Will definitely purchase again.",
+      image: "https://randomuser.me/api/portraits/men/41.jpg",
+    },
+    {
+      ID: 8,
+      Name: "Sneha Patel",
+      Rating: "4.9",
+      Review: "Good product, packaging was also neat and clean.",
+      image: "https://randomuser.me/api/portraits/women/24.jpg",
+    },
+    {
+      ID: 9,
+      Name: "Aditya Raj",
+      Rating: "4.9",
+      Review: "Fantastic product and timely delivery. Recommended!",
+      image: "https://randomuser.me/api/portraits/men/22.jpg",
+    },
+    {
+      ID: 10,
+      Name: "Neha Mehta",
+      Rating: "4.9",
+      Review: "Very happy with my purchase. Looks premium and durable.",
+      image: "https://randomuser.me/api/portraits/women/50.jpg",
+    },
+    {
+      ID: 11,
+      Name: "Arjun Nair",
+      Rating: "4.9",
+      Review: "Product performance is great and value for money.",
+      image: "https://randomuser.me/api/portraits/men/33.jpg",
+    },
+    {
+      ID: 12,
+      Name: "Kavya Joshi",
+      Rating: "4.9",
+      Review: "Loved the design and usability. Great experience overall.",
+      image: "https://randomuser.me/api/portraits/women/37.jpg",
+    },
+    {
+      ID: 13,
+      Name: "Harsh Kumar",
+      Rating: "4.9",
+      Review: "Awesome product! The build quality is top-notch.",
+      image: "https://randomuser.me/api/portraits/men/29.jpg",
+    },
+    {
+      ID: 14,
+      Name: "Isha Reddy",
+      Rating: "4.9",
+      Review: "Received it on time and it works perfectly fine.",
+      image: "https://randomuser.me/api/portraits/women/63.jpg",
+    },
+    {
+      ID: 15,
+      Name: "Nitin Singh",
+      Rating: "4.9",
+      Review: "Met all my expectations. Really satisfied!",
+      image: "https://randomuser.me/api/portraits/men/18.jpg",
+    },
+    {
+      ID: 16,
+      Name: "Pooja Mishra",
+      Rating: "4.9",
+      Review: "Stylish and efficient. A must-have product!",
+      image: "https://randomuser.me/api/portraits/women/49.jpg",
+    },
+    {
+      ID: 17,
+      Name: "Deepak Chauhan",
+      Rating: "4.9",
+      Review: "Great experience overall. Customer support was helpful too.",
+      image: "https://randomuser.me/api/portraits/men/55.jpg",
+    },
+    {
+      ID: 18,
+      Name: "Tanya Kapoor",
+      Rating: "4.9",
+      Review: "The product feels premium. Totally worth it!",
+      image: "https://randomuser.me/api/portraits/women/52.jpg",
+    },
+    {
+      ID: 19,
+      Name: "Karan Malhotra",
+      Rating: "4.9",
+      Review: "Using it for a week, and it's performing great!",
+      image: "https://randomuser.me/api/portraits/men/19.jpg",
+    },
+    {
+      ID: 20,
+      Name: "Divya Chauhan",
+      Rating: "4.9",
+      Review: "Elegant design and smooth functionality.",
+      image: "https://randomuser.me/api/portraits/women/35.jpg",
     },
   ];
 
@@ -66,45 +170,30 @@ const Index = () => {
       <section className="relative bg-white">
         <HeroSection />
       </section>
+
       <section className="bg-white">
-        <div className="">
-          <WhyUs />
-        </div>
+        <WhyUs />
       </section>
 
-      {/* Promotions Section */}
       <section className="bg-white">
-        <div className="">
-          <PromoCard />
-        </div>
+        <PromoCard />
       </section>
 
-      {/* Services Section */}
-      <section
-        className="py-1 sm:py-16 bg-gray-50"
-        aria-labelledby="services-heading"
-      >
-        <div className="">
-          <Suspense fallback={<div className="" />}>
-            <LazyServicesCarousel2 />
-            <div className="">
-              <LazyServicesCarousel4 />
-            </div>
-          </Suspense>
-        </div>
+      <section className="py-1 sm:py-16 bg-gray-50">
+        <Suspense fallback={<div />}>
+          <LazyServicesCarousel2 />
+          <LazyServicesCarousel4 />
+        </Suspense>
       </section>
 
+      {/* Reviews Section - scrollable horizontally */}
       <section className="bg-white mb-[15px]">
-        <div className="">
+        <div className="overflow-x-auto scrollbar-hide">
           <RatingScreen reviews={dummyReviews} />
         </div>
       </section>
 
-      {/* Become WePretiffy Vendor Section */}
-      <section
-        className="py-1 sm:py-16 bg-pink-50"
-        aria-labelledby="vendor-heading"
-      >
+      <section className="py-1 sm:py-16 bg-pink-50">
         <div className="max-w-7xl mx-auto px-1 sm:px-6 lg:px-8">
           <Suspense
             fallback={
@@ -115,6 +204,7 @@ const Index = () => {
           </Suspense>
         </div>
       </section>
+
       <footer className="mt-8 bg-gray-100 z-10 md:hidden">
         <Footer />
       </footer>

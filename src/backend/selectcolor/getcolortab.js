@@ -10,7 +10,7 @@ class GetColorTabModel {
 
   static fromJson(json) {
     return new GetColorTabModel(
-      json.id || 0,
+      json.id || 0, 
       json.Colors || "",
       json.label || 0,
       json.colorid || ""

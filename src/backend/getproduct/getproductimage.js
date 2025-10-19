@@ -14,6 +14,8 @@ class GetProductImageModel {
       json.pRODUCTiMAGES || "" // ✅ map correctly
     );
   }
+
+  
 }
 
 const GetProductImage = async (productId) => {

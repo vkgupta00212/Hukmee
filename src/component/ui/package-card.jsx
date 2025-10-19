@@ -106,7 +106,7 @@ const PackageCard = ({ addToCart, selectedServiceTab }) => {
     setError(null);
 
     try {
-      const data = await GetServicePack(selectedServiceTab.id);
+      const data = await GetServicePack(selectedServiceTab.id, "Service");
       setServicePackages(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error fetching packages:", err);
