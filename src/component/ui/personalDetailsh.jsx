@@ -159,8 +159,23 @@ const PersonalDetails = () => {
                   >
                     +91 {number}
                   </span>
+                ) : item.label === "Gender" ? (
+                  // 🧍 Gender Dropdown
+                  <select
+                    name="gender"
+                    value={editedDetails[item.key] || ""}
+                    onChange={(e) =>
+                      handleInputChange(item.key, e.target.value)
+                    }
+                    className={`w-full border ${Colors.borderGray} rounded-lg px-4 py-2 text-base focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white shadow-sm`}
+                  >
+                    <option value="">Select gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
                 ) : (
-                  // ✏️ Editable input
+                  // ✏️ Normal text input
                   <input
                     type="text"
                     value={editedDetails[item.key] || ""}

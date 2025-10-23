@@ -61,7 +61,7 @@ const Layout = ({ children }) => {
 
       {/* Mobile Navbar (only on home) */}
       {isMobile && isHomePage && (
-        <div className="fixed bottom-0 left-0 w-full z-50 bg-white shadow-t-md">
+        <div className="fixed bottom-0 top-4 left-0 w-full z-50 bg-white shadow-t-md">
           <MobileNavbar />
         </div>
       )}

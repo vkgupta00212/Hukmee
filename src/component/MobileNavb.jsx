@@ -5,6 +5,9 @@ import ProductScreen from "./ui/products";
 import UserProfile from "./ui/userprofile";
 import skin from "../assets/skinanalyze.jpg";
 import Colors from "../core/constant";
+import { MdNewReleases } from "react-icons/md";
+import { FaBeer } from "react-icons/fa";
+import { MdAlarm } from "react-icons/md";
 
 const navItems = [
   {
@@ -21,20 +24,13 @@ const navItems = [
   },
   {
     label: "New",
-    icon: <img src={skin} className="h-10" />,
+    icon: <MdNewReleases className={`w-8 h-8`} />,
     component: <ProductScreen />,
     notification: false,
   },
   {
     label: "Used",
-    icon: (
-      <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110">
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
-          <rect x="1" y="4" width="14" height="10" fill="#6b7280" />
-          <rect x="3" y="2" width="10" height="3" fill="#ffffff" />
-        </svg>
-      </div>
-    ),
+    icon: <MdAlarm size={30} />,
     component: <UsedProduct />,
     notification: true,
   },
@@ -72,7 +68,9 @@ const MobileNavbar = () => {
             key={item.label}
             onClick={() => setActiveTab(index)}
             className={`group flex flex-col items-center justify-center relative w-1/4 py-2 transition-all duration-300 hover:bg-indigo-50/70 rounded-xl ${
-              activeTab === index ? "text-indigo-700" : "text-gray-600"
+              activeTab === index
+                ? `text-${Colors.primaryMain}`
+                : "text-gray-600"
             }`}
             aria-label={`${item.label} tab`}
             aria-current={activeTab === index ? "page" : undefined}
