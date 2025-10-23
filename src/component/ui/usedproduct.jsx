@@ -170,7 +170,7 @@ const UsedProduct = () => {
                     <FiSearch className="text-gray-400 mr-3" size={20} />
                     <input
                       type="text"
-                      placeholder="Search for ‘salon’"
+                      placeholder="Search for ‘Product’"
                       className="flex-grow outline-none text-gray-600 placeholder-gray-400 bg-transparent"
                     />
                   </div>

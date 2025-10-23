@@ -21,37 +21,37 @@ const WhyUs = () => {
       icon: MdVerified,
       title: "Premium Repair",
       description: "Top quality certified parts",
-      color: "text-orange-600",
+      color: `text-${Colors.primaryMain}`,
     },
     {
       icon: MdSchedule,
       title: "Instant Mobile Repair",
       description: "Mobile repair on the Spot in Store or at Home.",
-      color: "text-orange-600",
+      color: `text-${Colors.primaryMain}`,
     },
     {
       icon: MdShield,
       title: "Physical Protection Warranty",
       description: "Free one Month Screen Replacement",
-      color: "text-orange-600",
+      color: `text-${Colors.primaryMain}`,
     },
     {
       icon: MdVerified,
       title: "6 Months Warranty",
       description: "Hassle free 6 month warranty.",
-      color: "text-orange-600",
+      color: `text-${Colors.primaryMain}`,
     },
     {
       icon: GrShieldSecurity,
       title: "Guaranteed Safety",
       description: "Device and Data Security",
-      color: "text-orange-600",
+      color: `text-${Colors.primaryMain}`,
     },
     {
       icon: RiUserSettingsFill,
       title: "Skilled Technicians",
       description: "Trained & Qualified",
-      color: "text-orange-600",
+      color: `text-${Colors.primaryMain}`,
     },
   ];
 

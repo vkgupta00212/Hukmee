@@ -14,7 +14,7 @@ const navItems = [
     label: "HM",
     icon: (
       <div
-        className={`text-[10px] w-8 h-8 bg-${Colors.primaryMain} text-white flex items-center justify-center rounded-full font-bold text-lg transition-all duration-300 group-hover:scale-110`}
+        className={`text-[10px] w-7 h-7 bg-${Colors.primaryMain} text-white flex items-center justify-center rounded-full font-bold text-lg transition-all duration-300 group-hover:scale-110`}
       >
         HM
       </div>
@@ -24,20 +24,20 @@ const navItems = [
   },
   {
     label: "New",
-    icon: <MdNewReleases className={`w-8 h-8`} />,
+    icon: <MdNewReleases className={`w-7 h-7`} />,
     component: <ProductScreen />,
     notification: false,
   },
   {
     label: "Used",
-    icon: <MdAlarm size={30} />,
+    icon: <MdAlarm className={`w-7 h-7`} />,
     component: <UsedProduct />,
     notification: true,
   },
   {
     label: "Profile",
     icon: (
-      <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-2xl transition-all duration-300 group-hover:scale-110">
+      <div className="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center text-2xl transition-all duration-300 group-hover:scale-110">
         👤
       </div>
     ),

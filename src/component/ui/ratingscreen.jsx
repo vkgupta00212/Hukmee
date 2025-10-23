@@ -137,7 +137,7 @@ const RatingScreen = ({ reviews }) => {
         <>
           {/* Mobile: Horizontal scrollable cards */}
           <div className="block sm:hidden">
-            <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
+            <div className="flex space-x-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
               {reviews.map((review) => (
                 <ReviewCard key={review.ID} review={review} isMobile={true} />
               ))}
@@ -145,10 +145,16 @@ const RatingScreen = ({ reviews }) => {
           </div>
 
           {/* Desktop: Grid layout */}
+          {/* Desktop: Show 3 reviews and make scrollable if more */}
           <div className="hidden sm:block">
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="flex space-x-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
               {reviews.map((review) => (
-                <ReviewCard key={review.ID} review={review} />
+                <div
+                  key={review.ID}
+                  className="flex-shrink-0 snap-start w-[32%] min-w-[300px]" // each card takes ~1/3 of width
+                >
+                  <ReviewCard review={review} />
+                </div>
               ))}
             </div>
           </div>
