@@ -183,10 +183,10 @@ const WomenSaloonIn = () => {
       return;
     }
 
-    if (orderType === "Product") {
-      setShowCart(true);
-      return;
-    }
+    // if (orderType === "Product") {
+    //   setShowCart(true);
+    //   return;
+    // }
 
     const price = parseInt(item.discountfee || item.fees || 0);
 
@@ -210,7 +210,7 @@ const WomenSaloonIn = () => {
         console.log("Generated new order:", currentOrderId);
       }
 
-      const orderPayload = {
+      await InsertOrder({
         OrderID: currentOrderId,
         UserID: UserID,
         OrderType: "Service",
@@ -222,9 +222,13 @@ const WomenSaloonIn = () => {
         Slot: "",
         SlotDatetime: "",
         OrderDatetime: new Date().toISOString(),
-      };
-
-      await InsertOrder(orderPayload);
+        VendorPhone: "",
+        BeforVideo: "", // ✅ corrected key name to match API
+        AfterVideo: "",
+        PaymentMethod: "",
+        lat: "26.551381",
+        long: "84.767491",
+      });
       console.log("InsertOrder API successful");
       if (!isMobile) {
         window.location.reload();

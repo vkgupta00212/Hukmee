@@ -25,6 +25,7 @@ import ContactInfo from "./component/ui/contact";
 import ScrollToTop from "./component/context/scrolltop";
 import UsedProduct from "./component/ui/usedproduct";
 import RegisterPage from "./component/ui/register";
+import VendorWait from "./component/ui/vendorwait";
 
 const queryClient = new QueryClient();
 
@@ -100,6 +101,7 @@ const App = () => {
               <Route path="/contact" element={<ContactInfo />} />
               <Route path="/usedproduct" element={<UsedProduct />} />
               <Route path="/register" element={<RegisterPage />} />
+              <Route path="/vendorwait" element={<VendorWait />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Layout>

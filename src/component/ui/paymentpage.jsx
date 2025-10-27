@@ -9,6 +9,8 @@ import SlotCard from "./slotCard";
 import { motion, AnimatePresence } from "framer-motion";
 import UpdateOrder from "../../backend/order/updateorder";
 import GetOrder from "../../backend/order/getorderid";
+import Colors from "../../core/constant";
+import AssignLeads from "../../backend/order/assignleads";
 
 const PaymentPage = () => {
   const location = useLocation();
@@ -81,104 +83,44 @@ const PaymentPage = () => {
       alert("Please login to continue.");
       return;
     }
+
     if (!selectedAddress) {
       alert("Please select an address before proceeding.");
       setShowAddressModal(true);
       return;
     }
+
     if (!selectedSlot) {
       alert("Please select a slot before proceeding.");
       setShowSlotModal(true);
       return;
     }
+
     if (!orderId) {
       alert("Order ID not available. Try again.");
       return;
     }
 
-    // fallback to calculate total
-    const finalAmountRupees =
-      typeof amount === "number" && !isNaN(amount) && amount > 0
-        ? amount
-        : calculateTotal();
-
-    if (!finalAmountRupees || finalAmountRupees <= 0) {
-      alert("Invalid payment amount.");
-      return;
-    }
-
-    if (!window.Razorpay) {
-      alert("Razorpay SDK not loaded. Try again later.");
-      return;
-    }
-
-    const paise = Math.round(finalAmountRupees * 100);
-    const description = `${title} on ${selectedSlot?.day?.label || ""} ${
-      selectedSlot?.day?.date || ""
-    } at ${selectedSlot?.time || ""}`;
-
-    const options = {
-      key: "rzp_live_sdP67bgbbdrRid", // ✅ replace with your test key if needed
-      amount: paise,
-      currency: "INR",
-      name: "WePretiffy",
-      description,
-      image: "/logo.png",
-      handler: async function (response) {
-        try {
-          alert(
-            `✅ Payment Successful!\nPayment ID: ${response.razorpay_payment_id}`
-          );
-
-          if (!orderId) {
-            alert("❌ No OrderID found, cannot update order.");
-            return;
-          }
-
-          // ✅ Update all fetched orders
-          for (const orderItem of orders) {
-            await UpdateOrder({
-              OrderID: orderItem.OrderID,
-              UserID: orderItem.UserID,
-              OrderType: orderItem.OrderType,
-              ItemImages: "",
-              ItemName: orderItem.ItemName,
-              Price: orderItem.Price,
-              Quantity: orderItem.Quantity,
-              Address: selectedAddress?.FullAddress || "",
-              Slot: `${selectedSlot?.day?.label} ${selectedSlot?.time}`,
-              SlotDatetime: `${selectedSlot?.day?.date} ${selectedSlot?.time}`,
-            });
-          }
-
-          alert("📝 Order Updated Successfully!");
-        } catch (err) {
-          console.error("UpdateOrder Error:", err);
-          alert(
-            "❌ Payment done, but order update failed. Please contact support."
-          );
-        }
-      },
-      prefill: {
-        name: selectedAddress?.Name || "Customer",
-        email: selectedAddress?.Email || "customer@example.com",
-        contact:
-          selectedAddress?.Phone || localStorage.getItem("userPhone") || "",
-      },
-      theme: { color: "#4f46e5" },
-    };
-
     try {
-      setLoading(true);
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    } catch (err) {
-      console.error("Razorpay error:", err);
-      alert("Error opening payment gateway. Try again.");
-    } finally {
-      setLoading(false);
+      // ✅ Call AssignLeads API
+      const response = await AssignLeads(orderId);
+      console.log("AssignLeads API Response:", response);
+
+      if (
+        response?.message === "Leads Assigned Successfully" ||
+        response === "Leads Assigned Successfully"
+      ) {
+        alert("Leads assigned successfully!");
+        navigate("/vendorwait", { state: { cartItems } });
+      } else {
+        alert("Failed to assign leads. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error during AssignLeads:", error);
+      alert("Something went wrong while assigning leads.");
     }
   };
+
   const goBack = () => {
     // Check if user can go back in history
     if (window.history.state && window.history.state.idx > 0) {
@@ -192,7 +134,7 @@ const PaymentPage = () => {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="fixed top-0 left-0 w-full bg-white shadow-md z-10 border-b border-gray-200">
+        <div className="md:hidden fixed top-0 left-0 w-full bg-white shadow-md z-10 border-b border-gray-200">
           <div className="flex items-center justify-start px-4 py-3 sm:px-6">
             <button
               onClick={goBack}
@@ -214,7 +156,9 @@ const PaymentPage = () => {
                 />
               </svg>
             </button>
-            <h2 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <h2
+              className={`text-xl sm:text-3xl font-bold bg-${Colors.primaryMain} bg-clip-text text-transparent`}
+            >
               Checkout
             </h2>
           </div>

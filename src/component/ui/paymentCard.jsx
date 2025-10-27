@@ -47,7 +47,7 @@ const PaymentCard = ({
     if (!isLoggedIn) return "Login to Continue";
     if (!selectedAddress) return "Select Address";
     if (!selectedSlot) return "Select Slot";
-    return `Proceed to Pay`;
+    return `Proceed`;
   };
 
   const desktop = (
@@ -139,7 +139,7 @@ const PaymentCard = ({
 
         {/* Payment */}
         <div>
-          <SectionHeader icon={MdPayment} title="Payment Method" />
+          {/* <SectionHeader icon={MdPayment} title="Payment Method" /> */}
           <button
             onClick={onProceedPayment}
             disabled={isPaymentButtonDisabled}

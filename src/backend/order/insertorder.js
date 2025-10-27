@@ -5,15 +5,20 @@ const InsertOrder = async ({
   UserID,
   OrderType,
   ItemImages = "",
-  ItemName,
-  Price,
-  Quantity,
+  ItemName = "",
+  Price = "",
+  Quantity = "",
   Address = "",
   Slot = "",
   SlotDatetime = "",
   OrderDatetime = new Date().toISOString(),
+  VendorPhone = "",
+  BeforVideo = "", // ✅ spelling must match exactly as in the API doc
+  AfterVideo = "",
+  PaymentMethod = "",
+  lat = "",
+  long = "",
 }) => {
-  // Create form data in key-value pairs exactly as API expects
   const formData = new URLSearchParams();
   formData.append("token", "SWNCMPMSREMXAMCKALVAALI");
   formData.append("OrderID", OrderID);
@@ -27,11 +32,17 @@ const InsertOrder = async ({
   formData.append("Slot", Slot);
   formData.append("SlotDatetime", SlotDatetime);
   formData.append("OrderDatetime", OrderDatetime);
+  formData.append("VendorPhone", VendorPhone);
+  formData.append("BeforVideo", BeforVideo); // ✅ fixed key name
+  formData.append("AfterVideo", AfterVideo);
+  formData.append("PaymentMethod", PaymentMethod);
+  formData.append("lat", lat);
+  formData.append("lon", long);
 
   try {
     const response = await axios.post(
       "https://api.hukmee.in/APIs/APIs.asmx/InsertOrders",
-      formData.toString(), // convert form data to string
+      formData.toString(),
       {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -39,7 +50,7 @@ const InsertOrder = async ({
       }
     );
 
-    // Return raw response (you can parse later if needed)
+    // .asmx APIs often return XML — we’ll just return it raw for now
     return response.data;
   } catch (error) {
     console.error("InsertOrder Error:", {
