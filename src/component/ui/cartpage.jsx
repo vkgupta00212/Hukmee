@@ -301,7 +301,7 @@ const CartPage = () => {
                   ₹{total.toFixed(2)}
                 </span>
                 <span className="text-base sm:text-lg font-semibold">
-                  Proceed to Pay
+                  Proceed
                 </span>
               </button>
             </div>

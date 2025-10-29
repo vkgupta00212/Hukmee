@@ -78,7 +78,7 @@ const PaymentPage = () => {
     fetchOrders();
   }, [UserID]);
 
-  const handleRazorpayPayment = async (amount) => {
+  const handleproceed = async (amount) => {
     if (!isLoggedIn) {
       alert("Please login to continue.");
       return;
@@ -103,6 +103,7 @@ const PaymentPage = () => {
 
     try {
       // ✅ Call AssignLeads API
+      console.log("orderID from paymentpage:", orderId);
       const response = await AssignLeads(orderId);
       console.log("AssignLeads API Response:", response);
 
@@ -163,6 +164,7 @@ const PaymentPage = () => {
             </h2>
           </div>
         </div>
+
         <div className="pt-[35px] mb-[10px]">
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -183,9 +185,7 @@ const PaymentPage = () => {
             <PaymentCard
               onSelectAddress={() => setShowAddressModal(true)}
               onSelectSlot={() => setShowSlotModal(true)}
-              onProceedPayment={(amt, coupon) =>
-                handleRazorpayPayment(amt, coupon)
-              }
+              onProceed={handleproceed}
               selectedAddress={selectedAddress}
               selectedSlot={selectedSlot}
               calculateTotal={calculateTotal}

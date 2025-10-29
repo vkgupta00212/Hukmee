@@ -10,7 +10,7 @@ import Colors from "../../core/constant";
 const PaymentCard = ({
   onSelectAddress,
   onSelectSlot,
-  onProceedPayment,
+  onProceed,
   selectedAddress,
   selectedSlot,
   itemTotal = 0,
@@ -141,7 +141,7 @@ const PaymentCard = ({
         <div>
           {/* <SectionHeader icon={MdPayment} title="Payment Method" /> */}
           <button
-            onClick={onProceedPayment}
+            onClick={onProceed}
             disabled={isPaymentButtonDisabled}
             className={`w-full mt-3 py-3 rounded-lg font-medium shadow transition-all focus:ring-2 focus:ring-indigo-300 ${
               isPaymentButtonDisabled
