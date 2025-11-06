@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import InsertAddress from "../../backend/address/insertaddress";
 import GetAddress from "../../backend/address/getaddress";
+import GetLocation from "../../backend/location/location";
+import GetUser from "../../backend/authentication/getuser";
 
 const AddressFormCard = ({ onClose, onSelectAddress }) => {
   const [formData, setFormData] = useState({
@@ -18,6 +20,7 @@ const AddressFormCard = ({ onClose, onSelectAddress }) => {
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
   const phone = localStorage.getItem("userPhone");
+  const [user, setUser] = useState([]);
 
   useEffect(() => {
     const fetchAddresses = async () => {
@@ -40,6 +43,19 @@ const AddressFormCard = ({ onClose, onSelectAddress }) => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    const fetchuser = async () => {
+      try {
+        const fetchedUser = await GetUser(phone);
+        console.log("Fetched from the Navigation ", { fetchedUser });
+        setUser(fetchedUser || []);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+    if (phone) fetchuser();
+  }, [phone]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -90,6 +106,32 @@ const AddressFormCard = ({ onClose, onSelectAddress }) => {
     onSelectAddress(address);
     setIsOpen(false);
     onClose?.();
+  };
+
+  // 📍 Fetch user location and autofill address fields
+  const handleLocationFetch = async () => {
+    setMessage("📡 Getting current location...");
+
+    try {
+      const location = await GetLocation(); // calls your backend API
+      console.log("📍 Location Data:", location);
+
+      setFormData((prev) => ({
+        ...prev,
+        name: user[0]?.Fullname || "",
+        address: location.address,
+        city: location.city,
+        state: location.state,
+        pincode: location.pincode,
+      }));
+
+      setMessage(
+        `✅ Location fetched successfully! (${location.city || "Unknown City"})`
+      );
+    } catch (error) {
+      console.error("Location Fetch Error:", error);
+      setMessage("❌ Failed to fetch your current location.");
+    }
   };
 
   if (!isOpen) {
@@ -144,6 +186,20 @@ const AddressFormCard = ({ onClose, onSelectAddress }) => {
               </div>
             )}
             <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="mb-4">
+                <button
+                  type="button"
+                  onClick={handleLocationFetch}
+                  className="w-full py-2 mb-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                >
+                  📍 Use Current Location
+                </button>
+
+                {message && (
+                  <p className="text-sm mt-2 text-gray-700">{message}</p>
+                )}
+              </div>
+
               <div>
                 <label className="block text-sm font-semibold text-gray-800 mb-1.5">
                   Full Name
