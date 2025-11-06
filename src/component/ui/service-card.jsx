@@ -12,7 +12,7 @@ const ServiceCard = ({ icon, label, onClick }) => {
       aria-label={`Select ${label} service`}
     >
       <Card
-        className={`w-[110px] h-[110px] sm:w-[130px] sm:h-[130px] md:w-[90px] md:h-[90px] lg:w-[90px] lg:h-[90px] rounded-xl overflow-hidden ${Colors.borderGray} bg-gradient-to-br from-white to-gray-50 shadow-lg group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300`}
+        className={` w-[100px] h-[100px] sm:w-[130px] sm:h-[130px] md:w-[90px] md:h-[90px] lg:w-[90px] lg:h-[90px] rounded-xl overflow-hidden ${Colors.borderGray} bg-gradient-to-br from-white to-gray-50 shadow-lg group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300`}
       >
         <CardContent className="p-0 flex items-center justify-center w-full h-full">
           <img
@@ -95,7 +95,7 @@ const ServiceCardSection = ({ onServiceSelect }) => {
             </div>
           ) : (
             <div className="max-h-[300px] sm:max-h-[550px] overflow-y-auto scrollbar-thin scrollbar-thumb-orange-200 scrollbar-track-gray-50 p-1 sm:p-5">
-              <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-5 sm:gap-6 justify-center ">
+              <div className="p-1 grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-5 sm:gap-6 justify-center ">
                 {serviceList.map((service) => (
                   <ServiceCard
                     key={service.id}

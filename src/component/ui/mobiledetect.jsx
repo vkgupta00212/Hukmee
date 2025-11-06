@@ -136,7 +136,7 @@ const MobileDetect = () => {
       <div className={`${sharedStyles.card} p-8`}>
         <div className={sharedStyles.title}>{title}</div>
         <div className={sharedStyles.model}>{deviceModel}</div>
-        <div className={sharedStyles.subtitle}>{subtitle}</div>
+        {/* <div className={sharedStyles.subtitle}>{subtitle}</div> */}
       </div>
     </div>
   );

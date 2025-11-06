@@ -83,6 +83,8 @@ const UserProfile = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [pendingPhone, setPendingPhone] = useState("");
+  const [addressRefreshKey, setAddressRefreshKey] = useState(0);
+  const cameraInputRef = useRef(null);
 
   const fileInputRef = useRef(null);
   const menuRef = useRef(null);
@@ -116,6 +118,10 @@ const UserProfile = () => {
     };
     fetchUser();
   }, [phone, isLoggedIn]);
+
+  const refreshAddresses = () => {
+    setAddressRefreshKey((prev) => prev + 1);
+  };
 
   // Close menu on click outside
   useEffect(() => {
@@ -182,6 +188,24 @@ const UserProfile = () => {
     }
   };
 
+  // Existing handleImageChange works for both gallery & camera
+  // const handleImageChange = (e) => {
+  //   const file = e.target.files[0];
+  //   if (!file) return;
+
+  //   setAvatar(file);
+  //   const reader = new FileReader();
+  //   reader.onload = () => {
+  //     const base64 = reader.result.replace(
+  //       /^data:image\/[a-zA-Z]+;base64,/,
+  //       ""
+  //     );
+  //     setBase64Image(base64);
+  //     setPreview(reader.result);
+  //   };
+  //   reader.readAsDataURL(file);
+  // };
+
   const handleSave = async () => {
     if (!base64Image) {
       alert("⚠️ Please select an image before saving.");
@@ -240,11 +264,18 @@ const UserProfile = () => {
     setBase64Image(null);
     setPreview(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
+    if (cameraInputRef.current) cameraInputRef.current.value = ""; // ADD THIS
   };
 
   const sections = [
     { id: 1, title: "Personal Details", Component: <PersonalDetails /> },
-    { id: 2, title: "Saved Addresses", Component: <AddressDetails /> },
+    {
+      id: 2,
+      title: "Saved Addresses",
+      Component: (
+        <AddressDetails key={addressRefreshKey} onRefresh={refreshAddresses} />
+      ),
+    },
     { id: 3, title: "Refer & Earn", Component: <ReferAndEarn /> },
     { id: 4, title: "Enter Referral Code", Component: <EnterReferCode /> },
     { id: 5, title: "My Orders", Component: <MyOrder /> },
@@ -545,18 +576,24 @@ const UserProfile = () => {
                   <FaTimes className="text-lg" />
                 </motion.button>
               </div>
+
               <div className="flex flex-col items-center">
+                {/* PREVIEW */}
                 <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-full overflow-hidden mb-6 border-2 border-gray-200 shadow-sm">
                   <img
                     src={
                       preview ||
-                      base64Image ||
-                      "https://via.placeholder.com/150?text=Preview"
+                      (base64Image
+                        ? `data:image/jpeg;base64,${base64Image}`
+                        : "https://via.placeholder.com/150?text=Preview")
                     }
                     alt="Avatar Preview"
                     className="w-full h-full object-cover"
                   />
                 </div>
+
+                {/* HIDDEN INPUTS */}
+                {/* Gallery */}
                 <input
                   type="file"
                   accept="image/*"
@@ -565,31 +602,51 @@ const UserProfile = () => {
                   className="hidden"
                   disabled={isUploading}
                 />
-                <motion.button
-                  onClick={() => fileInputRef.current.click()}
-                  className={`bg-gradient-to-r ${Colors.primaryFrom} ${
-                    Colors.primaryTo
-                  } ${
-                    Colors.textWhite
-                  } font-semibold py-2 px-6 rounded-lg hover:from-[#E56A00] hover:to-[#C75A00] transition-all duration-200 ${
-                    isUploading ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
-                  whileHover={{ scale: isUploading ? 1 : 1.05 }}
-                  whileTap={{ scale: isUploading ? 1 : 0.95 }}
-                  aria-label="Choose image file"
+                {/* Camera */}
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment" // opens rear camera
+                  ref={cameraInputRef}
+                  onChange={handleImageChange}
+                  className="hidden"
                   disabled={isUploading}
-                >
-                  {isUploading ? (
-                    <div className="flex items-center">
-                      <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2" />
-                      Uploading...
-                    </div>
-                  ) : (
-                    "Choose Image"
-                  )}
-                </motion.button>
+                />
+
+                {/* BUTTONS */}
+                <div className="flex gap-3 w-full">
+                  <motion.button
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`flex-1 bg-gradient-to-r ${Colors.primaryFrom} ${
+                      Colors.primaryTo
+                    } ${
+                      Colors.textWhite
+                    } font-semibold py-2 px-4 rounded-lg hover:from-[#E56A00] hover:to-[#C75A00] transition-all duration-200 ${
+                      isUploading ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    whileHover={{ scale: isUploading ? 1 : 1.05 }}
+                    whileTap={{ scale: isUploading ? 1 : 0.95 }}
+                    disabled={isUploading}
+                  >
+                    Gallery
+                  </motion.button>
+
+                  <motion.button
+                    onClick={() => cameraInputRef.current?.click()}
+                    className={`flex-1 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-semibold py-2 px-4 rounded-lg hover:from-indigo-700 hover:to-indigo-800 transition-all duration-200 ${
+                      isUploading ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    whileHover={{ scale: isUploading ? 1 : 1.05 }}
+                    whileTap={{ scale: isUploading ? 1 : 0.95 }}
+                    disabled={isUploading}
+                  >
+                    Camera
+                  </motion.button>
+                </div>
+
+                {/* SAVE + PROGRESS */}
                 {base64Image && (
-                  <div className="mt-4 w-full">
+                  <div className="mt-6 w-full">
                     <motion.button
                       onClick={handleSave}
                       className={`w-full bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold py-2 px-6 rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 ${
@@ -597,7 +654,6 @@ const UserProfile = () => {
                       }`}
                       whileHover={{ scale: isUploading ? 1 : 1.05 }}
                       whileTap={{ scale: isUploading ? 1 : 0.95 }}
-                      aria-label={isUploading ? "Saving avatar" : "Save avatar"}
                       disabled={isUploading}
                     >
                       {isUploading ? (
@@ -609,11 +665,12 @@ const UserProfile = () => {
                         "Save Avatar"
                       )}
                     </motion.button>
+
                     {isUploading && (
                       <div className="mt-4 w-full">
                         <div className="bg-gray-200 rounded-lg h-2 overflow-hidden">
                           <motion.div
-                            className={`h-full bg-green-600`}
+                            className="h-full bg-green-600"
                             initial={{ width: "0%" }}
                             animate={{ width: `${progress}%` }}
                             transition={{ duration: 0.2 }}
@@ -621,7 +678,6 @@ const UserProfile = () => {
                             aria-valuenow={progress}
                             aria-valuemin="0"
                             aria-valuemax="100"
-                            aria-label="Upload progress"
                           />
                         </div>
                         <p className="text-sm text-gray-600 mt-2 text-center">
