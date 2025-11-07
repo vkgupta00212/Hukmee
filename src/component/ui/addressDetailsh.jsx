@@ -216,7 +216,6 @@ const AddressList = ({ onRefresh }) => {
                         { label: "Address", value: address.Address },
                         { label: "City", value: address.City },
                         { label: "Pin Code", value: address.PinCode },
-                        { label: "User Phone", value: address.Userph },
                       ].map((field, idx) => (
                         <div
                           key={idx}

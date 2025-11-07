@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import InsertJoinCourse from "../../backend/joincourse/insertjoinpage";
-
+import Colors from "../../core/constant";
 const JoinCourses = () => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -71,7 +71,9 @@ const JoinCourses = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-lg bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 mt-[80px]">
-        <h2 className="text-3xl font-extrabold text-gray-900 text-center mb-3">
+        <h2
+          className={`text-3xl font-extrabold text-gray-900 text-center mb-3`}
+        >
           Join Our Courses
         </h2>
         <p className="text-sm text-gray-600 text-center mb-6">
@@ -154,7 +156,7 @@ const JoinCourses = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`w-full bg-${Colors.primaryMain} hover:bg-orange-500 text-white hover:cursor-pointer font-semibold py-3 rounded-xl shadow-md  transform transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {loading ? (
               <span className="flex items-center justify-center">

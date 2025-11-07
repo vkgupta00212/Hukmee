@@ -60,10 +60,12 @@ class GetOrderModel {
 }
 
 // Fetch orders function
-const GetOrders = async (UserID, Status = "Pending") => {
+const GetOrders = async (orderid, UserID, Status = "Pending") => {
   const formData = new URLSearchParams();
   formData.append("token", "SWNCMPMSREMXAMCKALVAALI");
+  formData.append("OrderID", orderid);
   formData.append("UserID", UserID);
+  formData.append("VendorPhone", "");
   formData.append("Status", Status);
 
   try {

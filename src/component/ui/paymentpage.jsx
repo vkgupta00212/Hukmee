@@ -101,15 +101,52 @@ const PaymentPage = () => {
       return;
     }
 
+    console.log(
+      "selected slot is like",
+      selectedSlot?.slotName || selectedSlot || ""
+    );
+
     try {
-      // ✅ Call AssignLeads API
-      console.log("orderID from paymentpage:", orderId);
-      const response = await AssignLeads(orderId);
-      console.log("AssignLeads API Response:", response);
+      setLoading(true);
+
+      // ✅ STEP 1: Update order details before assigning leads
+      const updateResponse = await UpdateOrder({
+        OrderID: orderId,
+        Address: selectedAddress?.FullAddress || "",
+        Slot: selectedSlot
+          ? `${selectedSlot?.day?.label || ""} ${
+              selectedSlot?.day?.date || ""
+            } - ${selectedSlot?.time || ""}`
+          : "",
+        Status: "Pending", // or "Confirmed" depending on logic
+        VendorPhone: "", // You can pass empty for now if not applicable
+        BeforVideo: "",
+        AfterVideo: "",
+        OTP: "",
+        PaymentMethod: "cash",
+      });
+
+      console.log("UpdateOrder Response:", updateResponse);
 
       if (
-        response?.message === "Leads Assigned Successfully" ||
-        response === "Leads Assigned Successfully"
+        !updateResponse ||
+        (typeof updateResponse === "string" &&
+          !updateResponse.includes("Successfully") &&
+          !updateResponse?.includes?.("Successfully"))
+      ) {
+        alert("Failed to update order. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      // ✅ STEP 2: Then assign leads
+      console.log("orderID from paymentpage:", orderId);
+      const assignResponse = await AssignLeads(orderId);
+      console.log("AssignLeads API Response:", assignResponse);
+
+      if (
+        assignResponse?.message === "Leads Assigned Successfully" ||
+        assignResponse === "Leads Assigned Successfully"
       ) {
         alert("Leads assigned successfully!");
         navigate("/vendorwait", { state: { cartItems } });
@@ -117,8 +154,10 @@ const PaymentPage = () => {
         alert("Failed to assign leads. Please try again.");
       }
     } catch (error) {
-      console.error("Error during AssignLeads:", error);
-      alert("Something went wrong while assigning leads.");
+      console.error("Error during handleproceed:", error);
+      alert("Something went wrong while updating or assigning leads.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -165,7 +204,7 @@ const PaymentPage = () => {
           </div>
         </div>
 
-        <div className="pt-[35px] mb-[10px]">
+        {/* <div className="pt-[35px] mb-[10px]">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-sm text-gray-500">
@@ -178,7 +217,7 @@ const PaymentPage = () => {
               )}
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>

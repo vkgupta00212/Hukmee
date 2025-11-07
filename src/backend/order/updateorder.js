@@ -2,36 +2,31 @@ import axios from "axios";
 
 const UpdateOrder = async ({
   OrderID,
-  UserID,
-  OrderType,
-  ItemImages = "",
-  ItemName,
-  Price,
-  Quantity,
   Address = "",
   Slot = "",
-  SlotDatetime = "",
-  OrderDatetime = new Date().toISOString(),
+  Status = "",
+  VendorPhone = "",
+  BeforVideo = "",
+  AfterVideo = "",
+  OTP = "",
+  PaymentMethod = "",
 }) => {
-  // Create form data in key-value pairs exactly as API expects
   const formData = new URLSearchParams();
   formData.append("token", "SWNCMPMSREMXAMCKALVAALI");
   formData.append("OrderID", OrderID);
-  formData.append("UserID", UserID);
-  formData.append("OrderType", OrderType);
-  formData.append("ItemImages", ItemImages);
-  formData.append("ItemName", ItemName);
-  formData.append("Price", Price);
-  formData.append("Quantity", Quantity);
   formData.append("Address", Address);
   formData.append("Slot", Slot);
-  formData.append("SlotDatetime", SlotDatetime);
-  formData.append("OrderDatetime", OrderDatetime);
+  formData.append("Status", Status);
+  formData.append("VendorPhone", VendorPhone);
+  formData.append("BeforVideo", BeforVideo);
+  formData.append("AfterVideo", AfterVideo);
+  formData.append("OTP", OTP);
+  formData.append("PaymentMethod", PaymentMethod);
 
   try {
     const response = await axios.post(
       "https://api.hukmee.in/APIs/APIs.asmx/UpdateOrders",
-      formData.toString(), // convert form data to string
+      formData.toString(),
       {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -41,7 +36,7 @@ const UpdateOrder = async ({
 
     return response.data;
   } catch (error) {
-    console.error("InsertOrder Error:", {
+    console.error("UpdateOrder Error:", {
       message: error.message,
       status: error.response?.status,
       data: error.response?.data,

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Phone, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Colors from "../../core/constant";
 import SendSMS from "../../backend/authentication/sendsms";
@@ -28,6 +29,7 @@ const LoginCard = ({ onClose, onSubmit }) => {
   const { width } = useWindowSize();
   const isMobile = width < 640; // Tailwind 'sm' breakpoint
   const modalRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const modalElement = modalRef.current;
@@ -174,19 +176,19 @@ const LoginCard = ({ onClose, onSubmit }) => {
             {/* T&C */}
             <p className="mt-5 text-xs text-center text-gray-600">
               By continuing, you agree to our{" "}
-              <a
-                href="#"
+              <button
+                onClick={() => navigate("/terms")}
                 className="underline text-indigo-600 hover:text-indigo-800"
               >
                 Terms
-              </a>{" "}
+              </button>{" "}
               and{" "}
-              <a
-                href="#"
+              <button
+                onClick={() => navigate("/privacy")}
                 className="underline text-indigo-600 hover:text-indigo-800"
               >
                 Privacy Policy
-              </a>
+              </button>
               .
             </p>
           </motion.div>
@@ -267,19 +269,19 @@ const LoginCard = ({ onClose, onSubmit }) => {
             {/* T&C */}
             <p className="mt-5 text-xs text-center text-gray-600">
               By continuing, you agree to our{" "}
-              <a
-                href="#"
+              <button
+                onClick={() => navigate("/terms")}
                 className="underline text-indigo-600 hover:text-indigo-800"
               >
                 Terms
-              </a>{" "}
+              </button>{" "}
               and{" "}
-              <a
-                href="#"
+              <button
+                onClick={() => navigate("/privacy")}
                 className="underline text-indigo-600 hover:text-indigo-800"
               >
                 Privacy Policy
-              </a>
+              </button>
               .
             </p>
           </motion.div>

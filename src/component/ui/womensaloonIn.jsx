@@ -354,14 +354,14 @@ const WomenSaloonIn = () => {
               )}
             </div>
 
-            <div className="flex-grow max-h-[calc(100vh-200px)] overflow-y-auto hide-scrollbar px-[1px] sm:px-[1px]">
+            {/* <div className="flex-grow max-h-[calc(100vh-200px)] overflow-y-auto hide-scrollbar px-[1px] sm:px-[1px]">
               {!isMobile && (
                 <Accesories
                   addToCart={addToCart}
                   selectedServiceTab={selectedServiceTab}
                 />
               )}
-            </div>
+            </div> */}
           </div>
 
           {isLaptop && (

@@ -8,28 +8,58 @@ const ServiceCard = ({ icon, label, onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="group cursor-pointer flex flex-col items-center space-y-3 transition-all duration-300 ease-in-out hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-300 rounded-xl"
-      aria-label={`Select ${label} service`}
+      className={`
+        group relative flex flex-col items-center justify-center
+        w-full max-w-[140px] p-3 rounded-2xl
+        transition-all duration-300 ease-out
+        hover:scale-[1.03] hover:shadow-xl
+        focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2
+        active:scale-95
+      `}
+      aria-label={`Select ${label}`}
     >
-      <Card
-        className={` w-[100px] h-[100px] sm:w-[130px] sm:h-[130px] md:w-[90px] md:h-[90px] lg:w-[90px] lg:h-[90px] rounded-xl overflow-hidden ${Colors.borderGray} bg-gradient-to-br from-white to-gray-50 shadow-lg group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300`}
+      {/* Card with subtle glow & gradient border */}
+      <div
+        className={`
+          relative w-full aspect-square rounded-xl overflow-hidden
+          border ${Colors.borderGray}
+          bg-gradient-to-br from-white via-gray-50 to-gray-100
+          shadow-lg
+          group-hover:shadow-2xl group-hover:ring-2 group-hover:ring-orange-300/50
+          transition-all duration-300
+        `}
       >
-        <CardContent className="p-0 flex items-center justify-center w-full h-full">
-          <img
-            src={icon}
-            alt={label}
-            className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-90"
-            onError={(e) => {
-              e.target.src = "/fallback-service-image.png";
-            }}
-          />
-        </CardContent>
-      </Card>
+        {/* Image */}
+        <img
+          src={icon}
+          alt={label}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          onError={(e) => {
+            e.currentTarget.src = "/fallback-service-image.png";
+          }}
+        />
+
+        {/* Optional: Subtle overlay on hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      </div>
+
+      {/* Label */}
       <span
-        className={`text-sm sm:text-base font-medium ${Colors.textGrayDark} text-center max-w-[130px] leading-tight group-hover:${Colors.tableHeadText} transition-colors duration-300`}
+        className={`
+          mt-3 block text-center text-xs sm:text-sm font-semibold
+          ${Colors.textGrayDark}
+          leading-tight tracking-tight
+          group-hover:${Colors.tableHeadText}
+          transition-colors duration-300
+          line-clamp-2
+        `}
+        title={label}
       >
         {label}
       </span>
+
+      {/* Ripple effect (optional visual feedback) */}
+      <span className="absolute inset-0 rounded-xl ring-0 group-active:ring-4 group-active:ring-orange-400/30 transition-all duration-200" />
     </button>
   );
 };

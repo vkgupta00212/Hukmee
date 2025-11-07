@@ -92,12 +92,12 @@ const App = () => {
               <Route path="/skinanalyzer" element={<SkinAnalyzer />} />
               <Route path="/userprofile" element={<UserProfile />} />
               <Route path="/joincourses" element={<JoinCourses />} />
-              <Route path="/terms" element={<TermsPage />} />
-              <Route path="/privacy" element={<PrivacyAndPolicy />} />
               <Route path="/transactions" element={<TransactionHistory />} />
               <Route path="/productscreen" element={<ProductScreen />} />
               <Route path="/productmainpage" element={<ProductMainPage />} />
               <Route path="/cartpage" element={<CartPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/privacy" element={<PrivacyAndPolicy />} />
               <Route path="/contact" element={<ContactInfo />} />
               <Route path="/usedproduct" element={<UsedProduct />} />
               <Route path="/register" element={<RegisterPage />} />

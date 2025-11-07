@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import FocusTrap from "focus-trap-react";
@@ -23,6 +23,7 @@ const Navigation = () => {
   const [wallet, setWallet] = useState([]);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Modal states
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -42,6 +43,13 @@ const Navigation = () => {
       document.body.classList.remove("overflow-hidden");
     };
   }, [showLoginModal, showOtpModal]);
+
+  useEffect(() => {
+    // Whenever the route changes, close all modals
+    setShowLoginModal(false);
+    setShowOtpModal(false);
+    setShowLogoutModal(false);
+  }, [location]);
 
   useEffect(() => {
     const fetchuser = async () => {

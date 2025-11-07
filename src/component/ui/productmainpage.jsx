@@ -55,10 +55,18 @@ const ProductMainPage = () => {
       try {
         setIsLoading(true);
         const fetchedImages = await GetProductImage(product.ProID);
+        console.log("product id is like", product.ProID);
+        console.log("Fetched Images", fetchedImages);
+
+        const baseUrl = "https://api.hukmee.in";
 
         if (Array.isArray(fetchedImages) && fetchedImages.length > 0) {
-          const mapped = fetchedImages.map(
-            (img) => img.productImage || spaImage
+          const mapped = fetchedImages.map((img) =>
+            img.productImage
+              ? `${baseUrl}${img.productImage.startsWith("/") ? "" : "/"}${
+                  img.productImage
+                }`
+              : spaImage
           );
           setImages(mapped);
         } else {
@@ -457,9 +465,10 @@ const ProductMainPage = () => {
       <div className="p-1 mt-[7px]">
         <RatingScreen reviews={reviews} />
       </div>
-      <div className="p-1 mt-[7px]">
+      {/* <div className="p-1 mt-[7px]">
         <SuggestProductScreen />
-      </div>
+      </div> */}
+
       <AnimatePresence>
         {showLogin && (
           <motion.div
