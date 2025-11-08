@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import GetServicePack from "../../backend/servicepack/getservicepack";
+import GetCourse from "../../backend/joincourse/getcourse";
 import Colors from "../../core/constant";
 
-// Base API image URL
 const imageBaseUrl = "https://api.hukmee.in/";
-const fallbackImage = "https://via.placeholder.com/400x300?text=Course+Image"; // fallback image
+const fallbackImage = "https://via.placeholder.com/400x300?text=Course+Image";
 
-// Package Card Component
 const PackageCardItem = ({
-  image,
-  servicename,
+  Image,
+  ServiceName,
   duration,
-  fees,
-  discountfee,
+  Fees,
+  DiscountFees,
   pkg,
 }) => {
   const navigate = useNavigate();
@@ -28,52 +26,48 @@ const PackageCardItem = ({
       className="group w-full max-w-xs rounded-xl border border-gray-200 bg-white shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
       whileHover={{ y: -4 }}
       transition={{ duration: 0.2 }}
-      aria-label={`View ${servicename} course details`}
     >
       <div className="relative overflow-hidden">
         <img
-          src={image || fallbackImage}
-          alt={servicename}
+          src={Image || fallbackImage}
+          alt={ServiceName}
           className="w-full h-40 sm:h-48 md:h-52 lg:h-56 object-cover transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
-          onError={(e) => {
-            e.currentTarget.src = fallbackImage;
-          }}
+          onError={(e) => (e.currentTarget.src = fallbackImage)}
         />
         {duration && (
           <div
             className={`absolute top-2 right-2 bg-${Colors.primaryMain} text-white px-2 py-1 rounded-full text-xs font-medium shadow-sm`}
           >
-            {duration}
+            {duration} Days
           </div>
         )}
-        {discountfee && (
+        {DiscountFees && (
           <div className="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium shadow-sm">
-            Save ₹{Number(fees - discountfee).toFixed(0)}
+            Save ₹{Number(Fees - DiscountFees).toFixed(0)}
           </div>
         )}
       </div>
 
       <div className="p-4 sm:p-5 space-y-3">
         <h2 className="text-base sm:text-lg font-semibold text-gray-900 tracking-tight line-clamp-2">
-          {servicename}
+          {ServiceName}
         </h2>
 
         <div className="flex items-center gap-2 text-sm font-medium">
           <span className={`text-${Colors.primaryMain} text-base font-bold`}>
-            ₹{discountfee || fees}
+            ₹{DiscountFees || Fees}
           </span>
-          {discountfee && (
-            <span className="line-through text-gray-500 text-xs">₹{fees}</span>
+          {DiscountFees && (
+            <span className="line-through text-gray-500 text-xs">₹{Fees}</span>
           )}
         </div>
 
         <motion.button
           onClick={handleJoinClick}
-          className={`w-full px-4 py-2 bg-${Colors.primaryMain} text-white text-sm font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-sm hover:shadow-md hover:cursor-pointer`}
+          className={`w-full px-4 py-2 bg-${Colors.primaryMain} text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md`}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          aria-label={`Join ${servicename} course`}
         >
           Join
         </motion.button>
@@ -82,7 +76,6 @@ const PackageCardItem = ({
   );
 };
 
-// Course Card List
 const CourseCard = () => {
   const [servicePackages, setServicePackages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -91,17 +84,20 @@ const CourseCard = () => {
     const fetchPackages = async () => {
       setLoading(true);
       try {
-        const data = await GetServicePack("1", "Courses");
+        const data = await GetCourse();
 
-        // 🟢 Attach full image URL to each package
-        const updatedData = data.map((pkg) => ({
-          ...pkg,
-          image: pkg.image ? `${imageBaseUrl}${pkg.image}` : fallbackImage,
-        }));
-
-        setServicePackages(updatedData);
+        if (Array.isArray(data)) {
+          const updatedData = data.map((pkg) => ({
+            ...pkg,
+            Image: pkg.Image ? `${imageBaseUrl}${pkg.Image}` : fallbackImage,
+          }));
+          setServicePackages(updatedData);
+        } else {
+          console.error("Unexpected response:", data);
+          setServicePackages([]);
+        }
       } catch (error) {
-        console.error("Error fetching packages:", error);
+        console.error("Error fetching courses:", error);
       } finally {
         setLoading(false);
       }
@@ -110,7 +106,6 @@ const CourseCard = () => {
     fetchPackages();
   }, []);
 
-  // Animation variants
   const headerVariants = {
     hidden: { opacity: 0, y: -20 },
     visible: { opacity: 1, y: 0 },
@@ -143,7 +138,6 @@ const CourseCard = () => {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
               className="flex justify-center items-center h-32 md:h-40"
-              aria-live="polite"
             >
               <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-600"></div>
               <p className="ml-3 text-gray-600 text-base md:text-lg">

@@ -116,9 +116,12 @@ const VendorCard = ({
               ))}
             </div>
           ) : (
-            <p className="text-center text-gray-500 text-sm py-8">
-              No items in this order.
-            </p>
+            <div className="flex flex-col items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500"></div>
+              <p className="text-center text-gray-500 text-sm mt-4 animate-pulse">
+                Finding vendor, please wait for a moment...
+              </p>
+            </div>
           )}
 
           {/* Total Price */}

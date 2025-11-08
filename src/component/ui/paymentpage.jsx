@@ -123,7 +123,7 @@ const PaymentPage = () => {
         BeforVideo: "",
         AfterVideo: "",
         OTP: "",
-        PaymentMethod: "cash",
+        PaymentMethod: "",
       });
 
       console.log("UpdateOrder Response:", updateResponse);
