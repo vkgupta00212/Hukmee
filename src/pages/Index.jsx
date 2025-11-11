@@ -205,9 +205,9 @@ const Index = () => {
         </div>
       </section>
 
-      <footer className="mt-8 bg-gray-100 z-10 md:hidden">
+      {/* <footer className="mt-8 bg-gray-100 z-10 md:hidden">
         <Footer />
-      </footer>
+      </footer> */}
     </div>
   );
 };

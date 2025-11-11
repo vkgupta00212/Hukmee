@@ -1,107 +1,142 @@
 // src/components/package/PackageCard.jsx
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, memo } from "react";
 import GetServicePack from "../../backend/servicepack/getservicepack";
 import Colors from "../../core/constant";
 
-const PackageCardItem = ({
-  image,
-  servicename,
-  duration,
-  fees,
-  discountfee,
-  onAdd,
-  refreshPackages,
-}) => {
-  const [isAdding, setIsAdding] = useState(false);
+// Memoized Card Item for performance
+const PackageCardItem = memo(
+  ({
+    image,
+    servicename,
+    duration,
+    fees,
+    discountfee,
+    onAdd,
+    refreshPackages,
+  }) => {
+    const [isAdding, setIsAdding] = useState(false);
 
-  const handleAddClick = async () => {
-    setIsAdding(true);
-    try {
-      // Simulate network delay (2–3 seconds)
-      const delay = Math.floor(Math.random() * 1000) + 2000;
-      await new Promise((resolve) => setTimeout(resolve, delay));
+    const handleAddClick = async () => {
+      setIsAdding(true);
+      try {
+        await onAdd();
+        refreshPackages?.();
+      } catch (err) {
+        console.error("Add to cart failed:", err);
+      } finally {
+        setIsAdding(false);
+      }
+    };
 
-      await onAdd();
-      refreshPackages?.();
-    } catch (err) {
-      console.error("Add to cart failed:", err);
-    } finally {
-      setIsAdding(false);
-    }
-  };
-
-  return (
-    <div
-      className={`relative w-full max-w-[400px] sm:max-w-[350px] md:max-w-[500px] lg:max-w-[550px] rounded-2xl border ${Colors.borderGray} bg-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1`}
-    >
-      {/* Image section */}
-      <div className="relative overflow-hidden rounded-t-2xl">
-        <img
-          src={image || "https://via.placeholder.com/550x200"}
-          alt={servicename}
-          className="w-full h-32 sm:h-40 md:h-48 lg:h-56 object-cover transition-transform duration-300 hover:scale-105"
-          loading="lazy"
-        />
+    return (
+      <div className="group relative w-full max-w mx-auto">
         <div
-          className={`absolute top-3 right-3 bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} ${Colors.textWhite} px-3 py-1 rounded-full text-xs sm:text-sm font-semibold shadow-sm`}
+          className="relative overflow-hidden rounded-2xl bg-white shadow-lg 
+                     ring-1 ring-gray-100 transition-all duration-300 
+                     hover:shadow-2xl hover:ring-2 hover:ring-orange-200 
+                     hover:-translate-y-1 cursor-pointer"
         >
-          {duration}
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="p-4 sm:p-5 md:p-6 space-y-3">
-        <h2
-          className={`text-base sm:text-lg md:text-xl font-bold ${Colors.textGrayDark} tracking-tight line-clamp-2`}
-        >
-          {servicename}
-        </h2>
-
-        {/* Price */}
-        <div className="flex items-center gap-2">
-          <span
-            className={`text-base sm:text-lg md:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo}`}
-          >
-            ₹{discountfee || fees}
-          </span>
-          {discountfee && (
-            <span
-              className={`line-through ${Colors.textMuted} text-xs sm:text-sm md:text-base`}
+          {/* Image */}
+          <div className="relative aspect-[4/2.5] overflow-hidden">
+            <img
+              src={image || "https://via.placeholder.com/600x300"}
+              alt={servicename}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              loading="lazy"
+            />
+            {/* Duration Badge */}
+            <div
+              className={`absolute top-3 right-3 px-3 py-1.5 rounded-full text-xs font-bold text-white 
+                         shadow-md bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo}`}
             >
-              ₹{fees}
-            </span>
-          )}
-        </div>
+              {duration}
+            </div>
 
-        {/* Button */}
-        <button
-          onClick={handleAddClick}
-          disabled={isAdding}
-          className={`w-full py-2 sm:py-2.5 bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} ${Colors.textWhite} text-xs sm:text-sm md:text-base font-semibold rounded-lg hover:bg-gradient-to-r ${Colors.hoverFrom} ${Colors.hoverTo} transition-colors duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 flex justify-center items-center gap-2`}
-          aria-label={`Add ${servicename} to cart`}
-        >
-          {isAdding && (
-            <span className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></span>
-          )}
-          {isAdding ? "Adding..." : "Add to Cart"}
-        </button>
+            {/* Shine Effect on Hover */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-full transition-transform duration-1000 skew-x-12" />
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="p-5 space-y-3">
+            <h3 className="text-lg font-bold text-gray-900 line-clamp-2 group-hover:text-orange-600 transition-colors">
+              {servicename}
+            </h3>
+
+            {/* Price */}
+            <div className="flex items-center gap-2">
+              <span
+                className={`text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo}`}
+              >
+                ₹{discountfee || fees}
+              </span>
+              {discountfee && (
+                <span className="line-through text-gray-400 text-sm">
+                  ₹{fees}
+                </span>
+              )}
+            </div>
+
+            {/* Add Button */}
+            <button
+              onClick={handleAddClick}
+              disabled={isAdding}
+              className={`w-full py-3 rounded-xl font-semibold text-white transition-all duration-200 
+                         flex items-center justify-center gap-2 shadow-md
+                         ${
+                           isAdding
+                             ? "bg-gray-400 cursor-not-allowed"
+                             : `bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} 
+                                hover:${Colors.hoverFrom} hover:${Colors.hoverTo} 
+                                hover:shadow-xl active:scale-95`
+                         }`}
+              aria-label={`Add ${servicename} to cart`}
+            >
+              {isAdding ? (
+                <>
+                  <svg
+                    className="animate-spin h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  Adding...
+                </>
+              ) : (
+                "Add to Cart"
+              )}
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+);
+
+PackageCardItem.displayName = "PackageCardItem";
 
 const PackageCard = ({ addToCart, selectedServiceTab }) => {
   const [servicePackages, setServicePackages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  console.log(
-    "Received selectedServiceTab in PackageCard:",
-    selectedServiceTab
-  );
-
   const fetchPackages = useCallback(async () => {
-    if (!selectedServiceTab?.id) return; // Safety check
+    if (!selectedServiceTab?.id) return;
     setLoading(true);
     setError(null);
 
@@ -122,41 +157,58 @@ const PackageCard = ({ addToCart, selectedServiceTab }) => {
   }, [fetchPackages]);
 
   return (
-    <div
-      className={`w-full bg-gradient-to-b border ${Colors.borderGray} rounded-[8px] py-8 sm:py-10 md:py-12`}
-    >
+    <section className="py-1 md:py-1 bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1
-          className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold ${Colors.textGrayDark} mb-6 sm:mb-8 md:mb-10 tracking-tight`}
-        >
-          Explore Our Service Packages
-        </h1>
+        {/* Header */}
+        <div className="text-center mb-10 md:mb-14">
+          <h1
+            className={`text-3xl sm:text-4xl md:text-5xl font-bold bg-clip-text text-transparent 
+                       bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} 
+                       tracking-tight`}
+          >
+            Explore Our Service Packages
+          </h1>
+          {/* <p className="mt-3 text-gray-600 max-w-2xl mx-auto">
+            Choose from premium packages tailored to your needs
+          </p> */}
+        </div>
 
-        {/* Loading */}
-        {loading ? (
-          <div className="flex justify-center items-center h-40 sm:h-48 md:h-56 gap-2">
+        {/* Loading State */}
+        {loading && (
+          <div className="flex flex-col items-center justify-center py-20">
             <div
-              className={`animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-t-2 border-b-2 ${Colors.primaryFrom.replace(
-                "from",
-                "border"
-              )}`}
-            ></div>
-            <p className={`text-base sm:text-lg ${Colors.textMuted}`}>
+              className={`animate-spin rounded-full h-12 w-12 border-4 border-t-transparent 
+                         border-orange-500`}
+            />
+            <p className="mt-4 text-gray-600 font-medium">
               Loading packages...
             </p>
           </div>
-        ) : error ? (
-          <p className="text-center text-red-600 text-base sm:text-lg py-8 sm:py-10 bg-white rounded-2xl shadow-md">
-            {error}
-          </p>
-        ) : servicePackages.length === 0 ? (
-          <p
-            className={`text-center ${Colors.textMuted} text-base sm:text-lg py-8 sm:py-10 bg-white rounded-2xl shadow-md`}
-          >
-            No packages available at the moment.
-          </p>
-        ) : (
-          <div className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8">
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="text-center py-16">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl max-w-md mx-auto">
+              {error}
+            </div>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && servicePackages.length === 0 && (
+          <div className="text-center py-16">
+            <div className="bg-gray-100 border-2 border-dashed rounded-xl p-12 max-w-md mx-auto">
+              <p className="text-gray-500 text-lg">
+                No packages available at the moment.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Packages Grid */}
+        {!loading && !error && servicePackages.length > 0 && (
+          <div className="grid grid-cols-1">
             {servicePackages.map((pkg) => (
               <PackageCardItem
                 key={pkg.id}
@@ -169,7 +221,7 @@ const PackageCard = ({ addToCart, selectedServiceTab }) => {
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 };
 

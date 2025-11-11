@@ -29,6 +29,7 @@ import VendorWait from "./component/ui/vendorwait";
 
 const queryClient = new QueryClient();
 
+// Layout Wrapper
 const Layout = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
@@ -62,15 +63,17 @@ const Layout = ({ children }) => {
 
       {/* Mobile Navbar (only on home) */}
       {isMobile && isHomePage && (
-        <div className="fixed bottom-0 top-0 left-0 w-full z-50 bg-white shadow-t-md">
+        <div className="fixed bottom-0 left-0 w-full z-50 bg-white shadow-t-md">
           <MobileNavbar />
         </div>
       )}
 
-      {/* Footer */}
-      <footer className="mt-8 bg-gray-100 z-10">
-        <Footer />
-      </footer>
+      {/* Footer - show only on desktop */}
+      {!isMobile && (
+        <footer className="mt-8 bg-gray-100 z-10">
+          <Footer />
+        </footer>
+      )}
     </div>
   );
 };
@@ -96,7 +99,7 @@ const App = () => {
               <Route path="/productscreen" element={<ProductScreen />} />
               <Route path="/productmainpage" element={<ProductMainPage />} />
               <Route path="/cartpage" element={<CartPage />} />
-              <Route path="/terms" element={<TermsPage />} />   
+              <Route path="/terms" element={<TermsPage />} />
               <Route path="/privacy" element={<PrivacyAndPolicy />} />
               <Route path="/contact" element={<ContactInfo />} />
               <Route path="/usedproduct" element={<UsedProduct />} />

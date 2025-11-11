@@ -2,27 +2,50 @@ import React from "react";
 
 const ServicePromoCard = ({ title, subtitle, image }) => {
   return (
-    <div className="m-2 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl">
+    <div className="m-2 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto">
       <div
-        className="relative w-full h-[220px] sm:h-[225px] md:h-[250px] lg:h-[280px] xl:h-[300px] rounded-xl overflow-hidden shadow-lg"
+        className="group relative w-full h-[220px] sm:h-[240px] md:h-[260px] lg:h-[280px] xl:h-[300px] 
+                   rounded-2xl overflow-hidden shadow-xl 
+                   transition-all duration-300 
+                   hover:shadow-2xl hover:-translate-y-1 
+                   cursor-pointer"
         style={{
           backgroundImage: `url(${image})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent p-3 sm:p-4 flex flex-col justify-end text-white">
-          <div className="space-y-1">
-            <h3 className="text-base sm:text-lg md:text-xl font-bold">
+        {/* Overlay Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent" />
+
+        {/* Content */}
+        <div className="absolute inset-0 p-4 sm:p-5 flex flex-col justify-end text-white">
+          <div className="space-y-1.5 transform transition-all duration-300 group-hover:translate-y-[-4px]">
+            <h3 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight">
               {title}
             </h3>
             {subtitle && (
-              <p className="text-xs sm:text-sm md:text-base">{subtitle}</p>
+              <p className="text-sm sm:text-base md:text-lg opacity-90 leading-snug">
+                {subtitle}
+              </p>
             )}
           </div>
-          <button className="mt-2 sm:mt-3 bg-white text-black text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-md shadow-md w-max hover:bg-gray-200 transition">
+
+          {/* Book Now Button */}
+          <button
+            className="mt-4 w-max px-5 py-2.5 bg-white text-black font-medium 
+                       text-sm sm:text-base rounded-full 
+                       shadow-lg hover:shadow-xl 
+                       transform transition-all duration-200 
+                       hover:scale-105 active:scale-95"
+          >
             Book Now
           </button>
+        </div>
+
+        {/* Subtle shine effect on hover */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-full transition-transform duration-1000 skew-x-12" />
         </div>
       </div>
     </div>

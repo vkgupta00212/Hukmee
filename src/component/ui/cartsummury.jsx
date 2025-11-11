@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import Colors from "../../core/constant";
 
 const CartSummary = ({ total, cartItems }) => {
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
-
 
   const totalDiscount = useMemo(() => {
     return cartItems.reduce((acc, item) => {
@@ -47,7 +47,7 @@ const CartSummary = ({ total, cartItems }) => {
     <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-white border-t border-gray-300 shadow-lg">
       <button
         onClick={handleCart}
-        className="w-full flex items-center justify-between bg-indigo-600 text-white px-4 sm:px-5 py-2 sm:py-3 rounded-lg shadow hover:bg-indigo-700 transition-colors duration-200"
+        className={`w-full flex items-center justify-between bg-${Colors.primaryMain} text-white px-4 sm:px-5 py-2 sm:py-3 rounded-lg shadow hover:bg-orange-500 transition-colors duration-200`}
       >
         <span className="text-sm sm:text-base font-semibold">
           Total Items: {cartItems.length}
