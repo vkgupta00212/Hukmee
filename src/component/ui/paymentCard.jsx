@@ -90,7 +90,7 @@ const PaymentCard = ({
           ) : (
             <button
               onClick={onSelectAddress}
-              className={`w-full mt-3 py-3 bg-${Colors.primaryMain} text-white rounded-lg font-medium shadow hover:shadow-lg hover:from-indigo-700 hover:to-purple-700 focus:ring-2 focus:ring-indigo-300 transition-all`}
+              className={`w-full mt-3 py-3 bg-${Colors.primaryMain} hover:cursor-pointer text-white rounded-lg font-medium shadow hover:shadow-lg hover:from-indigo-700 hover:to-purple-700 focus:ring-2 focus:ring-indigo-300 transition-all`}
             >
               Select an Address
             </button>
@@ -102,19 +102,21 @@ const PaymentCard = ({
         {/* Slot */}
         <div>
           <SectionHeader icon={IoIosTime} title="Slot" />
+
           {selectedSlot ? (
             <div
               onClick={onSelectSlot}
               className="mt-3 p-4 bg-white border border-indigo-200 rounded-lg shadow-sm cursor-pointer hover:shadow-md hover:border-indigo-400 transition-all duration-300"
             >
               <p className="text-sm font-medium text-gray-800">
-                <strong>Day:</strong> {selectedSlot.day.label}{" "}
-                {selectedSlot.day.date}
+                <strong>Day:</strong> {selectedSlot.day?.label}{" "}
+                {selectedSlot.day?.date}
               </p>
               <p className="text-sm text-gray-600">
-                <strong>Time:</strong> {selectedSlot.time}
+                <strong>Time:</strong> {selectedSlot.time?.time}
               </p>
-              {selectedSlot.day.recommended && (
+
+              {selectedSlot.day?.recommended && (
                 <p className="text-xs text-yellow-600 mt-1">
                   ⭐ Recommended Slot
                 </p>
@@ -127,7 +129,7 @@ const PaymentCard = ({
               className={`w-full mt-3 py-3 rounded-lg font-medium shadow transition-all focus:ring-2 focus:ring-indigo-300 ${
                 isSlotButtonDisabled
                   ? "bg-gray-300 cursor-not-allowed text-gray-500"
-                  : `bg-${Colors.primaryMain} text-white hover:shadow-lg hover:from-indigo-700 hover:to-purple-700`
+                  : `bg-${Colors.primaryMain} text-white hover:cursor-pointer hover:bg-orange-500 hover:shadow-lg`
               }`}
             >
               Select Slot
@@ -146,7 +148,7 @@ const PaymentCard = ({
             className={`w-full mt-3 py-3 rounded-lg font-medium shadow transition-all focus:ring-2 focus:ring-indigo-300 ${
               isPaymentButtonDisabled
                 ? "bg-gray-300 cursor-not-allowed text-gray-500"
-                : `bg-${Colors.primaryMain} text-white hover:shadow-lg hover:from-indigo-700 hover:to-purple-700`
+                : `bg-${Colors.primaryMain} text-white hover:shadow-lg hover:from-orange-500 hover:cursor-pointer hover:to-purple-700`
             }`}
           >
             {getPaymentButtonLabel()}

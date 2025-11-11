@@ -39,7 +39,7 @@ const PackageCardItem = ({
           <div
             className={`absolute top-2 right-2 bg-${Colors.primaryMain} text-white px-2 py-1 rounded-full text-xs font-medium shadow-sm`}
           >
-            {duration} Days
+            {duration} Minute
           </div>
         )}
         {DiscountFees && (
@@ -56,10 +56,12 @@ const PackageCardItem = ({
 
         <div className="flex items-center gap-2 text-sm font-medium">
           <span className={`text-${Colors.primaryMain} text-base font-bold`}>
-            ₹{DiscountFees || Fees}
+            ₹{Fees}
           </span>
           {DiscountFees && (
-            <span className="line-through text-gray-500 text-xs">₹{Fees}</span>
+            <span className="line-through text-gray-500 text-xs">
+              ₹{DiscountFees}
+            </span>
           )}
         </div>
 

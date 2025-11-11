@@ -6,6 +6,7 @@ import PaymentCard2 from "./paymentCard2";
 import PaymentCardButton from "./paymentCardButton";
 import AddressFormCard from "./addressCard";
 import SlotCard from "./slotCard";
+import NowSlotCard from "./nowslotcard";
 import { motion, AnimatePresence } from "framer-motion";
 import UpdateOrder from "../../backend/order/updateorder";
 import GetOrder from "../../backend/order/getorderid";
@@ -31,6 +32,9 @@ const PaymentPage = () => {
 
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [showSlotModal, setShowSlotModal] = useState(false);
+  const [showSlotFirst, setShowSlotFirst] = useState(false);
+  const [showNow, setShowNow] = useState(false);
+  const [showLater, setShowLater] = useState(false);
   const [isMobile, setIsMobile] = useState(
     typeof window !== "undefined" ? window.innerWidth < 640 : false
   );
@@ -77,6 +81,14 @@ const PaymentPage = () => {
     };
     fetchOrders();
   }, [UserID]);
+
+  const handleLaterClick = async () => {
+    setShowSlotModal(true);
+  };
+
+  const handleNowClick = async () => {
+    setShowNow(true);
+  };
 
   const handleproceed = async (amount) => {
     if (!isLoggedIn) {
@@ -223,7 +235,7 @@ const PaymentPage = () => {
           <div>
             <PaymentCard
               onSelectAddress={() => setShowAddressModal(true)}
-              onSelectSlot={() => setShowSlotModal(true)}
+              onSelectSlot={() => setShowSlotFirst(true)}
               onProceed={handleproceed}
               selectedAddress={selectedAddress}
               selectedSlot={selectedSlot}
@@ -322,6 +334,94 @@ const PaymentPage = () => {
                     className="px-4 py-2 text-sm font-medium text-orange-600 hover:text-orange-800 bg-orange-50 hover:bg-orange-100 rounded-lg transition"
                   >
                     Close
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          </AnimatePresence>
+        )}
+
+        {showNow && (
+          <AnimatePresence>
+            <motion.div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                className="bg-white rounded-xl shadow-xl w-full max-w-md p-5"
+                initial={{ y: 20, scale: 0.98 }}
+                animate={{ y: 0, scale: 1 }}
+                exit={{ y: 20, scale: 0.98 }}
+              >
+                <NowSlotCard
+                  onSelectSlot={(slot) => {
+                    setSelectedSlot(slot);
+                    setShowNow(false);
+                  }}
+                  onClose={() => setShowNow(false)}
+                />
+                <div className="mt-4 flex justify-end">
+                  <button
+                    onClick={() => setShowNow(false)}
+                    className="px-4 py-2 text-sm font-medium text-orange-600 hover:text-orange-800 bg-orange-50 hover:bg-orange-100 rounded-lg transition"
+                  >
+                    Close
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          </AnimatePresence>
+        )}
+
+        {showSlotFirst && (
+          <AnimatePresence>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="relative bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm text-center"
+              >
+                {/* ❌ Cross (Close) Button */}
+                <button
+                  onClick={() => setShowSlotFirst(false)}
+                  className="absolute top-3 right-3 text-gray-500 hover:text-red-600 transition"
+                >
+                  ✕
+                </button>
+
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 mt-2">
+                  Select slot
+                </h3>
+
+                <div className="flex justify-center gap-4">
+                  <button
+                    onClick={() => {
+                      handleNowClick();
+                      setShowSlotFirst(false);
+                    }}
+                    className={`px-4 py-2 text-${Colors.primaryMain} rounded-lg bg-orange-100 hover:bg-orange-500 hover:text-white hover:cursor-pointer transition`}
+                  >
+                    Now
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      handleLaterClick();
+                      setShowSlotFirst(false);
+                    }}
+                    className={`px-4 py-2 text-${Colors.primaryMain} rounded-lg bg-orange-100 hover:bg-orange-500 hover:text-white hover:cursor-pointer transition`}
+                  >
+                    Later
                   </button>
                 </div>
               </motion.div>
