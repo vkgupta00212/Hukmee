@@ -162,7 +162,7 @@ const PackageCard = ({ addToCart, selectedServiceTab }) => {
         {/* Header */}
         <div className="text-center mb-10 md:mb-14">
           <h1
-            className={`text-2xl sm:text-4xl md:text-5xl font-bold bg-clip-text text-transparent 
+            className={`text-2xl sm:text-4xl md:text-3xl font-bold bg-clip-text text-transparent 
                        bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} 
                        tracking-tight`}
           >

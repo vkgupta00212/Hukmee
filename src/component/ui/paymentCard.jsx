@@ -141,7 +141,11 @@ const PaymentCard = ({
         <button
           onClick={handleMainClick}
           disabled={!canProceed}
-          className={`w-full py-4 rounded-xl font-bold text-lg transition-all shadow-lg ${"bg-orange-500 text-white hover:bg-orange-600 transform hover:cursor-pointer hover:scale-[1.01] active:scale-95"}`}
+          className={`w-full py-4 rounded-xl font-bold text-lg transition-all shadow-lg ${
+            !canProceed
+              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+              : `bg-${Colors.primaryMain} text-white shadow-md hover:shadow-lg hover:cursor-pointer`
+          }`}
         >
           {getButtonLabel()}
         </button>

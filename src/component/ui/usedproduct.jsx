@@ -193,8 +193,49 @@ const UsedProduct = () => {
         </div>
       </header>
 
+      {!isMobile && (
+        <header className="mt-15 ml-[120px] mr-[120px] rounded-[10px] top-0 left-0 right-0 bg-white shadow-md z-50 border-b border-gray-200">
+          <div className="px-4 py-4 sm:px-6">
+            {/* Search Bar */}
+            <div className="flex justify-between items-center">
+              <motion.div
+                variants={headerVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{ duration: 0.5 }}
+                className="mt-3"
+              >
+                <div className="w-[280px] flex items-center border border-gray-300 rounded-lg px-4 py-2.5 bg-gray-50 shadow-sm">
+                  <FiSearch className="text-gray-500 mr-3" size={20} />
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search products..."
+                    className="flex-grow outline-none text-gray-700 placeholder-gray-400 bg-transparent text-sm"
+                  />
+                </div>
+              </motion.div>
+
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate("/cartpage")}
+                className="flex items-center gap-1 text-gray-700 hover:text-orange-600 cursor-pointer"
+                aria-label="View cart"
+              >
+                <div className="p-2 border border-gray-400 rounded-full">
+                  <ShoppingCart size={18} />
+                </div>
+                <span className="text-xs font-medium">Cart</span>
+              </motion.div>
+            </div>
+          </div>
+        </header>
+      )}
+
       {/* === MAIN CONTENT (Starts below header) === */}
-      <main className="pt-28 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <main className="pt-2 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Error */}
         {error && (
           <motion.div

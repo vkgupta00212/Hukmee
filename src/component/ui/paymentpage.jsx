@@ -231,7 +231,7 @@ const PaymentPage = () => {
           </div>
         </div> */}
 
-        <div className="w-full mb- max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="w-full mt-[30px] max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <PaymentCard
               onSelectAddress={() => setShowAddressModal(true)}
