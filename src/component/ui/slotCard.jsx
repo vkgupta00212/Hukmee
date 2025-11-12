@@ -13,11 +13,10 @@ const SlotCard = ({ onSelectSlot }) => {
   useEffect(() => {
     const generateSlots = () => {
       const now = new Date();
-      const tomorrow = addDays(now, 1);
 
-      // Next 3 days
+      // Include today + next 2 days
       const dynamicDays = Array.from({ length: 3 }, (_, i) => {
-        const date = addDays(tomorrow, i);
+        const date = addDays(now, i);
         return {
           label: format(date, "EEE"),
           date: format(date, "d"),
@@ -33,7 +32,7 @@ const SlotCard = ({ onSelectSlot }) => {
       let base = new Date(now);
       base.setHours(base.getHours() + 1, 0, 0, 0);
 
-      const startHour = 9;
+      const startHour = 10;
       const endHour = 21;
 
       if (base.getHours() >= endHour) {
@@ -98,7 +97,7 @@ const SlotCard = ({ onSelectSlot }) => {
       className="bg-white rounded-2xl shadow-2xl max-w-md mx-auto border border-gray-100
                  h-[520px] sm:h-[540px] flex flex-col overflow-hidden"
     >
-      {/* Header - Fixed */}
+      {/* Header */}
       <div className="p-5 sm:p-6 border-b border-gray-100">
         <div className="flex items-center gap-3">
           <div className="p-2.5 bg-gradient-to-br from-orange-100 to-pink-100 rounded-xl">
@@ -194,7 +193,7 @@ const SlotCard = ({ onSelectSlot }) => {
         </div>
       </div>
 
-      {/* Fixed Footer */}
+      {/* Footer */}
       <div className="p-5 sm:p-6 border-t border-gray-100 bg-gray-50/80 backdrop-blur">
         <button
           onClick={handleProceed}
@@ -211,9 +210,6 @@ const SlotCard = ({ onSelectSlot }) => {
           Confirm Slot
           <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
-        <p className="text-[10px] sm:text-xs text-gray-500 text-center mt-2">
-          Professional arrives within 30 mins
-        </p>
       </div>
     </div>
   );

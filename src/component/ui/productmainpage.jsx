@@ -36,6 +36,7 @@ const ProductMainPage = () => {
   const loginPromptRef = useRef(null);
   const loginCardRef = useRef(null);
   const otpModalRef = useRef(null);
+  const [addStatus, setAddStatus] = useState(null);
 
   const UserID = localStorage.getItem("userPhone");
 
@@ -244,29 +245,32 @@ const ProductMainPage = () => {
 
     const price = parseInt(item.Price || 0);
 
-    setCartItems((prev) => {
-      const exists = prev.find((i) => i.id === item.ProID);
-      if (exists) {
-        return prev.map((i) =>
-          i.id === item.ProID ? { ...i, quantity: i.quantity + 1 } : i
-        );
-      } else {
-        return [...prev, { ...item, id: item.ProID, quantity: 1, price }];
-      }
-    });
+    // Show "Adding…" immediately
+    setAddStatus("adding");
 
     try {
+      // Update local cart (optimistic)
+      setCartItems((prev) => {
+        const exists = prev.find((i) => i.id === item.ProID);
+        if (exists) {
+          return prev.map((i) =>
+            i.id === item.ProID ? { ...i, quantity: i.quantity + 1 } : i
+          );
+        }
+        return [...prev, { ...item, id: item.ProID, quantity: 1, price }];
+      });
+
+      // Create or reuse order
       let currentOrderId = orderId;
       if (!currentOrderId) {
         currentOrderId = `ORD${Date.now()}`;
         setOrderId(currentOrderId);
         setOrderType("Product");
-        console.log("Generated new order:", currentOrderId);
       }
 
       const orderPayload = {
         OrderID: currentOrderId,
-        UserID: UserID,
+        UserID,
         OrderType: "Product",
         ItemImages: "",
         ItemName: item.ProductName || "",
@@ -278,12 +282,15 @@ const ProductMainPage = () => {
         OrderDatetime: new Date().toISOString(),
       };
 
-      await InsertOrder(orderPayload);
-      console.log("InsertOrder API successful");
+      await InsertOrder(orderPayload); // API call
 
-      window.location.reload();
+      // Success → show "Added!" for 2 seconds
+      setAddStatus("added");
+      setTimeout(() => setAddStatus("idle"), 2000);
     } catch (err) {
       console.error("InsertOrder failed:", err);
+      setAddStatus("idle");
+      alert("Failed to add item. Please try again.");
     }
   };
 
@@ -336,18 +343,19 @@ const ProductMainPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 font-sans">
-      <div className="fixed top-0 left-0 w-full bg-white shadow-md z-10 border-b border-gray-200">
-        <div className="flex items-center justify-start px-4 py-3 sm:px-6">
+      <div className="fixed top-0 left-0 w-full bg-white shadow-lg z-50 border-b border-gray-200">
+        <div className="flex items-center justify-between px-4 py-3 sm:px-6">
+          {/* Back Button */}
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={goBack}
-            className="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="p-2.5 rounded-full bg-gray-50 hover:bg-gray-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-400"
             aria-label="Go back"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="w-6 h-6 text-gray-600 hover:text-gray-800"
+              className="w-6 h-6 text-gray-700"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -360,108 +368,234 @@ const ProductMainPage = () => {
               />
             </svg>
           </motion.button>
-          <h2 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+
+          {/* Title */}
+          <h2
+            className={`text-xl sm:text-2xl font-bold bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} bg-clip-text text-transparent`}
+          >
             Product
           </h2>
+
+          {/* Spacer */}
+          <div className="w-[210px]" />
         </div>
       </div>
       <div className="pt-[30px]"></div>
-      <div className="max-w-6xl md:mt-[50px] mx-auto flex flex-col md:flex-row gap-8 bg-white shadow-xl border border-gray-200 rounded-2xl overflow-hidden">
-        <div className="md:w-1/2 w-full h-[250px] p-[1px] bg-gray-100 rounded-[10px] overflow-hidden relative">
-          {isLoading ? (
-            <div className="flex items-center justify-center w-full h-full">
-              <p className="text-gray-600">Loading images...</p>
-            </div>
-          ) : images.length > 1 ? (
-            <>
-              <div ref={sliderRef} className="keen-slider w-full h-full">
-                {images.map((img, index) => (
-                  <div
-                    key={index}
-                    className="keen-slider__slide flex items-center justify-center bg-gray-100"
-                  >
-                    <img
-                      src={img}
-                      alt={`${product.ProductName} - Image ${index + 1}`}
-                      className="object-cover w-full h-full"
-                      onError={(e) => {
-                        e.currentTarget.src = spaImage;
-                      }}
-                    />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-6xl mx-auto p-1 sm:p-6"
+      >
+        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+          <div className="grid md:grid-cols-2 gap-0">
+            {/* Image Slider */}
+            <div className="relative h-72 md:h-96 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+              {isLoading ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent"></div>
+                </div>
+              ) : images.length > 1 ? (
+                <>
+                  <div ref={sliderRef} className="keen-slider h-full">
+                    {images.map((img, index) => (
+                      <div key={index} className="keen-slider__slide">
+                        <img
+                          src={img}
+                          alt={`${product.ProductName} - Image ${index + 1}`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = spaImage;
+                          }}
+                        />
+                      </div>
+                    ))}
                   </div>
-                ))}
+
+                  {/* Navigation Arrows */}
+                  {loaded && instanceRef.current && (
+                    <>
+                      <button
+                        onClick={() => instanceRef.current?.prev()}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-xl hover:bg-white transition-all duration-300 group"
+                        aria-label="Previous slide"
+                      >
+                        <svg
+                          className="w-5 h-5 text-gray-700 group-hover:text-orange-600 transition"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M15 19l-7-7 7-7"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => instanceRef.current?.next()}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-xl hover:bg-white transition-all duration-300 group"
+                        aria-label="Next slide"
+                      >
+                        <svg
+                          className="w-5 h-5 text-gray-700 group-hover:text-orange-600 transition"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </button>
+                    </>
+                  )}
+
+                  {/* Dots Indicator */}
+                  {loaded && instanceRef.current && (
+                    <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
+                      {images.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => instanceRef.current?.moveToIdx(index)}
+                          className={`transition-all duration-300 ${
+                            currentSlide === index
+                              ? "w-10 h-2.5 bg-white rounded-full shadow-lg"
+                              : "w-2.5 h-2.5 bg-white/60 rounded-full hover:bg-white/80"
+                          }`}
+                          aria-label={`Go to slide ${index + 1}`}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <img
+                  src={images[0] || spaImage}
+                  alt={product.ProductName}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = spaImage;
+                  }}
+                />
+              )}
+            </div>
+
+            {/* Product Details */}
+            <div className="p-6 sm:p-8 lg:p-10 flex flex-col justify-between">
+              <div>
+                <h2
+                  className={`text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} bg-clip-text text-transparent mb-4 leading-tight`}
+                >
+                  {product.ProductName}
+                </h2>
+                <p className="text-gray-600 text-sm sm:text-base lg:text-lg leading-relaxed line-clamp-4">
+                  {product.ProductDes ||
+                    "Experience premium quality with this handpicked product. Crafted with care for your satisfaction."}
+                </p>
               </div>
-              {loaded && instanceRef.current && (
-                <div className="absolute top-1/2 -translate-y-1/2 w-full flex justify-between px-4">
-                  <button
-                    onClick={() => instanceRef.current?.prev()}
-                    className="p-2 bg-gray-800 bg-opacity-50 rounded-full text-white hover:bg-opacity-75 transition"
-                    aria-label="Previous slide"
-                  >
-                    ‹
-                  </button>
-                  <button
-                    onClick={() => instanceRef.current?.next()}
-                    className="p-2 bg-gray-800 bg-opacity-50 rounded-full text-white hover:bg-opacity-75 transition"
-                    aria-label="Next slide"
-                  >
-                    ›
-                  </button>
+
+              <div className="mt-8">
+                <div className="flex items-baseline gap-3 mb-6">
+                  <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">
+                    ₹{Number(product.Price).toFixed(0)}
+                  </span>
+                  {product.OriginalPrice && (
+                    <span className="text-lg sm:text-xl text-gray-500 line-through">
+                      ₹{Number(product.OriginalPrice).toFixed(0)}
+                    </span>
+                  )}
                 </div>
-              )}
-              {loaded && instanceRef.current && (
-                <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
-                  {images.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => instanceRef.current?.moveToIdx(index)}
-                      className={`w-3 h-3 rounded-full ${
-                        currentSlide === index
-                          ? "bg-indigo-600"
-                          : "bg-gray-300 hover:bg-gray-400"
-                      } transition`}
-                      aria-label={`Go to slide ${index + 1}`}
-                    />
-                  ))}
-                </div>
-              )}
-            </>
-          ) : (
-            <img
-              src={images[0] || spaImage}
-              alt={product.ProductName}
-              className="object-cover w-full h-full"
-              onError={(e) => {
-                e.currentTarget.src = spaImage;
-              }}
-            />
-          )}
-        </div>
-        <div className="md:w-1/2 w-full p-[10px] flex flex-col justify-between">
-          <div>
-            <h2
-              className={`text-2xl md:text-3xl font-bold bg-${Colors.primaryMain} bg-clip-text text-transparent`}
-            >
-              {product.ProductName}
-            </h2>
-            <p className="text-gray-600 mt-[1px] text-sm md:text-base leading-relaxed">
-              {product.ProductDes}
-            </p>
+
+                <motion.button
+                  whileHover={{ scale: addStatus === "added" ? 1 : 1.02 }}
+                  whileTap={{ scale: addStatus === "added" ? 1 : 0.98 }}
+                  onClick={() => addToCart(product)}
+                  disabled={addStatus === "adding"}
+                  className={`
+    relative w-full py-4 rounded-2xl font-bold text-white shadow-xl transition-all duration-300
+    bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo}
+    hover:shadow-2xl flex items-center justify-center gap-3 text-lg
+    ${addStatus === "adding" ? "opacity-90 cursor-not-allowed" : ""}
+  `}
+                  aria-label="Add to cart"
+                >
+                  {/* Idle: Add to Cart */}
+                  {addStatus === "idle" && (
+                    <>
+                      <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                        />
+                      </svg>
+                      Add to Cart
+                    </>
+                  )}
+
+                  {/* Adding… */}
+                  {addStatus === "adding" && (
+                    <>
+                      <svg
+                        className="animate-spin w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v8z"
+                        />
+                      </svg>
+                      Adding…
+                    </>
+                  )}
+
+                  {/* Added! */}
+                  {addStatus === "added" && (
+                    <>
+                      <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      Added!
+                    </>
+                  )}
+                </motion.button>
+              </div>
+            </div>
           </div>
-          <div className="mt-[2px]">
-            <p className="text-xl md:text-2xl font-semibold text-gray-900">
-              ₹{Number(product.Price).toFixed(2)}
-            </p>
-            <button
-              onClick={() => addToCart(product)}
-              className={`w-full mt-[10px] py-[11px] bg-${Colors.primaryMain} text-white rounded-lg font-semibold shadow-md hover:shadow-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300`}
-              aria-label="Add to cart"
-            >
-              Add to Cart
-            </button>
-          </div>
         </div>
-      </div>
+      </motion.div>
       <div className="p-1 mt-[7px]">
         <RatingScreen reviews={reviews} />
       </div>

@@ -287,7 +287,7 @@ const WomenSaloonIn = () => {
 
   return (
     <div className="pt-4 px-1 md:px-6 lg:px-[120px] md:mt-[100px]">
-      <div className="relative flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 px-4 sm:px-6 pt-16 lg:pt-5">
+      <div className="relative flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 px-1 sm:px-6 pt-16 lg:pt-5">
         {/* Header with Back Button and Title */}
         <div className="md:hidden fixed top-0 left-0 w-full bg-white shadow-md z-10 border-b border-gray-200">
           <div className="flex items-center justify-start px-4 py-3 sm:px-6">

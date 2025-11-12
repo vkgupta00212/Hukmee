@@ -22,7 +22,7 @@ const NowSlotCard = ({ onSelectSlot }) => {
     setToday(todayObj);
 
     // ✅ Find nearest available slot (next full hour within 9AM–9PM)
-    const startHour = 9;
+    const startHour = 10;
     const endHour = 21;
 
     let baseTime = new Date(now);
@@ -104,9 +104,9 @@ const NowSlotCard = ({ onSelectSlot }) => {
         <ChevronRight className="w-5 h-5" />
       </button>
 
-      <p className="text-xs text-gray-500 text-center mt-4">
+      {/* <p className="text-xs text-gray-500 text-center mt-4">
         Service starts at selected time • Professional arrives within 30 mins
-      </p>
+      </p> */}
     </div>
   );
 };

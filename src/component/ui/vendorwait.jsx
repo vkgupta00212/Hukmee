@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import ShowOrders from "../../backend/order/showorder";
 import GetVendor from "../../backend/authentication/getvendor";
 
-// Reusable VendorCard component
+// Reusable VendorCard
 const VendorCard = ({
   title,
   vendorData = [],
@@ -22,7 +23,6 @@ const VendorCard = ({
 
   return (
     <div className="w-full max-w-lg bg-white border border-gray-200 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 sm:p-8">
-      {/* Title */}
       <h2
         className={`text-3xl font-bold text-center mb-6 ${
           isAccepted
@@ -33,101 +33,87 @@ const VendorCard = ({
         {title}
       </h2>
 
-      {/* Main Loading State */}
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500"></div>
-          <p className="text-center text-gray-500 text-sm mt-4 animate-pulse">
-            Finding vendor, please wait for a moment...
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-3 border-b-3 border-orange-500"></div>
+          <p className="text-center text-gray-600 text-base mt-4">
+            Finding the best vendor for you...
+          </p>
+          <p className="text-xs text-gray-500 mt-2">
+            This may take 10-30 seconds
           </p>
         </div>
       ) : (
         <>
-          {/* Vendor Details Section - Only after acceptance */}
           {isAccepted && (
-            <div className="flex flex-col">
-              <div className="mb-6 p-4 bg-green-50 rounded-lg border border-green-100">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                  Vendor Details
+            <div className="space-y-4">
+              {/* Vendor Details */}
+              <div className="p-5 bg-green-50 rounded-xl border border-green-200">
+                <h3 className="text-lg font-semibold text-green-800 mb-3 flex items-center gap-2">
+                  Vendor Assigned
                   {isVendorLoading && (
-                    <span className="inline-block animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-green-600"></span>
+                    <span className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-green-600"></span>
                   )}
                 </h3>
-
-                {isVendorLoading ? (
-                  <p className="text-sm text-gray-500 italic">
-                    Loading vendor info...
-                  </p>
-                ) : vendorDetails ? (
-                  <>
-                    <p className="text-sm text-gray-700">
-                      <span className="font-medium">Name:</span>{" "}
-                      {vendorDetails.fullname}
+                {vendorDetails ? (
+                  <div className="space-y-2 text-sm">
+                    <p>
+                      <strong>Name:</strong> {vendorDetails.fullname}
                     </p>
-                    <p className="text-sm text-gray-700">
-                      <span className="font-medium">Phone:</span>{" "}
-                      {vendorDetails.phoneNumber}
+                    <p>
+                      <strong>Phone:</strong> {vendorDetails.phoneNumber}
                     </p>
-                    <p className="text-sm text-gray-700">
-                      <span className="font-medium">Address:</span>{" "}
-                      {vendorDetails.Address || "Not provided"}
+                    <p>
+                      <strong>Address:</strong> {vendorDetails.Address || "N/A"}
                     </p>
-                  </>
+                  </div>
                 ) : (
-                  <p className="text-sm text-red-600 italic">
-                    Vendor details unavailable
+                  <p className="text-sm text-gray-600 italic">
+                    Loading details...
                   </p>
                 )}
               </div>
-              <div className="mb-6 p-4 bg-green-50 rounded-lg border border-green-100">
-                <div className="flex flex-row justify-between">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                    OTP
-                  </h3>
-                  <h3>{vendorData[0].OTP}</h3>
+
+              {/* OTP */}
+              {vendorData[0]?.OTP && (
+                <div className="p-5 bg-blue-50 rounded-xl border border-blue-200 text-center">
+                  <p className="text-sm text-blue-600 font-medium">
+                    Share this OTP with vendor
+                  </p>
+                  <p className="text-3xl font-bold text-blue-700 mt-2 tracking-widest">
+                    {vendorData[0].OTP}
+                  </p>
                 </div>
-              </div>
+              )}
             </div>
           )}
 
-          {/* Vendor Items */}
+          {/* Items */}
           {vendorData.length > 0 ? (
-            <div className="space-y-4">
+            <div className="mt-6 space-y-3">
               {vendorData.map((item) => (
                 <div
                   key={item.ID}
-                  className="flex justify-between items-start gap-4 border-b border-gray-100 pb-4 last:border-b-0"
-                  role="listitem"
+                  className="flex justify-between items-center border-b border-gray-100 pb-3 last:border-b-0"
                 >
-                  <div className="flex-1">
-                    <p className="text-base font-semibold text-gray-900">
-                      {item.ItemName || "Unknown Item"}
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-end">
-                    <div className="flex items-center border border-orange-200 bg-orange-50 rounded-full px-3 py-1 text-xs font-medium text-orange-600">
+                  <p className="font-medium text-gray-800">{item.ItemName}</p>
+                  <div className="text-right">
+                    <span className="inline-block px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
                       Qty: {item.Quantity || 1}
-                    </div>
-                    <p className="text-sm font-bold mt-2 text-gray-800">
-                      ₹{item.Price || "0.00"}
+                    </span>
+                    <p className="font-bold text-gray-900 mt-1">
+                      ₹{item.Price}
                     </p>
                   </div>
                 </div>
               ))}
             </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500"></div>
-              <p className="text-center text-gray-500 text-sm mt-4 animate-pulse">
-                Finding vendor, please wait for a moment...
-              </p>
-            </div>
-          )}
+          ) : null}
 
-          {/* Total Price */}
+          {/* Total */}
           {vendorData.length > 0 && (
-            <div className="mt-6 text-right border-t border-gray-200 pt-4">
-              <p className="text-lg font-semibold text-gray-900">
+            <div className="mt-6 pt-4 border-t border-gray-300 text-right">
+              <p className="text-xl font-bold text-gray-900">
                 Total: <span className="text-orange-600">₹{totalPrice}</span>
               </p>
             </div>
@@ -140,116 +126,174 @@ const VendorCard = ({
 
 const VendorWait = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const incomingCartItems = location.state?.cartItems || [];
   const [cartItems] = useState(
     Array.isArray(incomingCartItems) ? incomingCartItems : []
   );
 
   const orderId = cartItems[0]?.OrderID || "";
+  const userPhone = localStorage.getItem("userPhone");
 
   // State
   const [isLoading, setIsLoading] = useState(true);
-  const [vendorAccepted, setVendorAccepted] = useState(false);
+  const [isAccepted, setIsAccepted] = useState(false);
   const [vendorData, setVendorData] = useState([]);
   const [vendorDetails, setVendorDetails] = useState(null);
   const [isVendorLoading, setIsVendorLoading] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(120); // 2 minutes
 
-  const VendorPhone = localStorage.getItem("userPhone");
-
+  // 2-minute timeout → go home
   useEffect(() => {
-    if (!VendorPhone) {
+    if (isAccepted) return;
+    const timer = setInterval(() => {
+      setSecondsLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          navigate("/", { replace: true });
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [isAccepted, navigate]);
+
+  // Polling for order status
+  useEffect(() => {
+    if (!userPhone || !orderId) {
       setIsLoading(false);
       return;
     }
 
     let interval = null;
 
-    const fetchShowOrders = async () => {
+    const fetchOrderStatus = async () => {
       try {
         const res = await ShowOrders({
           orderid: orderId,
-          UserID: VendorPhone,
+          UserID: userPhone,
           VendorPhone: "",
           Status: "Done",
         });
 
-        if (Array.isArray(res) && res.length > 0) {
-          const doneOrders = res.filter((order) => order.Status === "Done");
-          console.log("orders fetched:", doneOrders);
+        if (!Array.isArray(res)) return;
 
-          if (doneOrders.length > 0) {
-            // Order accepted
-            setVendorAccepted(true);
-            setVendorData(doneOrders);
-            setIsLoading(false);
+        const currentOrder = res.find((o) => o.OrderID === orderId);
 
-            // Stop polling
-            if (interval) clearInterval(interval);
+        if (currentOrder && currentOrder.Status === "Done") {
+          setIsAccepted(true);
+          setVendorData(res.filter((o) => o.OrderID === orderId));
+          setIsLoading(false);
+          if (interval) clearInterval(interval);
 
-            // Fetch vendor details
-            const vendorPhone = doneOrders[0].VendorPhone;
-            if (vendorPhone && !vendorDetails) {
-              setIsVendorLoading(true);
-              try {
-                const vendorRes = await GetVendor(vendorPhone);
-                if (Array.isArray(vendorRes) && vendorRes.length > 0) {
-                  setVendorDetails(vendorRes[0]);
-                } else {
-                  setVendorDetails(null);
-                }
-              } catch (err) {
-                console.log("Failed to fetch vendor details:", err);
-                setVendorDetails(null);
-              } finally {
-                setIsVendorLoading(false);
+          const vendorPhone = currentOrder.VendorPhone;
+          if (vendorPhone && !vendorDetails) {
+            setIsVendorLoading(true);
+            try {
+              const vendorRes = await GetVendor(vendorPhone);
+              if (Array.isArray(vendorRes) && vendorRes.length > 0) {
+                setVendorDetails(vendorRes[0]);
               }
+            } finally {
+              setIsVendorLoading(false);
             }
-          } else {
-            // Still waiting
-            setVendorAccepted(false);
-            setVendorData([]);
-            setVendorDetails(null);
           }
         } else {
-          setVendorAccepted(false);
+          setIsAccepted(false);
           setVendorData([]);
           setVendorDetails(null);
         }
       } catch (error) {
-        console.error("Error in ShowOrders:", error);
-        setVendorAccepted(false);
-        setVendorDetails(null);
+        console.error("Polling error:", error);
       } finally {
-        if (!vendorAccepted) {
-          setIsLoading(false);
-        }
+        if (!isAccepted) setIsLoading(false);
       }
     };
 
-    // Initial fetch
-    fetchShowOrders();
+    fetchOrderStatus();
+    if (!isAccepted) interval = setInterval(fetchOrderStatus, 5000);
 
-    if (!vendorAccepted) {
-      interval = setInterval(fetchShowOrders, 5000);
-    }
-
-    // Cleanup
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [VendorPhone, vendorAccepted, vendorDetails]);
+    return () => interval && clearInterval(interval);
+  }, [orderId, userPhone, isAccepted, vendorDetails]);
 
   return (
-    <div className="mt-10 min-h-screen bg-gray-100 flex flex-wrap items-start justify-center gap-6 py-12 px-4 sm:px-6 lg:px-8">
-      {/* Right - Vendor Status Card */}
-      <VendorCard
-        title={vendorAccepted ? "Vendor Accepted" : "Finding Vendor"}
-        vendorData={vendorData}
-        isLoading={isLoading && !vendorAccepted}
-        isAccepted={vendorAccepted}
-        vendorDetails={vendorDetails}
-        isVendorLoading={isVendorLoading}
-      />
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      {/* Fixed Header */}
+      <div className="fixed top-0 left-0 right-0 bg-white shadow-md z-50 border-b border-gray-200">
+        <div className="flex items-center justify-between px-4 py-3 sm:px-6">
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => navigate(-1)}
+            className="p-2.5 rounded-full bg-gray-50 hover:bg-gray-100 transition-all duration-200"
+            aria-label="Go back"
+          >
+            <svg
+              className="w-6 h-6 text-gray-700"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </motion.button>
+
+          <h1 className="text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500">
+            Vendor Assignment
+          </h1>
+
+          <div className="w-10" />
+        </div>
+      </div>
+
+      {/* Countdown Progress Bar */}
+      {!isAccepted && secondsLeft > 0 && (
+        <div className="fixed top-16 left-0 right-0 bg-gray-100 h-1 z-40 overflow-hidden">
+          <motion.div
+            className="h-full bg-gradient-to-r from-orange-500 to-red-500"
+            initial={{ width: "100%" }}
+            animate={{ width: "0%" }}
+            transition={{ duration: 120, ease: "linear" }}
+          />
+        </div>
+      )}
+
+      {/* Main Content */}
+      <div className="pt-24 pb-12 px-4 flex justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <VendorCard
+            title={
+              isAccepted
+                ? "Vendor Accepted!"
+                : `Finding Vendor... (${secondsLeft}s)`
+            }
+            vendorData={vendorData}
+            isLoading={isLoading && !isAccepted}
+            isAccepted={isAccepted}
+            vendorDetails={vendorDetails}
+            isVendorLoading={isVendorLoading}
+          />
+        </motion.div>
+      </div>
+
+      {/* Last 10-sec Warning */}
+      {!isAccepted && secondsLeft <= 10 && secondsLeft > 0 && (
+        <div className="fixed bottom-6 left-0 right-0 text-center px-4">
+          <p className="text-sm font-medium text-red-600 bg-white rounded-full py-2 shadow-lg">
+            No vendor accepted. Redirecting to home in {secondsLeft}s...
+          </p>
+        </div>
+      )}
     </div>
   );
 };

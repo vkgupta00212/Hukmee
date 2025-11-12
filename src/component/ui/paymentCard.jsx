@@ -89,7 +89,7 @@ const PaymentCard = ({
           ) : (
             <button
               onClick={onSelectAddress}
-              className={`w-full py-3 rounded-xl font-medium text-white bg-gradient-to-r from-[${Colors.primaryMain}] to-orange-600 shadow-md hover:shadow-lg transition`}
+              className={`w-full py-3 rounded-xl font-medium text-white bg-${Colors.primaryMain} shadow-md hover:shadow-lg transition`}
             >
               Select Address
             </button>
@@ -129,7 +129,7 @@ const PaymentCard = ({
               className={`w-full py-3 rounded-xl font-medium transition-all ${
                 needAddress
                   ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                  : "bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-md hover:shadow-lg"
+                  : `bg-${Colors.primaryMain} text-white shadow-md hover:shadow-lg`
               }`}
             >
               Select Slot
@@ -141,11 +141,7 @@ const PaymentCard = ({
         <button
           onClick={handleMainClick}
           disabled={!canProceed}
-          className={`w-full py-4 rounded-xl font-bold text-lg transition-all shadow-lg ${
-            !canProceed
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-orange-500 text-white hover:bg-orange-600 transform hover:cursor-pointer hover:scale-[1.01] active:scale-95"
-          }`}
+          className={`w-full py-4 rounded-xl font-bold text-lg transition-all shadow-lg ${"bg-orange-500 text-white hover:bg-orange-600 transform hover:cursor-pointer hover:scale-[1.01] active:scale-95"}`}
         >
           {getButtonLabel()}
         </button>
@@ -191,11 +187,7 @@ const PaymentCard = ({
         {/* Pay Button */}
         <button
           onClick={handleMainClick}
-          className={`w-full py-3.5 rounded-xl font-bold text-white transition-all shadow-lg ${
-            !canProceed
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-orange-500 hover:from-ornage-600  active:scale-95"
-          }`}
+          className={`w-full py-3.5 rounded-xl font-bold text-white transition-all shadow-lg ${"bg-orange-500 hover:from-ornage-600  active:scale-95"}`}
         >
           {getButtonLabel()}
         </button>

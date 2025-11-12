@@ -133,7 +133,9 @@ const LoginCard = ({ onClose, onSubmit }) => {
             {/* Content */}
             <div className="mb-6">
               <Phone className="w-8 h-8 mb-3 text-[#FA7D09]" />
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <h2
+                className={`text-2xl font-bold bg-${Colors.primaryMain} bg-clip-text text-transparent`}
+              >
                 Enter your phone number
               </h2>
               <p className="text-sm text-gray-600 mt-2">

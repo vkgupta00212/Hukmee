@@ -231,7 +231,7 @@ const PaymentPage = () => {
           </div>
         </div> */}
 
-        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="w-full mb- max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <PaymentCard
               onSelectAddress={() => setShowAddressModal(true)}
@@ -243,7 +243,7 @@ const PaymentPage = () => {
             />
           </div>
 
-          <div className="flex flex-col gap-4 md:mt-[40px]">
+          <div className="flex flex-col gap-4 md:mt-[40px] mb-[70px]">
             <PaymentCard2
               cartItems={cartItems}
               calculateTotal={calculateTotal}

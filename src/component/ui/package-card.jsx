@@ -37,7 +37,7 @@ const PackageCardItem = memo(
                      hover:-translate-y-1 cursor-pointer"
         >
           {/* Image */}
-          <div className="relative aspect-[4/2.5] overflow-hidden">
+          <div className="relative aspect-[5/2.5] overflow-hidden">
             <img
               src={image || "https://via.placeholder.com/600x300"}
               alt={servicename}
@@ -158,11 +158,11 @@ const PackageCard = ({ addToCart, selectedServiceTab }) => {
 
   return (
     <section className="py-1 md:py-1 bg-gradient-to-b from-gray-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-1 sm:px-6 lg:px-5">
         {/* Header */}
         <div className="text-center mb-10 md:mb-14">
           <h1
-            className={`text-3xl sm:text-4xl md:text-5xl font-bold bg-clip-text text-transparent 
+            className={`text-2xl sm:text-4xl md:text-5xl font-bold bg-clip-text text-transparent 
                        bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} 
                        tracking-tight`}
           >

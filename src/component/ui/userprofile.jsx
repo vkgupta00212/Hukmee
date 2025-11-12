@@ -8,6 +8,7 @@ import {
   FaTimes,
   FaEllipsisV,
 } from "react-icons/fa";
+import { IoMdLogOut } from "react-icons/io";
 import AddressDetails from "./addressDetailsh.jsx";
 import PersonalDetails from "./personalDetailsh.jsx";
 import ReferAndEarn from "./refer&earn.jsx";
@@ -85,6 +86,7 @@ const UserProfile = () => {
   const [pendingPhone, setPendingPhone] = useState("");
   const [addressRefreshKey, setAddressRefreshKey] = useState(0);
   const cameraInputRef = useRef(null);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const fileInputRef = useRef(null);
   const menuRef = useRef(null);
@@ -267,6 +269,14 @@ const UserProfile = () => {
     if (cameraInputRef.current) cameraInputRef.current.value = ""; // ADD THIS
   };
 
+  const handleLog = () => {
+    // localStorage.removeItem("isLoggedIn");
+    // localStorage.removeItem("userPhone");
+    // setIsLoggedIn(false);
+    // navigate("/");
+    setShowLogoutModal(true);
+  };
+
   const sections = [
     { id: 1, title: "Personal Details", Component: <PersonalDetails /> },
     {
@@ -276,12 +286,10 @@ const UserProfile = () => {
         <AddressDetails key={addressRefreshKey} onRefresh={refreshAddresses} />
       ),
     },
-    { id: 3, title: "Refer & Earn", Component: <ReferAndEarn /> },
-    { id: 4, title: "Enter Referral Code", Component: <EnterReferCode /> },
-    { id: 5, title: "My Orders", Component: <MyOrder /> },
-    { id: 6, title: "About Us", Component: <AboutUs /> },
-    { id: 7, title: "Terms & Conditions", Component: <TermsPage /> },
-    { id: 8, title: "Privacy Policy", Component: <PrivacyAndPolicy /> },
+    { id: 3, title: "My Orders", Component: <MyOrder /> },
+    { id: 4, title: "About Us", Component: <AboutUs /> },
+    { id: 5, title: "Terms & Conditions", Component: <TermsPage /> },
+    { id: 6, title: "Privacy Policy", Component: <PrivacyAndPolicy /> },
   ];
 
   // Framer variants
@@ -399,51 +407,6 @@ const UserProfile = () => {
               >
                 My Profile
               </h2>
-              <div className="relative" ref={menuRef}>
-                <motion.button
-                  onClick={() => setShowMenu(!showMenu)}
-                  className="p-2 rounded-full hover:bg-gray-200 transition-colors"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label="Toggle profile menu"
-                >
-                  <FaEllipsisV className={`text-lg ${Colors.textGray}`} />
-                </motion.button>
-                <AnimatePresence>
-                  {showMenu && (
-                    <motion.div
-                      variants={menuVariants}
-                      initial="hidden"
-                      animate="visible"
-                      exit="hidden"
-                      transition={{ duration: 0.2 }}
-                      className={`absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border ${Colors.borderGray} z-50`}
-                    >
-                      <button
-                        onClick={handleLogout}
-                        className={`w-full text-left px-4 py-2 text-sm ${Colors.textGray} hover:${Colors.primaryFrom} hover:text-white transition-colors`}
-                        aria-label="Log out"
-                      >
-                        Logout
-                      </button>
-                      <button
-                        onClick={() => setShowMenu(false)}
-                        className={`w-full text-left px-4 py-2 text-sm ${Colors.textGray} hover:${Colors.primaryFrom} hover:text-white transition-colors`}
-                        aria-label="Settings"
-                      >
-                        Settings
-                      </button>
-                      <button
-                        onClick={() => setShowMenu(false)}
-                        className={`w-full text-left px-4 py-2 text-sm ${Colors.textGray} hover:${Colors.primaryFrom} hover:text-white transition-colors`}
-                        aria-label="Help"
-                      >
-                        Help
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
             </div>
           </div>
         </motion.div>
@@ -490,14 +453,14 @@ const UserProfile = () => {
         </motion.div>
 
         {/* SECTIONS */}
-        <div className="space-y-4">
+        <div className="space-y-4 flex flex-col items-center justify-center">
           {sections.map((section) => (
             <motion.div
               key={section.id}
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5, delay: section.id * 0.1 }}
-              className="bg-white rounded-xl shadow-md overflow-hidden"
+              className="bg-white rounded-xl shadow-md overflow-hidden w-full max-w-lg"
             >
               <motion.div
                 onClick={() => toggleSection(section.id)}
@@ -519,6 +482,7 @@ const UserProfile = () => {
                   )}
                 </motion.div>
               </motion.div>
+
               <AnimatePresence initial={false}>
                 {openSections[section.id] && (
                   <motion.div
@@ -536,6 +500,22 @@ const UserProfile = () => {
               </AnimatePresence>
             </motion.div>
           ))}
+
+          <motion.button
+            onClick={handleLog}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className={`w-[150px] py-3 mt-6 text-center font-semibold rounded-xl 
+        bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} ${Colors.textWhite} 
+        hover:from-[#E56A00] hover:to-[#C75A00] 
+        active:scale-95 transition-all duration-300`}
+          >
+            <div className="flex items-center justify-center gap-2">
+              <IoMdLogOut size={25} />
+              <span>Logout</span>
+            </div>
+          </motion.button>
         </div>
       </div>
 
@@ -691,6 +671,54 @@ const UserProfile = () => {
             </motion.div>
           </motion.div>
         )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {" "}
+        {showLogoutModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
+          >
+            {" "}
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm text-center"
+            >
+              {" "}
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                {" "}
+                Are you sure you want to logout?{" "}
+              </h3>{" "}
+              <div className="flex justify-center gap-4">
+                {" "}
+                <button
+                  onClick={() => {
+                    setShowLogoutModal(false);
+                    handleLogout();
+                  }}
+                  className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
+                >
+                  {" "}
+                  Logout{" "}
+                </button>{" "}
+                <button
+                  onClick={() => setShowLogoutModal(false)}
+                  className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition"
+                >
+                  {" "}
+                  Cancel{" "}
+                </button>{" "}
+              </div>{" "}
+            </motion.div>{" "}
+          </motion.div>
+        )}{" "}
       </AnimatePresence>
     </div>
   );
