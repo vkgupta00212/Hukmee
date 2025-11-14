@@ -3,7 +3,24 @@ import React, { useEffect, useState, useCallback, memo } from "react";
 import GetServicePack from "../../backend/servicepack/getservicepack";
 import Colors from "../../core/constant";
 
-// Memoized Card Item for performance
+// === SKELETON CARD COMPONENT ===
+const SkeletonCard = () => (
+  <div className="group relative w-full max-w mx-auto animate-pulse">
+    <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-gray-100">
+      {/* Skeleton Image */}
+      <div className="relative aspect-[5/2.5] bg-gray-200" />
+
+      {/* Skeleton Content */}
+      <div className="p-5 space-y-4">
+        <div className="h-6 bg-gray-200 rounded w-3/4" />
+        <div className="h-8 bg-gray-200 rounded w-1/2" />
+        <div className="h-11 bg-gray-200 rounded-xl" />
+      </div>
+    </div>
+  </div>
+);
+
+// === MEMOIZED PACKAGE CARD ITEM ===
 const PackageCardItem = memo(
   ({
     image,
@@ -52,7 +69,7 @@ const PackageCardItem = memo(
               {duration}
             </div>
 
-            {/* Shine Effect on Hover */}
+            {/* Shine Effect */}
             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
               <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-full transition-transform duration-1000 skew-x-12" />
             </div>
@@ -130,11 +147,42 @@ const PackageCardItem = memo(
 
 PackageCardItem.displayName = "PackageCardItem";
 
+// === MAIN PACKAGE CARD COMPONENT ===
 const PackageCard = ({ addToCart, selectedServiceTab }) => {
   const [servicePackages, setServicePackages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
 
+  // === FETCH USER'S REAL-TIME LOCATION ===
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      console.warn("Geolocation is not supported by this browser.");
+      setUserLocation({ lat: 26.551381, lon: 84.767491 }); // fallback
+      return;
+    }
+
+    const watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserLocation({ lat: latitude, lon: longitude });
+        console.log("Location updated:", latitude, longitude);
+      },
+      (err) => {
+        console.error("Geolocation error:", err);
+        setUserLocation({ lat: 26.551381, lon: 84.767491 }); // fallback
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
+
+    return () => navigator.geolocation.clearWatch(watchId);
+  }, []);
+
+  // === FETCH PACKAGES ===
   const fetchPackages = useCallback(async () => {
     if (!selectedServiceTab?.id) return;
     setLoading(true);
@@ -156,6 +204,25 @@ const PackageCard = ({ addToCart, selectedServiceTab }) => {
     fetchPackages();
   }, [fetchPackages]);
 
+  // === ENHANCED addToCart WITH REAL-TIME LOCATION ===
+  const handleAddToCart = useCallback(
+    (pkg) => {
+      if (!userLocation) {
+        alert("Location not available yet. Please wait...");
+        return Promise.reject("Location not ready");
+      }
+
+      const packageWithLocation = {
+        ...pkg,
+        lat: userLocation.lat,
+        lon: userLocation.lon,
+      };
+
+      return addToCart(packageWithLocation);
+    },
+    [addToCart, userLocation]
+  );
+
   return (
     <section className="py-1 mb-[50px] md:py-1 bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-1 sm:px-6 lg:px-5">
@@ -168,25 +235,18 @@ const PackageCard = ({ addToCart, selectedServiceTab }) => {
           >
             Explore Our Service Packages
           </h1>
-          {/* <p className="mt-3 text-gray-600 max-w-2xl mx-auto">
-            Choose from premium packages tailored to your needs
-          </p> */}
         </div>
 
-        {/* Loading State */}
+        {/* SKELETON LOADING */}
         {loading && (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div
-              className={`animate-spin rounded-full h-12 w-12 border-4 border-t-transparent 
-                         border-orange-500`}
-            />
-            <p className="mt-4 text-gray-600 font-medium">
-              Loading packages...
-            </p>
+          <div className="grid grid-cols-1 gap-6">
+            {[1, 2, 3].map((i) => (
+              <SkeletonCard key={`skeleton-${i}`} />
+            ))}
           </div>
         )}
 
-        {/* Error State */}
+        {/* ERROR STATE */}
         {error && (
           <div className="text-center py-16">
             <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl max-w-md mx-auto">
@@ -195,7 +255,7 @@ const PackageCard = ({ addToCart, selectedServiceTab }) => {
           </div>
         )}
 
-        {/* Empty State */}
+        {/* EMPTY STATE */}
         {!loading && !error && servicePackages.length === 0 && (
           <div className="text-center py-16">
             <div className="bg-gray-100 border-2 border-dashed rounded-xl p-12 max-w-md mx-auto">
@@ -206,15 +266,15 @@ const PackageCard = ({ addToCart, selectedServiceTab }) => {
           </div>
         )}
 
-        {/* Packages Grid */}
+        {/* PACKAGES GRID */}
         {!loading && !error && servicePackages.length > 0 && (
-          <div className="grid grid-cols-1">
+          <div className="grid grid-cols-1 gap-6">
             {servicePackages.map((pkg) => (
               <PackageCardItem
                 key={pkg.id}
                 {...pkg}
                 image={`https://api.hukmee.in/${pkg?.image}`}
-                onAdd={() => addToCart(pkg)}
+                onAdd={() => handleAddToCart(pkg)}
                 refreshPackages={fetchPackages}
               />
             ))}

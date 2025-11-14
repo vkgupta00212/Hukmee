@@ -113,32 +113,25 @@ const PaymentPage = () => {
       return;
     }
 
-    // Good debug output
-    console.log("selected slot:", selectedSlot);
-    console.log(
-      "selected slotName:",
-      selectedSlot?.slotName ||
-        `${selectedSlot?.day?.label || ""} ${selectedSlot?.day?.date || ""} - ${
-          selectedSlot?.time?.time || selectedSlot?.time || ""
-        }`
-    );
+    // debug
+    console.log("Proceeding with orderId:", orderId);
+    console.log("cartItems before proceed:", cartItems);
 
     try {
       setLoading(true);
 
-      // Build the slot string (prefer normalized slotName)
       const slotString =
         selectedSlot?.slotName ||
         `${selectedSlot?.day?.label || ""} ${selectedSlot?.day?.date || ""} - ${
           selectedSlot?.time?.time || selectedSlot?.time || ""
         }`;
 
-      // STEP 1: Update order details before assigning leads
+      // Update order on backend
       const updateResponse = await UpdateOrder({
         OrderID: orderId,
         Address: selectedAddress?.FullAddress || "",
         Slot: slotString,
-        Status: "Pending", // or "Confirmed" depending on logic
+        Status: "Pending",
         VendorPhone: "",
         BeforVideo: "",
         AfterVideo: "",
@@ -160,7 +153,7 @@ const PaymentPage = () => {
         return;
       }
 
-      // STEP 2: Assign leads
+      // Assign leads
       console.log("orderID from paymentpage:", orderId);
       const assignResponse = await AssignLeads(orderId);
       console.log("AssignLeads API Response:", assignResponse);
@@ -170,8 +163,21 @@ const PaymentPage = () => {
         assignResponse === "Leads Assigned Successfully";
 
       if (assignSuccess) {
+        // ensure cartItems includes OrderID for backward compatibility
+        const cartWithOrder = cartItems.map((c) =>
+          c.OrderID ? c : { ...c, OrderID: orderId }
+        );
+
+        // debug before navigating
+        console.log("Navigating to vendorwait with:", {
+          cartWithOrder,
+          orderId,
+        });
+
         alert("Leads assigned successfully!");
-        navigate("/vendorwait", { state: { cartItems } });
+        navigate("/vendorwait", {
+          state: { cartItems: cartWithOrder, orderId },
+        });
       } else {
         alert("Failed to assign leads. Please try again.");
       }
