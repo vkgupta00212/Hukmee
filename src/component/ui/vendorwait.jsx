@@ -178,12 +178,15 @@ const VendorWait = () => {
 
   // Polling for order status
   useEffect(() => {
-    if (!userPhone || !orderId || hasAccepted.current) {
+    if (!userPhone || !orderId) {
       setIsLoading(false);
       return;
     }
 
+    let isActive = true;
+
     const fetchOrderStatus = async () => {
+      if (!isActive || hasAccepted.current) return;
       try {
         const res = await ShowOrders({
           orderid: orderId,
@@ -206,13 +209,11 @@ const VendorWait = () => {
           setVendorData(res.filter((o) => o.OrderID === orderId));
           setIsLoading(false);
 
-          // Clear polling
           if (intervalRef.current) {
             clearInterval(intervalRef.current);
             intervalRef.current = null;
           }
 
-          // Load vendor details
           const vendorPhone = currentOrder.VendorPhone;
           if (vendorPhone && !vendorDetails) {
             setIsVendorLoading(true);
@@ -231,23 +232,36 @@ const VendorWait = () => {
       } catch (error) {
         console.error("Polling error:", error);
       } finally {
-        if (!hasAccepted.current) {
-          setIsLoading(false);
-        }
+        if (!hasAccepted.current) setIsLoading(false);
       }
     };
 
-    // Initial fetch
+    // ✅ Start polling
     fetchOrderStatus();
+    intervalRef.current = setInterval(fetchOrderStatus, 4000);
 
-    // Start polling
-    intervalRef.current = setInterval(fetchOrderStatus, 4000); // Faster polling
+    // ✅ Handle when tab becomes visible again
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && !hasAccepted.current) {
+        fetchOrderStatus(); // Trigger an instant refresh
+      }
+    };
+
+    // ✅ Also handle when user refocuses the window (for mobile Safari / Chrome)
+    const handleFocus = () => {
+      if (!hasAccepted.current) {
+        fetchOrderStatus(); // Instant refresh when focus returns
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
+      isActive = false;
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
     };
   }, [orderId, userPhone, vendorDetails]);
 

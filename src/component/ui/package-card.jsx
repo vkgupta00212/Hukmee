@@ -157,7 +157,7 @@ const PackageCard = ({ addToCart, selectedServiceTab }) => {
   }, [fetchPackages]);
 
   return (
-    <section className="py-1 md:py-1 bg-gradient-to-b from-gray-50 to-white">
+    <section className="py-1 mb-[50px] md:py-1 bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-1 sm:px-6 lg:px-5">
         {/* Header */}
         <div className="text-center mb-10 md:mb-14">

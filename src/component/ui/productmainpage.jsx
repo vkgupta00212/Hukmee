@@ -36,7 +36,7 @@ const ProductMainPage = () => {
   const loginPromptRef = useRef(null);
   const loginCardRef = useRef(null);
   const otpModalRef = useRef(null);
-  const [addStatus, setAddStatus] = useState(null);
+  const [addStatus, setAddStatus] = useState("idle");
 
   const UserID = localStorage.getItem("userPhone");
 
@@ -343,7 +343,7 @@ const ProductMainPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 font-sans">
-      <div className="fixed top-0 left-0 w-full bg-white shadow-lg z-50 border-b border-gray-200">
+      <div className="md:hidden fixed top-0 left-0 w-full bg-white shadow-lg z-50 border-b border-gray-200">
         <div className="flex items-center justify-between px-4 py-3 sm:px-6">
           {/* Back Button */}
           <motion.button
@@ -525,29 +525,31 @@ const ProductMainPage = () => {
   `}
                   aria-label="Add to cart"
                 >
-                  {/* Idle: Add to Cart */}
-                  {addStatus === "idle" && (
-                    <>
-                      <svg
-                        className="w-6 h-6"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                        />
-                      </svg>
-                      Add to Cart
-                    </>
-                  )}
+                  {/* Always show "Add to Cart" in background */}
+                  <span
+                    className={`flex items-center gap-3 ${
+                      addStatus !== "idle" ? "opacity-0" : ""
+                    }`}
+                  >
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                      />
+                    </svg>
+                    Add to Cart
+                  </span>
 
-                  {/* Adding… */}
+                  {/* Overlay: Adding… */}
                   {addStatus === "adding" && (
-                    <>
+                    <span className="absolute inset-0 flex items-center justify-center gap-2">
                       <svg
                         className="animate-spin w-5 h-5"
                         fill="none"
@@ -568,12 +570,12 @@ const ProductMainPage = () => {
                         />
                       </svg>
                       Adding…
-                    </>
+                    </span>
                   )}
 
-                  {/* Added! */}
+                  {/* Overlay: Added! */}
                   {addStatus === "added" && (
-                    <>
+                    <span className="absolute inset-0 flex items-center justify-center gap-2">
                       <svg
                         className="w-6 h-6"
                         fill="none"
@@ -588,7 +590,7 @@ const ProductMainPage = () => {
                         />
                       </svg>
                       Added!
-                    </>
+                    </span>
                   )}
                 </motion.button>
               </div>

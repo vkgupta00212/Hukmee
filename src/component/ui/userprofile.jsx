@@ -6,7 +6,13 @@ import {
   FaMinus,
   FaCamera,
   FaTimes,
-  FaEllipsisV,
+  FaUser,
+  FaMapMarkerAlt,
+  FaShoppingBag,
+  FaInfoCircle,
+  FaFileAlt,
+  FaShieldAlt,
+  FaCircle,
 } from "react-icons/fa";
 import { IoMdLogOut } from "react-icons/io";
 import AddressDetails from "./addressDetailsh.jsx";
@@ -63,7 +69,6 @@ const useFocusTrap = (isOpen, ref) => {
   }, [isOpen, ref]);
 };
 
-// Main component
 const UserProfile = () => {
   const phone = localStorage.getItem("userPhone");
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
@@ -71,13 +76,12 @@ const UserProfile = () => {
   const { width } = useWindowSize();
   const isMobile = width < 640;
 
-  const [openSections, setOpenSections] = useState({});
+  const [activeSection, setActiveSection] = useState(1);
   const [avatar, setAvatar] = useState(null);
   const [base64Image, setBase64Image] = useState(null);
   const [user, setUser] = useState([]);
   const [preview, setPreview] = useState(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -85,11 +89,10 @@ const UserProfile = () => {
   const [progress, setProgress] = useState(0);
   const [pendingPhone, setPendingPhone] = useState("");
   const [addressRefreshKey, setAddressRefreshKey] = useState(0);
-  const cameraInputRef = useRef(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
+  const cameraInputRef = useRef(null);
   const fileInputRef = useRef(null);
-  const menuRef = useRef(null);
   const loginModalRef = useRef(null);
   const otpModalRef = useRef(null);
   const uploadModalRef = useRef(null);
@@ -98,7 +101,7 @@ const UserProfile = () => {
   useFocusTrap(showOtpModal, otpModalRef);
   useFocusTrap(showUploadModal, uploadModalRef);
 
-  // Prevent background scroll when modal open
+  // Prevent scroll
   useEffect(() => {
     if (showLoginModal || showOtpModal || showUploadModal) {
       document.body.classList.add("overflow-hidden");
@@ -125,24 +128,9 @@ const UserProfile = () => {
     setAddressRefreshKey((prev) => prev + 1);
   };
 
-  // Close menu on click outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setShowMenu(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const toggleSection = (id) =>
-    setOpenSections((prev) => ({ ...prev, [id]: !prev[id] }));
-
   const handleLogout = () => {
     localStorage.removeItem("userPhone");
     localStorage.removeItem("isLoggedIn");
-    setShowMenu(false);
     navigate("/");
   };
 
@@ -182,49 +170,18 @@ const UserProfile = () => {
         );
         setPreview(reader.result);
       };
-      reader.onerror = (error) => {
-        console.error("Error reading file:", error);
-        alert("⚠️ Error reading the selected image.");
-      };
       reader.readAsDataURL(file);
     }
   };
 
-  // Existing handleImageChange works for both gallery & camera
-  // const handleImageChange = (e) => {
-  //   const file = e.target.files[0];
-  //   if (!file) return;
-
-  //   setAvatar(file);
-  //   const reader = new FileReader();
-  //   reader.onload = () => {
-  //     const base64 = reader.result.replace(
-  //       /^data:image\/[a-zA-Z]+;base64,/,
-  //       ""
-  //     );
-  //     setBase64Image(base64);
-  //     setPreview(reader.result);
-  //   };
-  //   reader.readAsDataURL(file);
-  // };
-
   const handleSave = async () => {
-    if (!base64Image) {
-      alert("⚠️ Please select an image before saving.");
-      return;
-    }
+    if (!base64Image) return alert("Please select an image.");
 
     setIsUploading(true);
     setProgress(0);
 
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 90) {
-          clearInterval(progressInterval);
-          return prev;
-        }
-        return prev + 10;
-      });
+    const interval = setInterval(() => {
+      setProgress((p) => (p >= 90 ? 90 : p + 10));
     }, 200);
 
     try {
@@ -243,18 +200,15 @@ const UserProfile = () => {
           setUser((prev) =>
             prev.map((u, i) => (i === 0 ? { ...u, Image: base64Image } : u))
           );
-          alert("✅ Profile image updated successfully!");
+          alert("Profile image updated!");
           handleCancelUpload();
           window.location.reload();
         }, 500);
-      } else {
-        alert("❌ Failed to update image.");
       }
     } catch (error) {
-      console.error("Image upload error:", error);
-      alert("❌ Error updating profile image.");
+      alert("Upload failed.");
     } finally {
-      clearInterval(progressInterval);
+      clearInterval(interval);
       setIsUploading(false);
       setProgress(0);
     }
@@ -266,15 +220,7 @@ const UserProfile = () => {
     setBase64Image(null);
     setPreview(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
-    if (cameraInputRef.current) cameraInputRef.current.value = ""; // ADD THIS
-  };
-
-  const handleLog = () => {
-    // localStorage.removeItem("isLoggedIn");
-    // localStorage.removeItem("userPhone");
-    // setIsLoggedIn(false);
-    // navigate("/");
-    setShowLogoutModal(true);
+    if (cameraInputRef.current) cameraInputRef.current.value = "";
   };
 
   const sections = [
@@ -292,28 +238,24 @@ const UserProfile = () => {
     { id: 6, title: "Privacy Policy", Component: <PrivacyAndPolicy /> },
   ];
 
-  // Framer variants
-  const modalVariants = {
-    hidden: { opacity: 0, scale: 0.95 },
-    visible: { opacity: 1, scale: 1 },
-    exit: { opacity: 0, scale: 0.95 },
-  };
-  const sectionVariants = {
-    hidden: { height: 0, opacity: 0 },
-    visible: { height: "auto", opacity: 1 },
-    exit: { height: 0, opacity: 0 },
-  };
-  const headerVariants = {
-    hidden: { y: -20, opacity: 0 },
-    visible: { y: 0, opacity: 1 },
-  };
-  const avatarVariants = {
-    hidden: { scale: 0.9, opacity: 0 },
-    visible: { scale: 1, opacity: 1 },
-  };
-  const menuVariants = {
-    hidden: { opacity: 0, y: -10 },
-    visible: { opacity: 1, y: 0 },
+  const getIcon = (title, size = 18) => {
+    const props = { size };
+    switch (title) {
+      case "Personal Details":
+        return <FaUser {...props} />;
+      case "Saved Addresses":
+        return <FaMapMarkerAlt {...props} />;
+      case "My Orders":
+        return <FaShoppingBag {...props} />;
+      case "About Us":
+        return <FaInfoCircle {...props} />;
+      case "Terms & Conditions":
+        return <FaFileAlt {...props} />;
+      case "Privacy Policy":
+        return <FaShieldAlt {...props} />;
+      default:
+        return <FaCircle {...props} />;
+    }
   };
 
   if (!isLoggedIn) {
@@ -324,7 +266,6 @@ const UserProfile = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
           className="max-w-md w-full text-center"
         >
           <h2
@@ -333,8 +274,7 @@ const UserProfile = () => {
             You’re not logged in
           </h2>
           <p className={`text-sm sm:text-base ${Colors.textMuted} mb-8`}>
-            To access your profile and start using all features, please log in
-            to your account.
+            Log in to access your profile.
           </p>
           <button
             onClick={handleLoginClick}
@@ -343,26 +283,14 @@ const UserProfile = () => {
               Colors.primaryFrom
             } ${Colors.primaryTo} ${
               Colors.textWhite
-            } rounded-xl shadow-lg hover:from-[#E56A00] hover:to-[#C75A00] transition-all duration-300 ${
-              isProcessing ? "opacity-50 cursor-not-allowed" : ""
+            } rounded-xl shadow-lg hover:shadow-xl transition-all ${
+              isProcessing ? "opacity-50" : ""
             }`}
-            aria-label={
-              isProcessing ? "Processing login" : "Log in to your account"
-            }
-            aria-busy={isProcessing}
           >
-            {isProcessing ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2" />
-                Processing...
-              </div>
-            ) : (
-              "Get Started"
-            )}
+            {isProcessing ? "Processing..." : "Get Started"}
           </button>
         </motion.div>
 
-        {/* LOGIN & OTP MODALS */}
         <AnimatePresence>
           {showLoginModal && (
             <Modal isMobile={isMobile} onClose={() => setShowLoginModal(false)}>
@@ -386,180 +314,166 @@ const UserProfile = () => {
     );
   }
 
-  // PROFILE VIEW
   return (
-    <div className={`min-h-screen ${Colors.bgGray} p-4 sm:p-6 md:p-8 lg:p-12`}>
-      <div className="max-w-4xl mx-auto">
-        {/* HEADER */}
-        <motion.div
-          variants={headerVariants}
-          initial="hidden"
-          animate="visible"
-          transition={{ duration: 0.5 }}
-          className="mb-8 flex items-center justify-between"
-        >
-          <div
-            className={`fixed top-0 left-0 w-full bg-white shadow-md z-10 border-b ${Colors.borderGray}`}
+    <div
+      className={`mt-[70px] min-h-screen ${Colors.bgGray} flex flex-col md:flex-row`}
+    >
+      {/* ===== SIDEBAR (Desktop) ===== */}
+      <div className="hidden md:block w-64 bg-white shadow-lg h-screen sticky top-0 overflow-y-auto">
+        <div className="p-6 border-b border-gray-200">
+          <h2
+            className={`text-2xl font-bold bg-gradient-to-r ${Colors.gradientFrom} ${Colors.gradientTo} bg-clip-text text-transparent`}
           >
-            <div className="flex items-center justify-between px-4 py-3 sm:px-6">
-              <h2
-                className={`text-xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo}`}
-              >
-                My Profile
-              </h2>
-            </div>
-          </div>
-        </motion.div>
+            My Profile
+          </h2>
+        </div>
 
-        {/* AVATAR */}
-        <motion.div
-          variants={avatarVariants}
-          initial="hidden"
-          animate="visible"
-          transition={{ duration: 0.5 }}
-          className="flex flex-col items-center mb-10 pt-[64px]"
-        >
-          <motion.div
-            className={`relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-orange-500 shadow-lg cursor-pointer group`}
-            whileHover={{ scale: 1.05 }}
-            aria-label="Change profile picture"
-          >
+        <div className="p-6 text-center">
+          <div className="relative inline-block">
             <img
               src={
                 user[0]?.Image
                   ? `https://api.hukmee.in/Images/${user[0].Image}`
                   : "https://via.placeholder.com/150?text=Avatar"
               }
-              alt={user[0]?.Fullname || "Profile"}
-              className="w-full h-full object-cover group-hover:opacity-90 transition-all duration-300"
+              alt="Profile"
+              className="w-20 h-20 rounded-full object-cover border-4 border-orange-400 shadow-md"
             />
-            <motion.div
-              className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            <button
               onClick={() => setShowUploadModal(true)}
-              initial={{ opacity: 0 }}
-              whileHover={{ opacity: 1 }}
+              className="absolute bottom-0 right-0 p-2 bg-orange-500 text-white rounded-full shadow-lg hover:bg-orange-600"
             >
-              <FaCamera className="text-white text-xl sm:text-2xl" />
-            </motion.div>
-          </motion.div>
-          <motion.h2
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className={`text-lg sm:text-xl font-semibold ${Colors.textGrayDark} mt-4`}
-          >
-            {user[0]?.Fullname || "User Profile"}
-          </motion.h2>
-        </motion.div>
+              <FaCamera size={14} />
+            </button>
+          </div>
+          <h3 className="mt-3 font-semibold text-gray-800">
+            {user[0]?.Fullname || "User"}
+          </h3>
+        </div>
 
-        {/* SECTIONS */}
-        <div className="space-y-4 flex flex-col items-center justify-center">
+        <nav className="px-4 pb-6">
           {sections.map((section) => (
-            <motion.div
+            <button
               key={section.id}
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: section.id * 0.1 }}
-              className="bg-white rounded-xl shadow-md overflow-hidden w-full max-w-lg"
+              onClick={() => setActiveSection(section.id)}
+              className={`w-full text-left px-4 py-3 rounded-lg mb-1 transition-all flex items-center gap-3 ${
+                activeSection === section.id
+                  ? `bg-gradient-to-r ${Colors.gradientFrom} ${Colors.gradientTo} text-white shadow-md`
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
             >
-              <motion.div
-                onClick={() => toggleSection(section.id)}
-                className={`p-4 sm:p-5 cursor-pointer flex items-center justify-between bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} ${Colors.textWhite} transition-all duration-300 hover:from-[#E56A00] hover:to-[#C75A00]`}
-                whileHover={{ scale: 1.01 }}
-                aria-label={`Toggle ${section.title} section`}
-              >
-                <h3 className="text-sm sm:text-base font-semibold tracking-tight">
-                  {section.title}
-                </h3>
-                <motion.div
-                  animate={{ rotate: openSections[section.id] ? 180 : 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {openSections[section.id] ? (
-                    <FaMinus className="text-sm" />
-                  ) : (
-                    <FaPlus className="text-sm" />
-                  )}
-                </motion.div>
-              </motion.div>
-
-              <AnimatePresence initial={false}>
-                {openSections[section.id] && (
-                  <motion.div
-                    key={`section-${section.id}`}
-                    variants={sectionVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    transition={{ duration: 0.4, ease: "easeInOut" }}
-                    className="p-3 bg-gray-50"
-                  >
-                    {section.Component}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
+              {getIcon(section.title)}
+              <span className="font-medium">{section.title}</span>
+            </button>
           ))}
 
-          <motion.button
-            onClick={handleLog}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className={`w-[150px] py-3 mt-6 text-center font-semibold rounded-xl 
-        bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} ${Colors.textWhite} 
-        hover:from-[#E56A00] hover:to-[#C75A00] 
-        active:scale-95 transition-all duration-300`}
+          <button
+            onClick={() => setShowLogoutModal(true)}
+            className="w-full text-left px-4 py-3 rounded-lg mt-6 bg-red-50 text-red-600 hover:bg-red-100 transition-all flex items-center gap-3"
           >
-            <div className="flex items-center justify-center gap-2">
-              <IoMdLogOut size={25} />
-              <span>Logout</span>
-            </div>
-          </motion.button>
+            <IoMdLogOut size={20} />
+            <span className="font-medium">Logout</span>
+          </button>
+        </nav>
+      </div>
+
+      {/* ===== MAIN CONTENT ===== */}
+      <div className="flex-1 p-1 md:p-8 lg:p-12">
+        <div className="max-w-8xl mx-auto">
+          <AnimatePresence mode="wait">
+            {sections.map(
+              (section) =>
+                activeSection === section.id && (
+                  <motion.div
+                    key={section.id}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-white rounded-2xl shadow-xl p-6 md:p-8"
+                  >
+                    <h3
+                      className={`text-xl md:text-2xl font-bold mb-6 bg-gradient-to-r ${Colors.gradientFrom} ${Colors.gradientTo} bg-clip-text text-transparent`}
+                    >
+                      {section.title}
+                    </h3>
+                    {section.Component}
+                  </motion.div>
+                )
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
-      {/* UPLOAD MODAL */}
+      {/* ===== MOBILE BOTTOM TABS ===== */}
+      <div className="md:hidden fixed bottom-[60px] left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+        <div className="flex items-center py-1">
+          {/* Scrollable Nav Items */}
+          <div className="flex overflow-x-auto no-scrollbar flex-1 px-1 space-x-4">
+            {sections.map((section) => (
+              <button
+                key={section.id}
+                onClick={() => setActiveSection(section.id)}
+                className={`flex flex-col items-center justify-center min-w-[60px] p-2 rounded-lg transition-all ${
+                  activeSection === section.id
+                    ? "text-orange-600"
+                    : "text-gray-600"
+                }`}
+              >
+                {getIcon(section.title, 20)}
+                <span className="text-xs mt-1">{section.title}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Logout Button (Fixed on Right) */}
+          <button
+            onClick={() => setShowLogoutModal(true)}
+            className="flex flex-col items-center p-2 text-red-600 min-w-[60px]"
+          >
+            <IoMdLogOut size={20} />
+            <span className="text-xs mt-1">Logout</span>
+          </button>
+        </div>
+      </div>
+
+      <div className="pb-20 md:pb-0"></div>
+
+      {/* ===== UPLOAD MODAL ===== */}
       <AnimatePresence>
         {showUploadModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 pointer-events-auto upload-modal"
+            className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4"
             ref={uploadModalRef}
-            aria-modal="true"
-            role="dialog"
-            aria-busy={isUploading}
           >
             <motion.div
-              variants={modalVariants}
+              variants={{
+                hidden: { opacity: 0, scale: 0.95 },
+                visible: { opacity: 1, scale: 1 },
+                exit: { opacity: 0, scale: 0.95 },
+              }}
               initial="hidden"
               animate="visible"
               exit="exit"
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl pointer-events-auto"
+              className="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl"
             >
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
-                  Upload Profile Picture
+                <h2 className="text-lg sm:text-xl font-semibold">
+                  Upload Picture
                 </h2>
-                <motion.button
+                <button
                   onClick={handleCancelUpload}
-                  className="text-gray-500 hover:text-gray-700 transition-colors"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label="Close upload modal"
-                  disabled={isUploading}
+                  className="text-gray-500 hover:text-gray-700"
                 >
                   <FaTimes className="text-lg" />
-                </motion.button>
+                </button>
               </div>
 
               <div className="flex flex-col items-center">
-                {/* PREVIEW */}
-                <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-full overflow-hidden mb-6 border-2 border-gray-200 shadow-sm">
+                <div className="w-40 h-40 rounded-full overflow-hidden mb-6 border-2 border-gray-200">
                   <img
                     src={
                       preview ||
@@ -567,102 +481,63 @@ const UserProfile = () => {
                         ? `data:image/jpeg;base64,${base64Image}`
                         : "https://via.placeholder.com/150?text=Preview")
                     }
-                    alt="Avatar Preview"
+                    alt="Preview"
                     className="w-full h-full object-cover"
                   />
                 </div>
 
-                {/* HIDDEN INPUTS */}
-                {/* Gallery */}
                 <input
                   type="file"
                   accept="image/*"
                   ref={fileInputRef}
                   onChange={handleImageChange}
                   className="hidden"
-                  disabled={isUploading}
                 />
-                {/* Camera */}
                 <input
                   type="file"
                   accept="image/*"
-                  capture="environment" // opens rear camera
+                  capture="environment"
                   ref={cameraInputRef}
                   onChange={handleImageChange}
                   className="hidden"
-                  disabled={isUploading}
                 />
 
-                {/* BUTTONS */}
                 <div className="flex gap-3 w-full">
-                  <motion.button
+                  <button
                     onClick={() => fileInputRef.current?.click()}
-                    className={`flex-1 bg-gradient-to-r ${Colors.primaryFrom} ${
-                      Colors.primaryTo
-                    } ${
-                      Colors.textWhite
-                    } font-semibold py-2 px-4 rounded-lg hover:from-[#E56A00] hover:to-[#C75A00] transition-all duration-200 ${
-                      isUploading ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                    whileHover={{ scale: isUploading ? 1 : 1.05 }}
-                    whileTap={{ scale: isUploading ? 1 : 0.95 }}
-                    disabled={isUploading}
+                    className={`flex-1 bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} text-white py-2 px-4 rounded-lg hover:opacity-90`}
                   >
                     Gallery
-                  </motion.button>
-
-                  <motion.button
+                  </button>
+                  <button
                     onClick={() => cameraInputRef.current?.click()}
-                    className={`flex-1 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-semibold py-2 px-4 rounded-lg hover:from-indigo-700 hover:to-indigo-800 transition-all duration-200 ${
-                      isUploading ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                    whileHover={{ scale: isUploading ? 1 : 1.05 }}
-                    whileTap={{ scale: isUploading ? 1 : 0.95 }}
-                    disabled={isUploading}
+                    className="flex-1 bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700"
                   >
                     Camera
-                  </motion.button>
+                  </button>
                 </div>
 
-                {/* SAVE + PROGRESS */}
                 {base64Image && (
                   <div className="mt-6 w-full">
-                    <motion.button
+                    <button
                       onClick={handleSave}
-                      className={`w-full bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold py-2 px-6 rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 ${
-                        isUploading ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
-                      whileHover={{ scale: isUploading ? 1 : 1.05 }}
-                      whileTap={{ scale: isUploading ? 1 : 0.95 }}
                       disabled={isUploading}
+                      className={`w-full bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700 ${
+                        isUploading ? "opacity-50" : ""
+                      }`}
                     >
-                      {isUploading ? (
-                        <div className="flex items-center justify-center">
-                          <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2" />
-                          Saving...
-                        </div>
-                      ) : (
-                        "Save Avatar"
-                      )}
-                    </motion.button>
-
+                      {isUploading ? "Saving..." : "Save Avatar"}
+                    </button>
                     {isUploading && (
-                      <div className="mt-4 w-full">
+                      <div className="mt-4">
                         <div className="bg-gray-200 rounded-lg h-2 overflow-hidden">
                           <motion.div
                             className="h-full bg-green-600"
                             initial={{ width: "0%" }}
                             animate={{ width: `${progress}%` }}
-                            transition={{ duration: 0.2 }}
-                            role="progressbar"
-                            aria-valuenow={progress}
-                            aria-valuemin="0"
-                            aria-valuemax="100"
                           />
                         </div>
-                        <p className="text-sm text-gray-600 mt-2 text-center">
-                          Uploading... {progress}%
-                        </p>
+                        <p className="text-sm text-center mt-2">{progress}%</p>
                       </div>
                     )}
                   </div>
@@ -673,58 +548,50 @@ const UserProfile = () => {
         )}
       </AnimatePresence>
 
+      {/* ===== LOGOUT CONFIRMATION ===== */}
       <AnimatePresence>
-        {" "}
         {showLogoutModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
             className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
           >
-            {" "}
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
               className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm text-center"
             >
-              {" "}
               <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                {" "}
-                Are you sure you want to logout?{" "}
-              </h3>{" "}
+                Logout?
+              </h3>
               <div className="flex justify-center gap-4">
-                {" "}
                 <button
                   onClick={() => {
                     setShowLogoutModal(false);
                     handleLogout();
                   }}
-                  className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                 >
-                  {" "}
-                  Logout{" "}
-                </button>{" "}
+                  Logout
+                </button>
                 <button
                   onClick={() => setShowLogoutModal(false)}
-                  className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition"
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
                 >
-                  {" "}
-                  Cancel{" "}
-                </button>{" "}
-              </div>{" "}
-            </motion.div>{" "}
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
           </motion.div>
-        )}{" "}
+        )}
       </AnimatePresence>
     </div>
   );
 };
 
-// Reusable modal
+// Reusable Modal
 const Modal = ({ children, isMobile, onClose }) => {
   return (
     <motion.div
@@ -732,22 +599,18 @@ const Modal = ({ children, isMobile, onClose }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      role="dialog"
-      aria-modal="true"
     >
       {isMobile ? (
         <motion.div
           variants={{
-            hidden: { y: "100%", opacity: 0 },
-            visible: { y: 0, opacity: 1 },
-            exit: { y: "100%", opacity: 0 },
+            hidden: { y: "100%" },
+            visible: { y: 0 },
+            exit: { y: "100%" },
           }}
           initial="hidden"
           animate="visible"
           exit="exit"
-          transition={{ duration: 0.3, ease: "easeInOut" }}
-          className="fixed bottom-0 left-0 right-0 w-full h-[70vh] bg-white rounded-t-2xl shadow-2xl p-6 max-w-md mx-auto"
+          className="fixed bottom-0 left-0 right-0 w-full h-[70vh] bg-white rounded-t-2xl shadow-2xl p-6"
         >
           <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-4" />
           {children}
@@ -762,7 +625,6 @@ const Modal = ({ children, isMobile, onClose }) => {
           initial="hidden"
           animate="visible"
           exit="exit"
-          transition={{ duration: 0.3, ease: "easeInOut" }}
           className="bg-white rounded-xl shadow-xl p-6 max-w-md w-full"
         >
           {children}

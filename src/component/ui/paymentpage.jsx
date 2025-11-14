@@ -113,25 +113,33 @@ const PaymentPage = () => {
       return;
     }
 
+    // Good debug output
+    console.log("selected slot:", selectedSlot);
     console.log(
-      "selected slot is like",
-      selectedSlot?.slotName || selectedSlot || ""
+      "selected slotName:",
+      selectedSlot?.slotName ||
+        `${selectedSlot?.day?.label || ""} ${selectedSlot?.day?.date || ""} - ${
+          selectedSlot?.time?.time || selectedSlot?.time || ""
+        }`
     );
 
     try {
       setLoading(true);
 
-      // ✅ STEP 1: Update order details before assigning leads
+      // Build the slot string (prefer normalized slotName)
+      const slotString =
+        selectedSlot?.slotName ||
+        `${selectedSlot?.day?.label || ""} ${selectedSlot?.day?.date || ""} - ${
+          selectedSlot?.time?.time || selectedSlot?.time || ""
+        }`;
+
+      // STEP 1: Update order details before assigning leads
       const updateResponse = await UpdateOrder({
         OrderID: orderId,
         Address: selectedAddress?.FullAddress || "",
-        Slot: selectedSlot
-          ? `${selectedSlot?.day?.label || ""} ${
-              selectedSlot?.day?.date || ""
-            } - ${selectedSlot?.time || ""}`
-          : "",
+        Slot: slotString,
         Status: "Pending", // or "Confirmed" depending on logic
-        VendorPhone: "", // You can pass empty for now if not applicable
+        VendorPhone: "",
         BeforVideo: "",
         AfterVideo: "",
         OTP: "",
@@ -140,26 +148,28 @@ const PaymentPage = () => {
 
       console.log("UpdateOrder Response:", updateResponse);
 
-      if (
-        !updateResponse ||
-        (typeof updateResponse === "string" &&
-          !updateResponse.includes("Successfully") &&
-          !updateResponse?.includes?.("Successfully"))
-      ) {
+      const success =
+        updateResponse &&
+        (typeof updateResponse === "string"
+          ? updateResponse.toLowerCase().includes("success")
+          : updateResponse?.message?.toLowerCase?.().includes("success"));
+
+      if (!success) {
         alert("Failed to update order. Please try again.");
         setLoading(false);
         return;
       }
 
-      // ✅ STEP 2: Then assign leads
+      // STEP 2: Assign leads
       console.log("orderID from paymentpage:", orderId);
       const assignResponse = await AssignLeads(orderId);
       console.log("AssignLeads API Response:", assignResponse);
 
-      if (
+      const assignSuccess =
         assignResponse?.message === "Leads Assigned Successfully" ||
-        assignResponse === "Leads Assigned Successfully"
-      ) {
+        assignResponse === "Leads Assigned Successfully";
+
+      if (assignSuccess) {
         alert("Leads assigned successfully!");
         navigate("/vendorwait", { state: { cartItems } });
       } else {
@@ -323,7 +333,15 @@ const PaymentPage = () => {
               >
                 <SlotCard
                   onSelectSlot={(slot) => {
-                    setSelectedSlot(slot);
+                    // slot === { day, time } from SlotCard
+                    const normalized = {
+                      slotName: `${slot.day.label} ${slot.day.date} - ${slot.time.time}`, // human friendly
+                      slotIso: slot.time.iso, // useful for backend if needed
+                      day: slot.day,
+                      time: slot.time, // original object preserved
+                    };
+
+                    setSelectedSlot(normalized);
                     setShowSlotModal(false);
                   }}
                   onClose={() => setShowSlotModal(false)}

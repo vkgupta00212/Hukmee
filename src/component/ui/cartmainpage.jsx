@@ -7,7 +7,7 @@ const CartMain = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-1 sm:p-6 lg:p-8">
       {/* Header Section */}{" "}
       <div className="w-full max-w-5xl flex flex-col items-center">
         {" "}
@@ -48,7 +48,7 @@ const CartMain = () => {
           <CartPage />
         </main>
         {/* Footer Section */}
-        <footer className="mt-8 w-full max-w-3xl text-center py-4">
+        {/* <footer className="mt-8 w-full max-w-3xl text-center py-4">
           <p className="text-sm text-gray-500">
             Need help?{" "}
             <a
@@ -58,7 +58,7 @@ const CartMain = () => {
               Contact Support
             </a>
           </p>
-        </footer>
+        </footer> */}
       </div>
     </div>
   );
