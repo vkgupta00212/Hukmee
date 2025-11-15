@@ -70,16 +70,6 @@ const OTPCard = ({ otp = "", mask = false, expirySeconds = 300 }) => {
     }
   };
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator
-        .share({ title: "OTP Code", text: `OTP: ${otp}` })
-        .catch(() => {});
-    } else {
-      handleCopy();
-    }
-  };
-
   const display = mask ? otp.replace(/\d/g, "•") : otp;
 
   const minutes = Math.floor(secondsLeft / 60);
@@ -107,14 +97,6 @@ const OTPCard = ({ otp = "", mask = false, expirySeconds = 300 }) => {
             aria-label="Copy OTP"
           >
             {copied ? "Copied!" : "Copy"}
-          </button>
-
-          <button
-            onClick={handleShare}
-            className="px-3 py-2 bg-white border border-blue-200 text-blue-700 rounded-lg text-sm hover:bg-blue-50 transition"
-            aria-label="Share OTP"
-          >
-            Share
           </button>
         </div>
       </div>

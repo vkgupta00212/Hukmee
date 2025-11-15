@@ -59,21 +59,19 @@ const MyOrder = () => {
           {/* Responsive Filter Tabs */}
           <div className="mt-4 flex justify-center">
             <div className="inline-flex bg-gray-50 rounded-xl shadow-inner p-1 overflow-x-auto scrollbar-hide gap-1">
-              {["All", "Pending", "Accepted", "Declined", "Completed"].map(
-                (f) => (
-                  <button
-                    key={f}
-                    onClick={() => setFilter(f)}
-                    className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300 whitespace-nowrap min-w-[80px] sm:min-w-[100px] ${
-                      filter === f
-                        ? `bg-gradient-to-r ${Colors.gradientFrom} ${Colors.gradientTo} text-white shadow-md`
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                    }`}
-                  >
-                    {f === "All" ? "All Orders" : f}
-                  </button>
-                )
-              )}
+              {["All", "Pending", "Done", "Declined", "Completed"].map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300 whitespace-nowrap min-w-[80px] sm:min-w-[100px] ${
+                    filter === f
+                      ? `bg-gradient-to-r ${Colors.gradientFrom} ${Colors.gradientTo} text-white shadow-md`
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  }`}
+                >
+                  {f === "All" ? "All Orders" : f}
+                </button>
+              ))}
             </div>
           </div>
         </div>
