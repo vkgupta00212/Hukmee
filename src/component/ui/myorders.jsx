@@ -30,7 +30,20 @@ const MyOrder = () => {
       setIsLoading(true);
       setErrorMsg("");
       try {
-        const apiStatus = filter === "All" ? "" : filter;
+        // map UI filter labels to API status values
+        const statusMap = {
+          All: "",
+          Accepted: "done", // <--- when filter is "Accepted" send "done"
+          Completed: "completed",
+          Pending: "pending",
+          // add more mappings if your API expects different keywords
+        };
+
+        // use mapping, but fall back to filter string if not present
+        const apiStatus = statusMap.hasOwnProperty(filter)
+          ? statusMap[filter]
+          : filter;
+
         const data = await ShowOrders({
           orderid: "",
           UserID,
@@ -58,12 +71,12 @@ const MyOrder = () => {
         <div className="max-w-8xl mx-auto px-2 py-2">
           {/* Responsive Filter Tabs */}
           <div className="mt-4 flex justify-center">
-            <div className="inline-flex bg-gray-50 rounded-xl shadow-inner p-1 overflow-x-auto scrollbar-hide gap-1">
-              {["All", "Pending", "Done", "Declined", "Completed"].map((f) => (
+            <div className="inline-flex bg-gray-50 rounded-xl shadow-inner p-4 overflow-x-auto scrollbar-hide gap-1">
+              {["All", "Pending", "Accepted", "Completed"].map((f) => (
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
-                  className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300 whitespace-nowrap min-w-[80px] sm:min-w-[100px] ${
+                  className={`px-4 py-2 sm:px-5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-300 whitespace-nowrap min-w-[80px] sm:min-w-[100px] ${
                     filter === f
                       ? `bg-gradient-to-r ${Colors.gradientFrom} ${Colors.gradientTo} text-white shadow-md`
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
@@ -78,7 +91,7 @@ const MyOrder = () => {
       </div>
 
       {/* ===== CONTENT AREA ===== */}
-      <div className="max-w-7xl mx-auto px-4 pb-6 pt-2">
+      <div className="max-w-7xl mx-auto px-1 pb-2 pt-1">
         {isLoading ? (
           <LoadingSkeleton />
         ) : errorMsg ? (
@@ -119,9 +132,16 @@ const OrderCards = ({ orders, filter }) => {
       : orders.filter((o) => {
           const status = (o.Status || "").toLowerCase();
           const target = filter.toLowerCase();
-          if (target === "completed")
-            return status === "completed" || status === "done";
-          return status === target;
+
+          if (target === "completed") {
+            return status === "completed";
+          }
+
+          if (target === "accepted") {
+            return status === "done"; // Show 'done' when filter = 'Accepted'
+          }
+
+          return true;
         });
 
   if (!filteredOrders.length) {
@@ -156,15 +176,15 @@ const OrderCards = ({ orders, filter }) => {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.3, delay: idx * 0.05 }}
-              className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden"
+              className="p-4 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden"
             >
-              <div className="p-2 sm:p-5">
+              <div className=" sm:p-5">
                 {/* Header */}
-                <div className="flex justify-between items-start mb-3 sm:mb-4">
+                <div className="flex flex-row justify-between items-start mb-5 sm:mb-4">
                   <div>
-                    <h3 className="font-bold text-base sm:text-lg text-gray-800 flex items-center gap-1.5 sm:gap-2">
+                    <p className="font-bold text-base sm:text-lg text-gray-800 flex items-center ">
                       <Package size={16} /> #{order.OrderID}
-                    </h3>
+                    </p>
                     <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
                       <User size={12} /> {order.UserID}
                     </p>
@@ -176,23 +196,6 @@ const OrderCards = ({ orders, filter }) => {
                     {status}
                   </span>
                 </div>
-
-                {/* Image */}
-                {order.ItemImages ? (
-                  <img
-                    src={order.ItemImages}
-                    alt={order.ItemName}
-                    className="w-full h-40 sm:h-48 object-cover rounded-xl mb-3 sm:mb-4"
-                    onError={(e) => {
-                      e.target.src =
-                        "https://via.placeholder.com/400x200?text=Image+Not+Found";
-                    }}
-                  />
-                ) : (
-                  <div className="bg-gray-100 h-40 sm:h-48 rounded-xl mb-3 sm:mb-4 flex items-center justify-center">
-                    <Package size={36} className="text-gray-400" />
-                  </div>
-                )}
 
                 {/* Details */}
                 <div className="space-y-2 text-xs sm:text-sm">

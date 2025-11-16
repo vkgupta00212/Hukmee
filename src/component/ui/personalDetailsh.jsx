@@ -205,7 +205,7 @@ const PersonalDetails = () => {
             <>
               <div className="flex flex-row sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b border-gray-200">
                 <h3
-                  className={`text-xl md:text-2xl font-semibold ${Colors.textGrayDark}`}
+                  className={`text-l md:text-2xl font-semibold ${Colors.textGrayDark}`}
                 >
                   Personal Details
                 </h3>

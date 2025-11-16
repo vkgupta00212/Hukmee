@@ -390,7 +390,7 @@ const UserProfile = () => {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ duration: 0.3 }}
-                    className="bg-white rounded-2xl shadow-xl p-6 md:p-8"
+                    className="bg-white rounded-2xl shadow-xl p-3 md:p-8"
                   >
                     <h3
                       className={`text-xl md:text-2xl font-bold mb-6 bg-gradient-to-r ${Colors.gradientFrom} ${Colors.gradientTo} bg-clip-text text-transparent`}
