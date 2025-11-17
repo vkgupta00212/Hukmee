@@ -1,35 +1,16 @@
 import axios from "axios";
 
-const UpdateOrder = async ({
-  OrderID,
-  Price,
-  Quantity,
-  Address = "",
-  Slot = "",
-  Status = "",
-  VendorPhone = "",
-  BeforVideo = "",
-  AfterVideo = "",
-  OTP = "",
-  PaymentMethod = "",
-}) => {
+const UpdateOrderQuantity = async ({ Id, OrderID, Price, Quantity }) => {
   const formData = new URLSearchParams();
   formData.append("token", "SWNCMPMSREMXAMCKALVAALI");
+  formData.append("ID", Id);
   formData.append("OrderID", OrderID);
   formData.append("Price", Price);
   formData.append("Quantity", Quantity);
-  formData.append("Address", Address);
-  formData.append("Slot", Slot);
-  formData.append("Status", Status);
-  formData.append("VendorPhone", VendorPhone);
-  formData.append("BeforVideo", BeforVideo);
-  formData.append("AfterVideo", AfterVideo);
-  formData.append("OTP", OTP);
-  formData.append("PaymentMethod", PaymentMethod);
 
   try {
     const response = await axios.post(
-      "https://api.hukmee.in/APIs/APIs.asmx/UpdateOrders",
+      "https://api.hukmee.in/APIs/APIs.asmx/UpdateQtyPrice",
       formData.toString(),
       {
         headers: {
@@ -49,4 +30,4 @@ const UpdateOrder = async ({
   }
 };
 
-export default UpdateOrder;
+export default UpdateOrderQuantity;

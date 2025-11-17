@@ -1,12 +1,14 @@
 // src/components/cart/CartPage.jsx
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { Minus, Plus, Trash2, X, IndianRupee } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion"; // ← Required for modal animation
 import GetOrder from "../../backend/order/getorderid";
 import DeleteOrder from "../../backend/order/deleteorder";
-import UpdateQuantity from "../../backend/order/updateorder";
 import Colors from "../../core/constant";
 import ShowOrders from "../../backend/order/showorder";
+import UpdateOrderQuantity from "../../backend/order/updateorderquantity";
+import UpdateOrderstatus from "../../backend/order/updateorder";
 
 const CartPage = () => {
   const [orders, setOrders] = useState([]);
@@ -15,316 +17,589 @@ const CartPage = () => {
   const [updatingItemId, setUpdatingItemId] = useState(null);
   const [pending1, setPending1] = useState([]);
   const [pendingLoading, setPendingLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("cart");
   const UserID = localStorage.getItem("userPhone");
   const navigate = useNavigate();
 
-  // Fetch cart orders
+  // Payment Modal States
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentOrderId, setPaymentOrderId] = useState("");
+  const [paymentAmount, setPaymentAmount] = useState(0);
+
+  // Fetch cart orders (Pending)
   const fetchCartOrders = useCallback(async () => {
-    if (!UserID) return;
+    if (!UserID) {
+      setOrders([]);
+      return;
+    }
     setIsCartLoading(true);
     try {
       const data = await GetOrder(UserID, "Pending");
-      setOrders(data || []);
+      setOrders(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error fetching cart:", err);
+      setOrders([]);
     } finally {
       setIsCartLoading(false);
     }
   }, [UserID]);
 
-  useEffect(() => {
-    if (!UserID) return;
-    const fetchPendingOrders = async () => {
-      setPendingLoading(true);
-      try {
-        const data = await ShowOrders({
-          orderid: "",
-          UserID,
-          VendorPhone: "",
-          Status: "Pending1", // ✅ make sure backend supports this
-        });
-        setPending1(data || []);
-        console.log("✅ Pending orders:", data);
-      } catch (error) {
-        console.error("Error fetching pending orders:", error);
-      } finally {
-        setPendingLoading(false);
-      }
-    };
-
-    fetchPendingOrders();
+  // Fetch Pending1 (vendor suggestions)
+  const fetchPending1Orders = useCallback(async () => {
+    if (!UserID) {
+      setPending1([]);
+      return;
+    }
+    setPendingLoading(true);
+    try {
+      const data = await ShowOrders({
+        orderid: "",
+        UserID,
+        VendorPhone: "",
+        Status: "Pending1",
+      });
+      setPending1(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error fetching pending1 orders:", error);
+      setPending1([]);
+    } finally {
+      setPendingLoading(false);
+    }
   }, [UserID]);
 
   useEffect(() => {
     fetchCartOrders();
-  }, [fetchCartOrders]);
+    fetchPending1Orders();
+  }, [fetchCartOrders, fetchPending1Orders]);
+
+  useEffect(() => {
+    if (Array.isArray(pending1) && pending1.length > 0) {
+      setActiveTab("reorder");
+    } else {
+      setActiveTab("cart");
+      fetchCartOrders();
+    }
+  }, [pending1]);
+
+  const canShowCart = pending1.length === 0;
+  const hiddenCartBecauseReorder = pending1.length > 0;
 
   // Remove item
   const handleRemove = async (id) => {
+    if (!id) return;
     setDeletingItemId(id);
-    setOrders((prev) => prev.filter((item) => item.ID !== id));
     try {
-      await DeleteOrder(id);
+      if (activeTab === "cart" && canShowCart) {
+        setOrders((prev) =>
+          prev.filter((item) => String(item.ID) !== String(id))
+        );
+        await DeleteOrder(id);
+        await fetchCartOrders();
+      } else {
+        setPending1((prev) =>
+          prev.filter((item) => String(item.ID) !== String(id))
+        );
+        await DeleteOrder(id);
+        await fetchPending1Orders();
+      }
     } catch (err) {
       console.error("Delete failed:", err);
+      await fetchCartOrders();
+      await fetchPending1Orders();
+      alert("Failed to remove item. Please try again.");
     } finally {
       setDeletingItemId(null);
     }
   };
 
   // Update quantity
-  const handleUpdateQuantity = async (orderId, newQty) => {
-    const orderToUpdate = orders.find((item) => item.OrderID === orderId);
+  const handleUpdateQuantity = async (rowId, newQty) => {
+    if (!rowId) return;
+
+    const orderToUpdate =
+      activeTab === "cart" && canShowCart
+        ? orders.find((item) => String(item.ID) === String(rowId))
+        : pending1.find((item) => String(item.ID) === String(rowId));
+
     if (!orderToUpdate) return;
 
-    // Optimistic update
-    setOrders((prev) =>
-      prev.map((item) =>
-        item.OrderID === orderId ? { ...item, Quantity: newQty } : item
-      )
-    );
+    const clampedQty = Math.max(1, Number(newQty));
 
-    setUpdatingItemId(orderId);
-
-    try {
-      await UpdateQuantity({
-        OrderID: orderToUpdate.OrderID,
-        UserID: orderToUpdate.UserID || UserID,
-        OrderType: orderToUpdate.OrderType || "Pending",
-        ItemImages: "",
-        ItemName: "",
-        Price: "",
-        Quantity: newQty,
-        Address: "",
-        Slot: "",
-        SlotDatetime: "",
-        OrderDatetime: "",
-      });
-
-      // artificial delay
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-    } catch (err) {
-      console.error("Update quantity failed:", err);
+    if (activeTab === "cart" && canShowCart) {
       setOrders((prev) =>
         prev.map((item) =>
-          item.OrderID === orderId
-            ? { ...item, Quantity: orderToUpdate.Quantity }
+          String(item.ID) === String(rowId)
+            ? { ...item, Quantity: clampedQty }
             : item
         )
       );
+    } else {
+      setPending1((prev) =>
+        prev.map((item) =>
+          String(item.ID) === String(rowId)
+            ? { ...item, Quantity: clampedQty }
+            : item
+        )
+      );
+    }
+
+    setUpdatingItemId(rowId);
+
+    try {
+      await UpdateOrderQuantity({
+        Id: String(orderToUpdate.ID),
+        OrderID: orderToUpdate.OrderID || "",
+        Price: String(orderToUpdate.Price || "0"),
+        Quantity: String(clampedQty),
+      });
+
+      activeTab === "cart" && canShowCart
+        ? await fetchCartOrders()
+        : await fetchPending1Orders();
+    } catch (err) {
+      console.error("Update quantity failed:", err);
+      await fetchCartOrders();
+      await fetchPending1Orders();
+      alert("Failed to update quantity. Please try again.");
     } finally {
       setUpdatingItemId(null);
     }
   };
 
   // Totals
-  const total = useMemo(
+  const cartTotal = useMemo(
     () =>
-      orders.reduce(
-        (acc, item) => acc + Number(item.Price) * Number(item.Quantity),
+      (orders || []).reduce(
+        (a, i) => a + Number(i.Price || 0) * Number(i.Quantity || 0),
         0
       ),
     [orders]
   );
 
-  const totalDiscount = useMemo(
+  const pending1Total = useMemo(
     () =>
-      orders.reduce((acc, item) => {
-        const original = Number(item.Price) || 0;
-        const discounted = Number(item.DiscountPrice) || original;
-        const qty = Number(item.Quantity) || 1;
-        return acc + (original - discounted) * qty;
-      }, 0),
-    [orders]
+      (pending1 || []).reduce(
+        (a, i) => a + Number(i.Price || 0) * Number(i.Quantity || 0),
+        0
+      ),
+    [pending1]
   );
 
   const handleProceed = () => {
-    navigate("/paymentpage", {
-      state: {
-        cartItems: orders,
-        total,
-        totalDiscount,
-      },
-    });
+    if (activeTab === "cart" && canShowCart) {
+      navigate("/paymentpage", {
+        state: { cartItems: orders, total: cartTotal, totalDiscount: 0 },
+      });
+    } else {
+      navigate("/paymentpage", {
+        state: { cartItems: pending1, total: pending1Total, isReorder: true },
+      });
+    }
   };
 
-  const isMobile = window.innerWidth < 640;
+  // Open Payment Modal when "Update Items" is clicked
+  const openPaymentModal = () => {
+    const orderId = pending1[0]?.OrderID || "N/A";
+    setPaymentOrderId(orderId);
+    setPaymentAmount(pending1Total);
+    setShowPaymentModal(true);
+  };
+
+  const handlePaymentComplete = async (orderId, amount, mode) => {
+    try {
+      // 1. Update Order Status (PaymentMethod)
+      const updateResponse = await UpdateOrderstatus({
+        OrderID: orderId,
+        Price: "",
+        Quantity: "",
+        Status: "Onservice",
+        VendorPhone: UserID,
+        BeforVideo: "",
+        AfterVideo: "",
+        OTP: "",
+        PaymentMethod: "",
+      });
+
+      alert("Payment Complited...");
+
+      window.location.reload();
+    } catch (error) {
+      console.error("Payment error:", error);
+      alert("Payment process failed.");
+    }
+  };
+
+  const pending1RemoveAllowed = () => pending1.length > 1;
+
+  // Payment Confirmation Modal Component
+  const PaymentModal = ({ isOpen, onClose, orderId, amount, onConfirm }) => {
+    return (
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={onClose}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full text-center relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={onClose}
+                className="absolute top-3 right-3 text-gray-500 hover:text-red-600 transition"
+              >
+                <X size={20} />
+              </button>
+
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <IndianRupee className="text-blue-600" size={32} />
+              </div>
+
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                Payment By?
+              </h3>
+              <p className="text-sm text-gray-600 mb-5">
+                Confirm ₹{amount} has been paid for Order #{orderId}
+              </p>
+
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => {
+                    onConfirm(orderId, amount, "Cash");
+                    onClose();
+                  }}
+                  className="bg-gradient-to-r from-green-500 to-emerald-600 text-white py-2.5 rounded-xl font-medium hover:shadow-md transition"
+                >
+                  Cash
+                </button>
+                <button
+                  onClick={() => {
+                    onConfirm(orderId, amount, "Online");
+                    onClose();
+                  }}
+                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-2.5 rounded-xl font-medium hover:shadow-md transition"
+                >
+                  Online
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    );
+  };
 
   return (
-    <div className="w-full md:w-80 lg:w-96 mx-auto bg-white rounded-2xl shadow-lg overflow-hidden font-sans">
-      {/* Header */}
-      <div className={`p-4 sm:p-6 border-b ${Colors.borderGray}`}>
-        <h2
-          className={`text-xl sm:text-2xl font-bold ${Colors.textGrayDark} mb-4 sm:mb-6`}
+    <>
+      <div className="w-full md:w-80 lg:w-96 mx-auto bg-white rounded-2xl shadow-lg overflow-hidden font-sans">
+        {/* Header */}
+        <div className={`p-4 sm:p-6 border-b ${Colors.borderGray}`}>
+          <h2
+            className={`text-xl sm:text-2xl font-bold ${Colors.textGrayDark} mb-2 sm:mb-3`}
+          >
+            Your Cart
+          </h2>
+
+          {!hiddenCartBecauseReorder && (
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={() => setActiveTab("cart")}
+                className={`flex-1 py-2 rounded-lg text-sm font-medium ${
+                  activeTab === "cart"
+                    ? `bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} text-white`
+                    : `bg-gray-100 text-gray-700`
+                }`}
+              >
+                Cart Items
+              </button>
+              <button
+                onClick={() => setActiveTab("reorder")}
+                className={`flex-1 py-2 rounded-lg text-sm font-medium ${
+                  activeTab === "reorder"
+                    ? `bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} text-white`
+                    : `bg-gray-100 text-gray-700`
+                }`}
+              >
+                Reorder
+              </button>
+            </div>
+          )}
+
+          {hiddenCartBecauseReorder && (
+            <p className="mt-2 text-sm text-orange-600">
+              Vendor suggested changes are pending — editing the reorder only.
+            </p>
+          )}
+        </div>
+
+        {/* Cart Body */}
+        <div
+          className="px-4 sm:px-6"
+          style={{
+            maxHeight: "calc(100vh - 460px)",
+            overflowY: "auto",
+            paddingRight: "8px",
+          }}
         >
-          Your Cart
-        </h2>
-
-        {/* 🛒 Pending Orders (Normal Cart) */}
-        <div className="mb-8">
-          {isCartLoading ? (
-            <div className="flex justify-center items-center py-4">
-              <div
-                className={`animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 ${Colors.primaryFrom.replace(
-                  "from",
-                  "border"
-                )}`}
-              ></div>
-              <p className={`ml-3 ${Colors.textMuted}`}>Loading pending...</p>
-            </div>
-          ) : (
-            orders.map((item) => (
-              <div
-                key={item.ID}
-                className={`flex justify-between items-start mb-4 pb-4 border-b ${Colors.divideGray}`}
-              >
-                {/* Left */}
-                <div className="flex-grow pr-3">
-                  <p
-                    className={`text-sm sm:text-base font-semibold ${Colors.textGrayDark}`}
-                  >
-                    {item.ItemName}
-                  </p>
-                  <button
-                    onClick={() => handleRemove(item.ID)}
-                    disabled={deletingItemId === item.ID}
-                    className={`flex items-center bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} bg-clip-text text-transparent text-sm mt-2`}
-                  >
-                    <Trash2 size={14} className="mr-1" />
-                    {deletingItemId === item.ID ? "Removing..." : "Remove"}
-                  </button>
+          {activeTab === "cart" && !hiddenCartBecauseReorder ? (
+            /* Normal Cart */
+            <div className="mb-8">
+              {isCartLoading ? (
+                <div className="flex justify-center items-center py-4">
+                  <div
+                    className={`animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 ${Colors.primaryFrom.replace(
+                      "from",
+                      "border"
+                    )}`}
+                  />
+                  <p className={`ml-3 ${Colors.textMuted}`}>Loading cart...</p>
                 </div>
-
-                {/* Right */}
-                <div className="flex flex-col items-end">
-                  <div className="flex items-center bg-gray-50 rounded-full px-2 py-1 gap-2">
-                    <button
-                      onClick={() =>
-                        handleUpdateQuantity(
-                          item.OrderID,
-                          Math.max(1, Number(item.Quantity) - 1)
-                        )
-                      }
-                      disabled={
-                        Number(item.Quantity) <= 1 ||
-                        updatingItemId === item.OrderID
-                      }
-                      className="p-1 hover:bg-gray-200 rounded-full transition-colors disabled:opacity-50"
-                    >
-                      <Minus size={16} />
-                    </button>
-                    {updatingItemId === item.OrderID ? (
-                      <div className="w-6 text-center">
-                        <div
-                          className={`animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 ${Colors.primaryFrom.replace(
-                            "from",
-                            "border"
-                          )}`}
-                        />
+              ) : orders.length === 0 ? (
+                <p className={`${Colors.textMuted}`}>Your cart is empty.</p>
+              ) : (
+                orders.map((item) => (
+                  <div
+                    key={item.ID}
+                    className={`flex justify-between items-start mb-4 pb-4 border-b ${Colors.divideGray}`}
+                  >
+                    <div className="flex-grow pr-3">
+                      <p
+                        className={`text-sm sm:text-base font-semibold ${Colors.textGrayDark}`}
+                      >
+                        {item.ItemName}
+                      </p>
+                      <button
+                        onClick={() => handleRemove(item.ID)}
+                        disabled={deletingItemId === item.ID}
+                        className={`flex items-center mt-2 text-sm ${Colors.textMuted}`}
+                      >
+                        <Trash2 size={14} className="mr-1" />
+                        {deletingItemId === item.ID ? "Removing..." : "Remove"}
+                      </button>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <div className="flex items-center bg-gray-50 rounded-full px-2 py-1 gap-2">
+                        <button
+                          onClick={() =>
+                            handleUpdateQuantity(
+                              item.ID,
+                              Number(item.Quantity) - 1
+                            )
+                          }
+                          disabled={
+                            Number(item.Quantity) <= 1 ||
+                            updatingItemId === item.ID
+                          }
+                        >
+                          <Minus size={16} />
+                        </button>
+                        {updatingItemId === item.ID ? (
+                          <div className="w-6 text-center">
+                            <div
+                              className={`animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 ${Colors.primaryFrom.replace(
+                                "from",
+                                "border"
+                              )}`}
+                            />
+                          </div>
+                        ) : (
+                          <span className="w-6 text-center">
+                            {item.Quantity}
+                          </span>
+                        )}
+                        <button
+                          onClick={() =>
+                            handleUpdateQuantity(
+                              item.ID,
+                              Number(item.Quantity) + 1
+                            )
+                          }
+                          disabled={updatingItemId === item.ID}
+                        >
+                          <Plus size={16} />
+                        </button>
                       </div>
-                    ) : (
-                      <span className="w-6 text-center">{item.Quantity}</span>
-                    )}
-                    <button
-                      onClick={() =>
-                        handleUpdateQuantity(
-                          item.OrderID,
-                          Number(item.Quantity) + 1
-                        )
-                      }
-                      disabled={updatingItemId === item.OrderID}
-                      className="p-1 hover:bg-gray-200 rounded-full transition-colors disabled:opacity-50"
-                    >
-                      <Plus size={16} />
-                    </button>
+                      <p
+                        className={`text-base sm:text-lg font-bold bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} bg-clip-text text-transparent mt-2`}
+                      >
+                        ₹
+                        {(
+                          Number(item.Price || 0) * Number(item.Quantity || 0)
+                        ).toFixed(2)}
+                      </p>
+                    </div>
                   </div>
-                  <p
-                    className={`text-base sm:text-lg font-bold bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} bg-clip-text text-transparent mt-2`}
-                  >
-                    ₹{(Number(item.Price) * Number(item.Quantity)).toFixed(2)}
+                ))
+              )}
+            </div>
+          ) : (
+            /* Reorder (Pending1) */
+            <div className="mb-8">
+              {pendingLoading ? (
+                <div className="flex justify-center items-center py-4">
+                  <div
+                    className={`animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 ${Colors.primaryFrom.replace(
+                      "from",
+                      "border"
+                    )}`}
+                  />
+                  <p className={`ml-3 ${Colors.textMuted}`}>
+                    Loading reorder...
                   </p>
                 </div>
-              </div>
-            ))
+              ) : pending1.length === 0 ? (
+                <p className={`${Colors.textMuted}`}>No reorder suggestions.</p>
+              ) : (
+                pending1.map((item) => (
+                  <div
+                    key={item.ID}
+                    className={`flex justify-between items-start mb-4 pb-4 border-b ${Colors.divideGray}`}
+                  >
+                    <div className="flex-grow pr-3">
+                      <p
+                        className={`text-sm sm:text-base font-semibold ${Colors.textGrayDark}`}
+                      >
+                        {item.ItemName}
+                      </p>
+                      <button
+                        onClick={() => handleRemove(item.ID)}
+                        disabled={
+                          deletingItemId === item.ID || !pending1RemoveAllowed()
+                        }
+                        className={`flex items-center mt-2 text-sm ${
+                          Colors.textMuted
+                        } ${
+                          !pending1RemoveAllowed()
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                        title={
+                          !pending1RemoveAllowed()
+                            ? "Cannot remove last vendor-suggested item"
+                            : undefined
+                        }
+                      >
+                        <Trash2 size={14} className="mr-1" />
+                        {deletingItemId === item.ID ? "Removing..." : "Remove"}
+                      </button>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <div className="flex items-center bg-gray-50 rounded-full px-2 py-1 gap-2">
+                        <button
+                          onClick={() =>
+                            handleUpdateQuantity(
+                              item.ID,
+                              Number(item.Quantity) - 1
+                            )
+                          }
+                          disabled={
+                            Number(item.Quantity) <= 1 ||
+                            updatingItemId === item.ID
+                          }
+                        >
+                          <Minus size={16} />
+                        </button>
+                        {updatingItemId === item.ID ? (
+                          <div className="w-6 text-center">
+                            <div
+                              className={`animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 ${Colors.primaryFrom.replace(
+                                "from",
+                                "border"
+                              )}`}
+                            />
+                          </div>
+                        ) : (
+                          <span className="w-6 text-center">
+                            {item.Quantity}
+                          </span>
+                        )}
+                        <button
+                          onClick={() =>
+                            handleUpdateQuantity(
+                              item.ID,
+                              Number(item.Quantity) + 1
+                            )
+                          }
+                          disabled={updatingItemId === item.ID}
+                        >
+                          <Plus size={16} />
+                        </button>
+                      </div>
+                      <p
+                        className={`text-base sm:text-lg font-bold bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} bg-clip-text text-transparent mt-2`}
+                      >
+                        ₹
+                        {(
+                          Number(item.Price || 0) * Number(item.Quantity || 0)
+                        ).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           )}
         </div>
 
-        {/* 🧾 Pending1 Orders */}
-        <div>
-          {pendingLoading ? (
-            <div className="flex justify-center items-center py-4">
+        {/* Summary & Buttons */}
+        {(activeTab === "cart" ? orders.length > 0 : pending1.length > 0) && (
+          <div className="w-full p-4 sm:p-6 bg-white border-t border-gray-200">
+            <div className="mb-4">
               <div
-                className={`animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 ${Colors.primaryFrom.replace(
-                  "from",
-                  "border"
-                )}`}
-              ></div>
-              <p className={`ml-3 ${Colors.textMuted}`}>Loading pending1...</p>
-            </div>
-          ) : (
-            pending1.map((item) => (
-              <div
-                key={item.ID}
-                className={`flex justify-between items-start mb-4 pb-4 border-b ${Colors.divideGray}`}
+                className={`flex justify-between text-base sm:text-lg font-semibold ${Colors.textGrayDark}`}
               >
-                <div className="flex-grow pr-3">
-                  <p
-                    className={`text-sm sm:text-base font-semibold ${Colors.textGrayDark}`}
-                  >
-                    {item.ItemName}
-                  </p>
-                  <button
-                    onClick={() => handleRemove(item.ID)}
-                    disabled={deletingItemId === item.ID}
-                    className={`flex items-center bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} bg-clip-text text-transparent text-sm mt-2`}
-                  >
-                    <Trash2 size={14} className="mr-1" />
-                    {deletingItemId === item.ID ? "Removing..." : "Remove"}
-                  </button>
-                </div>
-                <div className="flex flex-col items-end">
-                  <p
-                    className={`text-base sm:text-lg font-bold bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} bg-clip-text text-transparent mt-2`}
-                  >
-                    ₹{Number(item.Price).toFixed(2)}
-                  </p>
-                </div>
+                <span>
+                  {activeTab === "cart" ? "Subtotal" : "Reorder Total"}
+                </span>
+                <span>
+                  ₹
+                  {(activeTab === "cart" ? cartTotal : pending1Total).toFixed(
+                    2
+                  )}
+                </span>
               </div>
-            ))
-          )}
-        </div>
+            </div>
+
+            {activeTab === "cart" && !hiddenCartBecauseReorder ? (
+              <button
+                onClick={handleProceed}
+                className={`w-full flex items-center justify-between bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} ${Colors.textWhite} px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow hover:opacity-90`}
+              >
+                <span className="text-base sm:text-lg font-semibold">
+                  Proceed
+                </span>
+                <span className="text-base sm:text-lg font-semibold">→</span>
+              </button>
+            ) : (
+              <button
+                onClick={openPaymentModal} // This opens the modal
+                className={`w-full flex items-center justify-between bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} ${Colors.textWhite} px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow hover:opacity-90`}
+              >
+                <span className="text-base sm:text-lg font-semibold">
+                  Update Items
+                </span>
+                <span className="text-base sm:text-lg font-semibold">→</span>
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* ✅ Summary */}
-      {orders.length > 0 && (
-        <div className="w-full p-4 sm:p-6 bg-white border-t border-gray-200">
-          <div className="mb-4">
-            <div
-              className={`flex justify-between text-base sm:text-lg font-semibold ${Colors.textGrayDark}`}
-            >
-              <span>Subtotal</span>
-              <span>
-                ₹
-                {orders
-                  .reduce(
-                    (acc, item) =>
-                      acc + Number(item.Price) * Number(item.Quantity),
-                    0
-                  )
-                  .toFixed(2)}
-              </span>
-            </div>
-          </div>
-          <button
-            onClick={handleProceed}
-            className={`w-full flex items-center justify-between bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} ${Colors.textWhite} px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow hover:opacity-90`}
-          >
-            <span className="text-base sm:text-lg font-semibold">Proceed</span>
-            <span className="text-base sm:text-lg font-semibold">→</span>
-          </button>
-        </div>
-      )}
-    </div>
+      {/* Payment Confirmation Modal */}
+      <PaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        orderId={paymentOrderId}
+        amount={paymentAmount}
+        onConfirm={handlePaymentComplete}
+      />
+    </>
   );
 };
 

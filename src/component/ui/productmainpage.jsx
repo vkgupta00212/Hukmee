@@ -13,6 +13,7 @@ import GetOrder from "../../backend/order/getorderid";
 import LoginCard from "./loginCard";
 import OtpVerification from "./otpverification";
 import Colors from "../../core/constant";
+import UpdateOrderQuantity from "../../backend/order/updateorderquantity";
 
 const ProductMainPage = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -37,6 +38,7 @@ const ProductMainPage = () => {
   const loginCardRef = useRef(null);
   const otpModalRef = useRef(null);
   const [addStatus, setAddStatus] = useState("idle");
+  const [isProcessingAdd, setIsProcessingAdd] = useState(false);
 
   const UserID = localStorage.getItem("userPhone");
 
@@ -232,6 +234,7 @@ const ProductMainPage = () => {
   }, [showLogin, showLoginCard, showOtpModal]);
 
   const addToCart = async (item) => {
+    // require login
     if (!UserID) {
       setPendingCartItem(item);
       setShowLogin(true);
@@ -243,54 +246,167 @@ const ProductMainPage = () => {
       return;
     }
 
-    const price = parseInt(item.Price || 0);
+    // prevent double requests
+    if (isProcessingAdd) return;
+    setIsProcessingAdd(true);
 
-    // Show "Adding…" immediately
+    // quick price fallback
+    const price =
+      parseInt(item.Price || item.fees || item.discountfee || 0, 10) || 0;
+
+    // optimistic local update for UX
     setAddStatus("adding");
+    setCartItems((prev) => {
+      const exists = prev.find((i) => String(i.id) === String(item.ProID));
+      if (exists) {
+        return prev.map((i) =>
+          String(i.id) === String(item.ProID)
+            ? { ...i, quantity: i.quantity + 1 }
+            : i
+        );
+      }
+      return [
+        ...prev,
+        { id: item.ProID, ProductName: item.ProductName, price, quantity: 1 },
+      ];
+    });
 
     try {
-      // Update local cart (optimistic)
-      setCartItems((prev) => {
-        const exists = prev.find((i) => i.id === item.ProID);
-        if (exists) {
-          return prev.map((i) =>
-            i.id === item.ProID ? { ...i, quantity: i.quantity + 1 } : i
-          );
+      // 1) fetch server pending rows so we have DB row IDs
+      const pendingRows = Array.isArray(await GetOrder(UserID, "Pending"))
+        ? await GetOrder(UserID, "Pending")
+        : [];
+
+      // 2) try to find existing row by stable key: ProID (preferred), fallback to ProductName
+      const normalize = (s) => (s ?? "").toString().trim().toLowerCase();
+
+      const existingRow = (pendingRows || []).find((r) => {
+        // if server returns a product id field use that (try r.ProID or r.ItemID)
+        if (r.ProID && item.ProID) {
+          return String(r.ProID) === String(item.ProID);
         }
-        return [...prev, { ...item, id: item.ProID, quantity: 1, price }];
+        if (r.ItemID && item.ProID) {
+          return String(r.ItemID) === String(item.ProID);
+        }
+        // fallback to name match (case-insensitive)
+        return (
+          normalize(r.ItemName) === normalize(item.ProductName || item.ItemName)
+        );
       });
 
-      // Create or reuse order
+      if (existingRow) {
+        // 3) UPDATE existing row: increment quantity by 1 using DB row ID
+        const prevQty = Number(existingRow.Quantity || 0) || 0;
+        const newQty = prevQty + 1;
+
+        const updatePayload = {
+          Id: String(existingRow.ID), // DB row id required by UpdateOrderQuantity
+          OrderID: existingRow.OrderID || orderId || "",
+          Price: String(existingRow.Price ?? price),
+          Quantity: String(newQty),
+        };
+
+        console.log("Updating existing cart row:", updatePayload);
+        const updResp = await UpdateOrderQuantity(updatePayload);
+        // optional: inspect updResp for success; legacy .asmx endpoints often return wrappers
+
+        // re-fetch server pending rows to get authoritative cart with IDs/quantities
+        const refreshed = Array.isArray(await GetOrder(UserID, "Pending"))
+          ? await GetOrder(UserID, "Pending")
+          : [];
+
+        // map server rows to local cart shape
+        const mapped = (refreshed || []).map((r) => ({
+          id: String(r.ID),
+          dbId: r.ID,
+          ProductName: r.ItemName || r.ProductName,
+          price: Number(r.Price) || price,
+          quantity: Number(r.Quantity) || 0,
+        }));
+        setCartItems(mapped);
+
+        setAddStatus("added");
+        setTimeout(() => setAddStatus("idle"), 1500);
+        setIsProcessingAdd(false);
+        return;
+      }
+
+      // 4) NOT FOUND -> INSERT new row (create orderId if missing)
       let currentOrderId = orderId;
       if (!currentOrderId) {
         currentOrderId = `ORD${Date.now()}`;
         setOrderId(currentOrderId);
         setOrderType("Product");
+        console.log("Generated new order:", currentOrderId);
       }
 
-      const orderPayload = {
+      const insertPayload = {
         OrderID: currentOrderId,
         UserID,
         OrderType: "Product",
-        ItemImages: "",
-        ItemName: item.ProductName || "",
-        Price: price.toString(),
+        ItemImages: "", // you can add product images if needed
+        ItemName: item.ProductName || item.ItemName || "",
+        Price: String(price),
         Quantity: "1",
         Address: "",
         Slot: "",
         SlotDatetime: "",
         OrderDatetime: new Date().toISOString(),
+        VendorPhone: "",
+        BeforVideo: "",
+        AfterVideo: "",
+        PaymentMethod: "",
+        lat: "", // optional
+        long: "",
       };
 
-      await InsertOrder(orderPayload); // API call
+      console.log("Inserting new cart row:", insertPayload);
+      await InsertOrder(insertPayload);
 
-      // Success → show "Added!" for 2 seconds
+      // after insert, re-fetch pending rows to get DB ids and server-truth
+      const refreshedAfterInsert = Array.isArray(
+        await GetOrder(UserID, "Pending")
+      )
+        ? await GetOrder(UserID, "Pending")
+        : [];
+
+      const mappedAfterInsert = (refreshedAfterInsert || []).map((r) => ({
+        id: String(r.ID),
+        dbId: r.ID,
+        ProductName: r.ItemName || r.ProductName,
+        price: Number(r.Price) || price,
+        quantity: Number(r.Quantity) || 0,
+      }));
+      setCartItems(mappedAfterInsert);
+
       setAddStatus("added");
-      setTimeout(() => setAddStatus("idle"), 2000);
+      setTimeout(() => setAddStatus("idle"), 1500);
     } catch (err) {
-      console.error("InsertOrder failed:", err);
+      console.error("addToCart error:", err);
       setAddStatus("idle");
-      alert("Failed to add item. Please try again.");
+      // rollback: re-fetch server rows to restore authoritative state
+      try {
+        const refreshed = Array.isArray(await GetOrder(UserID, "Pending"))
+          ? await GetOrder(UserID, "Pending")
+          : [];
+        const mapped = (refreshed || []).map((r) => ({
+          id: String(r.ID),
+          dbId: r.ID,
+          ProductName: r.ItemName || r.ProductName,
+          price: Number(r.Price) || price,
+          quantity: Number(r.Quantity) || 0,
+        }));
+        setCartItems(mapped);
+      } catch (fetchErr) {
+        console.error("Rollback fetch failed:", fetchErr);
+        // if even fetch fails, remove optimistic add for the item
+        setCartItems((prev) =>
+          prev.filter((c) => String(c.id) !== String(item.ProID))
+        );
+      }
+      alert("Failed to add/update cart. Try again.");
+    } finally {
+      setIsProcessingAdd(false);
     }
   };
 
@@ -502,7 +618,7 @@ const ProductMainPage = () => {
 
               <div className="mt-8">
                 <div className="flex items-baseline gap-3 mb-6">
-                  <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">
+                  <span className="text-2xl sm:text-4xl lg:text-3xl font-bold text-gray-900">
                     ₹{Number(product.Price).toFixed(0)}
                   </span>
                   {product.OriginalPrice && (
@@ -801,7 +917,7 @@ const ProductMainPage = () => {
                         setShowCart(false);
                         navigate("/cartpage");
                       }}
-                      className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200"
+                      className="px-6 py-3 bg-gradient-to-r from-orange-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       aria-label="Go to cart"
@@ -863,7 +979,7 @@ const ProductMainPage = () => {
                           setShowCart(false);
                           navigate("/cartpage");
                         }}
-                        className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200"
+                        className="px-6 py-3 bg-gradient-to-r from-orange-600 to-gray-600 text-white font-semibold rounded-lg hover:from-orange-700 hover:to-gray-700 transition-all duration-200 hover:cursor-pointer"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         aria-label="Go to cart"
@@ -872,7 +988,7 @@ const ProductMainPage = () => {
                       </motion.button>
                       <motion.button
                         onClick={() => setShowCart(false)}
-                        className="px-6 py-3 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition-all duration-200"
+                        className="px-6 py-3 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition-all duration-200 hover:cursor-pointer"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         aria-label="Return to browsing"

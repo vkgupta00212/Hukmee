@@ -129,6 +129,8 @@ const PaymentPage = () => {
       // Update order on backend
       const updateResponse = await UpdateOrder({
         OrderID: orderId,
+        Price: "",
+        Quantity: "",
         Address: selectedAddress?.FullAddress || "",
         Slot: slotString,
         Status: "Pending",

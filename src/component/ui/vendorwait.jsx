@@ -100,11 +100,6 @@ const OTPCard = ({ otp = "", mask = false, expirySeconds = 300 }) => {
           </button>
         </div>
       </div>
-
-      <div className="mt-3 text-xs text-blue-600">
-        Expires in{" "}
-        <strong>{`${minutes}:${String(seconds).padStart(2, "0")}`}</strong>
-      </div>
     </div>
   );
 };
@@ -221,7 +216,7 @@ const VendorCard = ({
             </div>
           ) : (
             <div className="mt-6 text-center text-gray-500">
-              <p>No items in order.</p>
+              {/* <p>No items in order.</p> */}
             </div>
           )}
 

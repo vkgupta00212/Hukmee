@@ -12,6 +12,9 @@ import LoginCard from "./loginCard";
 import OtpVerification from "./otpverification";
 import Accesories from "./accessories";
 import Colors from "../../core/constant";
+import UpdateOrder from "../../backend/order/updateorder";
+import UpdateOrderQuantity from "../../backend/order/updateorderquantity";
+import ShowOrders from "../../backend/order/showorder";
 
 const WomenSaloonIn = () => {
   const location = useLocation();
@@ -35,6 +38,9 @@ const WomenSaloonIn = () => {
   const [orderType, setOrderType] = useState(null);
   const UserID = localStorage.getItem("userPhone");
   const navigate = useNavigate();
+  const [isProcessingAdd, setIsProcessingAdd] = useState(false);
+  const [pending1Rows, setPending1Rows] = useState([]);
+  const [pendingLoading, setPendingLoading] = useState(false);
 
   useEffect(() => {
     const checkScreen = () => {
@@ -159,6 +165,46 @@ const WomenSaloonIn = () => {
     fetchExistingOrder();
   }, [UserID]);
 
+  const fetchCartOrders = useCallback(async () => {
+    if (!UserID) {
+      return;
+    }
+    try {
+      const rows = await GetOrderid(UserID, "Pending");
+      // If GetOrderid returns array or something else adapt accordingly
+      // store nothing because you already use fetch on useEffect, but we expose this for refreshs
+      // if you want to keep local orders state add setOrders(...)
+      return Array.isArray(rows) ? rows : [];
+    } catch (err) {
+      console.error("fetchCartOrders error", err);
+      return [];
+    }
+  }, [UserID]);
+
+  const fetchPending1Orders = useCallback(async () => {
+    if (!UserID) {
+      setPending1Rows([]);
+      return [];
+    }
+    setPendingLoading(true);
+    try {
+      const rows = await ShowOrders({
+        orderid: "",
+        UserID,
+        VendorPhone: "",
+        Status: "Pending1",
+      });
+      setPending1Rows(Array.isArray(rows) ? rows : []);
+      return Array.isArray(rows) ? rows : [];
+    } catch (err) {
+      console.error("fetchPending1Orders error", err);
+      setPending1Rows([]);
+      return [];
+    } finally {
+      setPendingLoading(false);
+    }
+  }, [UserID]);
+
   const [servicePackages, setServicePackages] = useState([]);
   const fetchPackages = useCallback(async () => {
     if (!selectedServiceTab?.SubCatid) return;
@@ -176,6 +222,44 @@ const WomenSaloonIn = () => {
     fetchPackages();
   }, [fetchPackages]);
 
+  // inside your component, replace existing addToCart with this
+  const getCurrentLocation = (timeoutMs = 5000) =>
+    new Promise((resolve) => {
+      if (!navigator.geolocation) {
+        // no geolocation API
+        return resolve({ lat: "26.551381", long: "84.767491" });
+      }
+
+      let settled = false;
+      const timer = setTimeout(() => {
+        if (!settled) {
+          settled = true;
+          resolve({ lat: "26.551381", long: "84.767491" });
+        }
+      }, timeoutMs);
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          const { latitude, longitude } = pos.coords;
+          resolve({
+            lat: String(latitude ?? 26.551381),
+            long: String(longitude ?? 84.767491),
+          });
+        },
+        (err) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          console.warn("geolocation failed or denied:", err);
+          resolve({ lat: "26.551381", long: "84.767491" });
+        },
+        { maximumAge: 60_000, timeout: 4000, enableHighAccuracy: false }
+      );
+    });
+
   const addToCart = async (item) => {
     if (!UserID) {
       setPendingCartItem(item);
@@ -183,58 +267,187 @@ const WomenSaloonIn = () => {
       return;
     }
 
-    // if (orderType === "Product") {
-    //   setShowCart(true);
-    //   return;
-    // }
+    if (isProcessingAdd) return;
+    setIsProcessingAdd(true);
 
-    const price = parseInt(item.discountfee || item.fees || 0);
-
-    setCartItems((prev) => {
-      const exists = prev.find((i) => i.id === item.id);
-      if (exists) {
-        return prev.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-        );
-      } else {
-        return [...prev, { ...item, quantity: 1, price }];
-      }
-    });
+    const price = parseInt(item.discountfee || item.fees || 0) || 0;
+    const token = localStorage.getItem("token") || "SWNCMPMSREMXAMCKALVAALI";
+    const normalize = (s) => (s || "").toString().trim().toLowerCase();
 
     try {
-      let currentOrderId = orderId;
-      if (!currentOrderId) {
-        currentOrderId = `ORD${Date.now()}`;
-        setOrderId(currentOrderId);
-        setOrderType("Service");
-        console.log("Generated new order:", currentOrderId);
+      // get best-effort location (async, may use fallback)
+      const { lat, long } = await getCurrentLocation();
+
+      // 1) check vendor-pending (Pending1)
+      const p1 = await fetchPending1Orders();
+      const pending1 = Array.isArray(p1) ? p1 : [];
+
+      if (pending1.length > 0) {
+        const pendingOrderId = pending1[0].OrderID || "";
+
+        // normalize accessor: pending1 items could be ShowOrderModel instances or plain objects
+        const firstPending = pending1[0] || {};
+        const getField = (obj, key) =>
+          obj && typeof obj[key] !== "undefined"
+            ? obj[key]
+            : obj?.[key]?.toString?.() ?? "";
+
+        // grab values to reuse (safe fallbacks)
+        const reuseOTP = getField(firstPending, "OTP") || "";
+        const reuseBeforVideo = getField(firstPending, "BeforVideo") || "";
+        const reuseAddress = getField(firstPending, "Address") || "";
+        const reuseVendorPhone = getField(firstPending, "VendorPhone") || "";
+
+        console.log("Reusing from pending1 (first row):", {
+          reuseOTP,
+          reuseBeforVideo,
+          reuseAddress,
+          reuseVendorPhone,
+        });
+
+        const existingRow = pending1.find((r) =>
+          r.ItemID
+            ? String(r.ItemID) === String(item.ItemID || item.itemId)
+            : normalize(r.ItemName) ===
+              normalize(item.servicename || item.ItemName)
+        );
+
+        if (existingRow) {
+          const prevQty = Number(existingRow.Quantity || 0) || 0;
+          const newQty = prevQty + 1;
+          const updatePayload = {
+            token,
+            Id: String(existingRow.ID),
+            OrderID: pendingOrderId,
+            Price: String(existingRow.Price ?? price),
+            Quantity: String(newQty),
+          };
+          console.log("Updating pending1 row:", updatePayload);
+          const updResp = await UpdateOrderQuantity(updatePayload);
+          console.log("UpdateOrderQuantity (pending1) response:", updResp);
+
+          await fetchPending1Orders();
+          await fetchCartOrders();
+          alert(
+            `${item.servicename || item.ItemName} quantity updated (pending1).`
+          );
+        } else {
+          // insert using reused OTP/Address/BeforVideo/VendorPhone from the first pending1 row
+          const insertPayload = {
+            token,
+            OrderID: pendingOrderId,
+            UserID,
+            OrderType: "Service",
+            ItemImages: "",
+            ItemName: item.servicename || item.ItemName || "",
+            Price: String(price),
+            Quantity: "1",
+            Address: reuseAddress,
+            Slot: "",
+            SlotDatetime: "",
+            OrderDatetime: new Date().toISOString(),
+            VendorPhone: reuseVendorPhone,
+            BeforVideo: reuseBeforVideo,
+            AfterVideo: "",
+            OTP: reuseOTP,
+            PaymentMethod: "",
+            lat: String(lat),
+            long: String(long), // use `long` (spelled out) — consistent with typical backend fields
+            Status: "Pending1",
+          };
+          console.log(
+            "Inserting (pending1) row (reused fields):",
+            insertPayload
+          );
+          const insResp = await InsertOrder(insertPayload);
+          console.log("InsertOrder (pending1) response:", insResp);
+
+          await fetchPending1Orders();
+          await fetchCartOrders();
+          alert(
+            `${
+              item.servicename || item.ItemName
+            } added to vendor pending order.`
+          );
+        }
+        // reload to reflect UI/quantity/state like your original flow
+        window.location.reload();
+
+        setIsProcessingAdd(false);
+        return;
       }
 
-      await InsertOrder({
-        OrderID: currentOrderId,
-        UserID: UserID,
-        OrderType: "Service",
-        ItemImages: "",
-        ItemName: item.servicename || "",
-        Price: price.toString(),
-        Quantity: "1",
-        Address: "",
-        Slot: "",
-        SlotDatetime: "",
-        OrderDatetime: new Date().toISOString(),
-        VendorPhone: "",
-        BeforVideo: "", // ✅ corrected key name to match API
-        AfterVideo: "",
-        PaymentMethod: "",
-        lat: "26.551381",
-        long: "84.767491",
-      });
-      console.log("InsertOrder API successful");
-      if (!isMobile) {
+      // 2) No pending1: fallback to normal Pending
+      const pendingRows = Array.isArray(await GetOrderid(UserID, "Pending"))
+        ? await GetOrderid(UserID, "Pending")
+        : [];
+
+      const existingRow = (pendingRows || []).find((r) =>
+        r.ItemID
+          ? String(r.ItemID) === String(item.ItemID || item.itemId)
+          : normalize(r.ItemName) ===
+            normalize(item.servicename || item.ItemName)
+      );
+
+      if (existingRow) {
+        const prevQty = Number(existingRow.Quantity || 0) || 0;
+        const newQty = prevQty + 1;
+        const updatePayload = {
+          token,
+          Id: String(existingRow.ID),
+          OrderID: existingRow.OrderID || orderId || "",
+          Price: String(existingRow.Price ?? price),
+          Quantity: String(newQty),
+        };
+        console.log("Updating existing pending row:", updatePayload);
+        const updResp = await UpdateOrderQuantity(updatePayload);
+        console.log("UpdateOrderQuantity response:", updResp);
+
+        await fetchCartOrders();
+        alert(`${item.servicename || item.ItemName} quantity updated.`);
+      } else {
+        let currentOrderId = orderId || `ORD${Date.now()}`;
+        if (!orderId) {
+          setOrderId(currentOrderId);
+          setOrderType("Service");
+        }
+
+        const insertPayload = {
+          token,
+          OrderID: currentOrderId,
+          UserID,
+          OrderType: "Service",
+          ItemImages: "",
+          ItemName: item.servicename || item.ItemName || "",
+          Price: String(price),
+          Quantity: "1",
+          Address: "",
+          Slot: "",
+          SlotDatetime: "",
+          OrderDatetime: new Date().toISOString(),
+          VendorPhone: "",
+          BeforVideo: "",
+          AfterVideo: "",
+          OTP: "",
+          PaymentMethod: "",
+          lat: String(lat),
+          long: String(long),
+          Status: "Pending",
+        };
+
+        console.log("Inserting new cart row (normal):", insertPayload);
+        const insResp = await InsertOrder(insertPayload);
+        console.log("InsertOrder response:", insResp);
+
+        await fetchCartOrders();
+        alert(`${item.servicename || item.ItemName} added to cart.`);
         window.location.reload();
       }
     } catch (err) {
-      console.error("InsertOrder failed:", err);
+      console.error("addToCart error:", err);
+      alert("Failed to add/update cart. Check console/network for details.");
+    } finally {
+      setIsProcessingAdd(false);
     }
   };
 
@@ -768,5 +981,3 @@ const WomenSaloonIn = () => {
 };
 
 export default WomenSaloonIn;
-
-

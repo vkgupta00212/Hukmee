@@ -15,9 +15,11 @@ const InsertOrder = async ({
   VendorPhone = "",
   BeforVideo = "", // ✅ spelling must match exactly as in the API doc
   AfterVideo = "",
+  OTP = "",
   PaymentMethod = "",
   lat = "",
   long = "",
+  Status = "",
 }) => {
   const formData = new URLSearchParams();
   formData.append("token", "SWNCMPMSREMXAMCKALVAALI");
@@ -35,9 +37,11 @@ const InsertOrder = async ({
   formData.append("VendorPhone", VendorPhone);
   formData.append("BeforVideo", BeforVideo); // ✅ fixed key name
   formData.append("AfterVideo", AfterVideo);
+  formData.append("OTP", OTP);
   formData.append("PaymentMethod", PaymentMethod);
   formData.append("lat", lat);
   formData.append("lon", long);
+  formData.append("Status", Status);
 
   try {
     const response = await axios.post(

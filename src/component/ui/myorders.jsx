@@ -264,6 +264,15 @@ const OrderCards = ({ orders, filter }) => {
                         : "N/A"}
                     </span>
                   </div>
+
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 flex items-center gap-1">
+                      <Clock size={12} /> OTP
+                    </span>
+                    <span className="font-medium text-xs">
+                      {order.OTP ? order.OTP : "N/A"}
+                    </span>
+                  </div>
                 </div>
               </div>
             </motion.div>
