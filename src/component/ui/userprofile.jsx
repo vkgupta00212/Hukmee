@@ -406,7 +406,7 @@ const UserProfile = () => {
       </div>
 
       {/* ===== MOBILE BOTTOM TABS ===== */}
-      <div className="md:hidden fixed bottom-[60px] left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+      <div className="md:hidden fixed bottom-[80px] left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
         <div className="flex items-center py-1">
           {/* Scrollable Nav Items */}
           <div className="flex overflow-x-auto no-scrollbar flex-1 px-1 space-x-4">
