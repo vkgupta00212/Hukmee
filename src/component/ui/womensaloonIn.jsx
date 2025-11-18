@@ -15,6 +15,7 @@ import Colors from "../../core/constant";
 import UpdateOrder from "../../backend/order/updateorder";
 import UpdateOrderQuantity from "../../backend/order/updateorderquantity";
 import ShowOrders from "../../backend/order/showorder";
+import MobileCartSummary from "./mobilecart";
 
 const WomenSaloonIn = () => {
   const location = useLocation();
@@ -223,42 +224,72 @@ const WomenSaloonIn = () => {
   }, [fetchPackages]);
 
   // inside your component, replace existing addToCart with this
-  const getCurrentLocation = (timeoutMs = 5000) =>
-    new Promise((resolve) => {
+  // Real-time location with fallback + continuous update
+  const useRealTimeLocation = () => {
+    const [location, setLocation] = useState({
+      lat: "00.00000",
+      long: "00.0000",
+    });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
       if (!navigator.geolocation) {
-        // no geolocation API
-        return resolve({ lat: "26.551381", long: "84.767491" });
+        setLocation({ lat: "00.0000", long: "00.0000" });
+        setLoading(false);
+        return;
       }
 
-      let settled = false;
-      const timer = setTimeout(() => {
-        if (!settled) {
-          settled = true;
-          resolve({ lat: "26.551381", long: "84.767491" });
-        }
-      }, timeoutMs);
+      let watchId = null;
 
+      const updateLocation = (position) => {
+        const { latitude, longitude } = position.coords;
+        setLocation({
+          lat: String(latitude),
+          long: String(longitude),
+        });
+        setLoading(false);
+      };
+
+      const handleError = (err) => {
+        console.warn("Location access denied or failed:", err.message);
+
+        setLoading(false);
+      };
+
+      // First: Try one-time high accuracy
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          if (settled) return;
-          settled = true;
-          clearTimeout(timer);
-          const { latitude, longitude } = pos.coords;
-          resolve({
-            lat: String(latitude ?? 26.551381),
-            long: String(longitude ?? 84.767491),
-          });
+          updateLocation(pos);
+          // Then: Start watching for better accuracy over time
+          watchId = navigator.geolocation.watchPosition(
+            updateLocation,
+            handleError,
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+          );
         },
-        (err) => {
-          if (settled) return;
-          settled = true;
-          clearTimeout(timer);
-          console.warn("geolocation failed or denied:", err);
-          resolve({ lat: "26.551381", long: "84.767491" });
+        () => {
+          // Fallback: Use low accuracy + watch
+          watchId = navigator.geolocation.watchPosition(
+            updateLocation,
+            handleError,
+            { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 }
+          );
         },
-        { maximumAge: 60_000, timeout: 4000, enableHighAccuracy: false }
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
       );
-    });
+
+      // Cleanup watcher on unmount
+      return () => {
+        if (watchId !== null) {
+          navigator.geolocation.clearWatch(watchId);
+        }
+      };
+    }, []);
+
+    return { location, loading };
+  };
+
+  const { location: realTimeLocation } = useRealTimeLocation();
 
   const addToCart = async (item) => {
     if (!UserID) {
@@ -276,7 +307,7 @@ const WomenSaloonIn = () => {
 
     try {
       // get best-effort location (async, may use fallback)
-      const { lat, long } = await getCurrentLocation();
+      const { lat, long } = realTimeLocation;
 
       // 1) check vendor-pending (Pending1)
       const p1 = await fetchPending1Orders();
@@ -326,11 +357,11 @@ const WomenSaloonIn = () => {
           const updResp = await UpdateOrderQuantity(updatePayload);
           console.log("UpdateOrderQuantity (pending1) response:", updResp);
 
-          await fetchPending1Orders();
-          await fetchCartOrders();
+          window.location.reload();
           alert(
             `${item.servicename || item.ItemName} quantity updated (pending1).`
           );
+          window.location.reload();
         } else {
           // insert using reused OTP/Address/BeforVideo/VendorPhone from the first pending1 row
           const insertPayload = {
@@ -369,9 +400,9 @@ const WomenSaloonIn = () => {
               item.servicename || item.ItemName
             } added to vendor pending order.`
           );
+          window.location.reload();
         }
         // reload to reflect UI/quantity/state like your original flow
-        window.location.reload();
 
         setIsProcessingAdd(false);
         return;
@@ -402,7 +433,7 @@ const WomenSaloonIn = () => {
         console.log("Updating existing pending row:", updatePayload);
         const updResp = await UpdateOrderQuantity(updatePayload);
         console.log("UpdateOrderQuantity response:", updResp);
-
+        window.location.reload();
         await fetchCartOrders();
         alert(`${item.servicename || item.ItemName} quantity updated.`);
       } else {
@@ -541,10 +572,18 @@ const WomenSaloonIn = () => {
             />
 
             {isMobile && (
-              <PackageMain
-                addToCart={addToCart}
-                selectedServiceTab={selectedServiceTab}
-              />
+              <>
+                <div>
+                  <div className="mb-[60px]">
+                    <PackageMain
+                      addToCart={addToCart}
+                      selectedServiceTab={selectedServiceTab}
+                    />
+                  </div>
+
+                  <MobileCartSummary />
+                </div>
+              </>
             )}
 
             {isTablet && (

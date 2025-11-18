@@ -1,11 +1,18 @@
+// src/components/cart/cartsummury.jsx
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Colors from "../../core/constant";
 
-const CartSummary = ({ total, cartItems }) => {
+const CartSummary = ({
+  total,
+  cartItems,
+  customButtonText, // Optional: override button text
+  customOnClick, // Optional: override click behavior
+}) => {
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
 
+  // Calculate total discount (if DiscountPrice exists)
   const totalDiscount = useMemo(() => {
     return cartItems.reduce((acc, item) => {
       const original = Number(item.Price) || 0;
@@ -15,72 +22,82 @@ const CartSummary = ({ total, cartItems }) => {
     }, 0);
   }, [cartItems]);
 
-  const handleCart = () => {
-    console.log("Navigating to payment with:", {
-      cartItems,
-      total,
-      totalDiscount,
+  // Total quantity of items (e.g. 2 shirts + 3 pants = 5 items)
+  const totalItemsQty = useMemo(() => {
+    return cartItems.reduce((sum, item) => sum + Number(item.Quantity || 0), 0);
+  }, [cartItems]);
+
+  // Default click handler (navigate to payment)
+  const handleClick =
+    customOnClick ||
+    (() => {
+      navigate("/paymentpage", {
+        state: {
+          cartItems,
+          total,
+          totalDiscount,
+        },
+      });
     });
-    navigate("/paymentpage", {
-      state: {
-        cartItems,
-        total,
-        totalDiscount,
-      },
-    });
-  };
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 640);
-    };
+    const handleResize = () => setIsMobile(window.innerWidth < 640);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  if (!cartItems || cartItems.length === 0) {
-    return null;
-  }
+  if (!cartItems || cartItems.length === 0) return null;
 
-  // ✅ Mobile summary (sticky bottom)
+  // Mobile Sticky Bottom Bar
   const MobileSummary = () => (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-white border-t border-gray-300 shadow-lg">
+    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-white border-t border-gray-300 shadow-2xl">
       <button
-        onClick={handleCart}
-        className={`w-full flex items-center justify-between bg-${Colors.primaryMain} text-white px-4 sm:px-5 py-2 sm:py-3 rounded-lg shadow hover:bg-orange-500 transition-colors duration-200`}
+        onClick={handleClick}
+        className={`w-full flex items-center justify-between bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} text-white px-5 py-3.5 rounded-xl font-semibold text-base shadow-lg hover:shadow-xl transition-all`}
       >
-        <span className="text-sm sm:text-base font-semibold">
-          Total Items: {cartItems.length}
+        <span>
+          {totalItemsQty} Item{totalItemsQty !== 1 ? "s" : ""}
         </span>
-        <span className="text-sm sm:text-base font-semibold">View Cart</span>
+        <span>{customButtonText || "View Cart →"}</span>
       </button>
     </div>
   );
 
-  // ✅ Desktop summary
+  // Desktop Summary (inside cart drawer)
   const DesktopSummary = () => (
-    <div className="w-full p-4 sm:p-6 bg-white border-t border-gray-200">
-      <div className="mb-4">
-        <div className="flex justify-between text-base sm:text-lg font-semibold text-gray-900">
-          <span>Subtotal</span>
+    <div className="w-full p-5 bg-white border-t border-gray-200">
+      <div className="space-y-3 mb-5">
+        <div className="flex justify-between text-lg font-semibold text-gray-900">
+          <span>
+            {customButtonText?.includes("Update")
+              ? "Reorder Total"
+              : "Subtotal"}
+          </span>
           <span>₹{Number(total).toFixed(2)}</span>
         </div>
+
         {totalDiscount > 0 && (
-          <div className="flex justify-between text-sm sm:text-base text-green-600 mt-1">
-            <span>Discount</span>
-            <span>-₹{totalDiscount.toFixed(2)}</span>
+          <div className="flex justify-between text-sm text-green-600 font-medium">
+            <span>You Saved</span>
+            <span>₹{totalDiscount.toFixed(2)}</span>
           </div>
         )}
+
+        <div className="flex justify-between text-sm text-gray-600">
+          <span>Total Items</span>
+          <span>
+            {totalItemsQty} Item{totalItemsQty !== 1 ? "s" : ""}
+          </span>
+        </div>
       </div>
+
       <button
-        onClick={handleCart}
-        className="w-full flex items-center justify-between bg-indigo-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow hover:bg-indigo-700 transition-colors duration-200"
+        onClick={handleClick}
+        className={`w-full bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3`}
       >
-        <span className="text-base sm:text-lg font-semibold">
-          ₹{Number(total).toFixed(2)}
-        </span>
-        <span className="text-base sm:text-lg font-semibold">
-          Proceed to Pay
+        <span>₹{Number(total).toFixed(2)}</span>
+        <span className="border-l border-white/30 pl-3">
+          {customButtonText || "Proceed to Pay →"}
         </span>
       </button>
     </div>

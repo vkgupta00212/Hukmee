@@ -9,6 +9,7 @@ import Colors from "../../core/constant";
 import ShowOrders from "../../backend/order/showorder";
 import UpdateOrderQuantity from "../../backend/order/updateorderquantity";
 import UpdateOrderstatus from "../../backend/order/updateorder";
+import CartSummary from "./cartsummury";
 
 const CartPage = () => {
   const [orders, setOrders] = useState([]);
@@ -184,6 +185,24 @@ const CartPage = () => {
       ),
     [pending1]
   );
+
+  const totalCartItemsQty = useMemo(
+    () => orders.reduce((sum, item) => sum + Number(item.Quantity || 0), 0),
+    [orders]
+  );
+
+  const totalPending1ItemsQty = useMemo(
+    () => pending1.reduce((sum, item) => sum + Number(item.Quantity || 0), 0),
+    [pending1]
+  );
+
+  const currentItems = activeTab === "cart" && canShowCart ? orders : pending1;
+  const currentTotal =
+    activeTab === "cart" && canShowCart ? cartTotal : pending1Total;
+  const currentItemCount =
+    activeTab === "cart" && canShowCart
+      ? totalCartItemsQty
+      : totalPending1ItemsQty;
 
   const handleProceed = () => {
     if (activeTab === "cart" && canShowCart) {
@@ -547,47 +566,24 @@ const CartPage = () => {
           )}
         </div>
 
-        {/* Summary & Buttons */}
-        {(activeTab === "cart" ? orders.length > 0 : pending1.length > 0) && (
-          <div className="w-full p-4 sm:p-6 bg-white border-t border-gray-200">
-            <div className="mb-4">
-              <div
-                className={`flex justify-between text-base sm:text-lg font-semibold ${Colors.textGrayDark}`}
-              >
-                <span>
-                  {activeTab === "cart" ? "Subtotal" : "Reorder Total"}
-                </span>
-                <span>
-                  ₹
-                  {(activeTab === "cart" ? cartTotal : pending1Total).toFixed(
-                    2
-                  )}
-                </span>
-              </div>
-            </div>
-
-            {activeTab === "cart" && !hiddenCartBecauseReorder ? (
-              <button
-                onClick={handleProceed}
-                className={`w-full flex items-center justify-between bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} ${Colors.textWhite} px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow hover:opacity-90`}
-              >
-                <span className="text-base sm:text-lg font-semibold">
-                  Proceed
-                </span>
-                <span className="text-base sm:text-lg font-semibold">→</span>
-              </button>
-            ) : (
-              <button
-                onClick={openPaymentModal} // This opens the modal
-                className={`w-full flex items-center justify-between bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} ${Colors.textWhite} px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow hover:opacity-90`}
-              >
-                <span className="text-base sm:text-lg font-semibold">
-                  Update Items
-                </span>
-                <span className="text-base sm:text-lg font-semibold">→</span>
-              </button>
-            )}
-          </div>
+        {/* Smart Summary using CartSummary Component */}
+        {currentItems.length > 0 && (
+          <CartSummary
+            total={currentTotal}
+            cartItems={currentItems}
+            customButtonText={
+              activeTab === "reorder" || hiddenCartBecauseReorder
+                ? `Update Items (${currentItemCount} ${
+                    currentItemCount === 1 ? "Item" : "Items"
+                  })`
+                : undefined
+            }
+            customOnClick={
+              activeTab === "reorder" || hiddenCartBecauseReorder
+                ? openPaymentModal
+                : undefined
+            }
+          />
         )}
       </div>
 
