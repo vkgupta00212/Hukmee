@@ -123,7 +123,7 @@ const MobileHeader = () => {
       <div>
         <div
           onClick={() => navigate("/")}
-          className="flex items-start cursor-pointer p-[2px]"
+          className="flex items-start cursor-pointer p-[5px] ml-[5px]"
         >
           <img
             src={logo}
@@ -144,7 +144,7 @@ const MobileHeader = () => {
                 <FiSearch className="text-gray-500 mr-[1px]" size={20} />
                 <input
                   type="text"
-                  placeholder="Search services..."
+                  placeholder="Search brands..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onFocus={() => setIsDropdownOpen(true)}
