@@ -123,7 +123,7 @@ const MobileHeader = () => {
       <div>
         <div
           onClick={() => navigate("/")}
-          className="flex items-start cursor-pointer"
+          className="flex items-start cursor-pointer p-[2px]"
         >
           <img
             src={logo}
