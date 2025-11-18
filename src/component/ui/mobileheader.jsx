@@ -12,7 +12,7 @@ const CartWithBadge = ({ count }) => (
   <div className="relative">
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      className="w-5 h-5 text-gray-700"
+      className="w-4 h-4 text-gray-700"
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -136,19 +136,19 @@ const MobileHeader = () => {
       <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
         <div className="flex items-center justify-between px-5 py-3">
           {/* Search Bar */}
-          <div className="flex-1 mx-3 relative" ref={dropdownRef}>
+          <div className="flex mx-3 relative" ref={dropdownRef}>
             <div
-              className="flex items-center bg-gray-50 border border-gray-300 rounded-2xl px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-orange-400 transition-all"
+              className="flex items-center bg-gray-50 border border-gray-300 rounded-2xl px-3 py-3 shadow-sm focus-within:ring-2 focus-within:ring-orange-400 transition-all"
               onClick={() => setIsDropdownOpen(true)}
             >
-              <FiSearch className="text-gray-500 mr-3" size={22} />
+              <FiSearch className="text-gray-500 mr-3" size={20} />
               <input
                 type="text"
                 placeholder="Search services..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onFocus={() => setIsDropdownOpen(true)}
-                className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400 font-medium"
+                className="flex bg-transparent outline-none text-gray-700 placeholder-gray-400 font-normal"
               />
             </div>
 
@@ -204,7 +204,7 @@ const MobileHeader = () => {
           <div className="">
             <button
               onClick={() => navigate("/cartpage")}
-              className="ml-1 p-3 rounded-full border b "
+              className="m-[1px]-1 p-[10px] rounded-full border b "
             >
               {isLoading ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
