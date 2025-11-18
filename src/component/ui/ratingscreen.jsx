@@ -108,7 +108,7 @@ const RatingScreen = ({ reviews = [] }) => {
       : 0;
 
   return (
-    <div className="bg-gradient-to-b from-gray-50 to-white rounded-3xl p-6 sm:p-8 max-w-7xl mx-auto shadow-xl border border-gray-200">
+    <div className="bg-gradient-to-b from-gray-50 to-white rounded-xl p-6 sm:p-8 max-w-7xl mx-auto shadow-xl border border-gray-200">
       {/* Header */}
       <div className="text-center mb-8">
         <h2 className="text-xl sm:text-4xl font-bold text-gray-800 mb-3">
@@ -133,7 +133,10 @@ const RatingScreen = ({ reviews = [] }) => {
           <div className="block sm:hidden">
             <div className="flex gap-5 overflow-x-auto pb-6 snap-x snap-mandatory scrollbar-hide">
               {reviews.map((review) => (
-                <div key={review.ID} className="snap-start flex-shrink-0">
+                <div
+                  key={review.ID}
+                  className="snap-start flex-shrink-0 p-[1px]"
+                >
                   <ReviewCard review={review} isMobile={true} />
                 </div>
               ))}
@@ -141,10 +144,19 @@ const RatingScreen = ({ reviews = [] }) => {
           </div>
 
           {/* Desktop: Grid */}
-          <div className="hidden sm:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {reviews.map((review) => (
-              <ReviewCard key={review.ID} review={review} />
-            ))}
+          <div className="hidden sm:block">
+            <div className="overflow-x-auto pb-8 scrollbar-hide">
+              <div className="flex gap-6">
+                {reviews.map((review) => (
+                  <div
+                    key={review.ID}
+                    className="flex-shrink-0 w-96" // ~3 cards fit perfectly
+                  >
+                    <ReviewCard review={review} isMobile={false} />
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </>
       )}

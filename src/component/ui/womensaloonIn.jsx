@@ -580,8 +580,9 @@ const WomenSaloonIn = () => {
                       selectedServiceTab={selectedServiceTab}
                     />
                   </div>
-
-                  <MobileCartSummary />
+                  <div>
+                    <MobileCartSummary />
+                  </div>
                 </div>
               </>
             )}

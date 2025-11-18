@@ -26,7 +26,7 @@ const Index = () => {
     {
       ID: 1,
       Name: "Vishal Gupta",
-      Rating: "4.9",
+      Rating: "4",
       Review: "Great product! The quality exceeded my expectations.",
       image: "https://randomuser.me/api/portraits/men/32.jpg",
     },
@@ -40,7 +40,7 @@ const Index = () => {
     {
       ID: 3,
       Name: "Rahul Verma",
-      Rating: "4.9",
+      Rating: "4.4",
       Review: "It’s decent but could be improved in packaging.",
       image: "https://randomuser.me/api/portraits/men/12.jpg",
     },
@@ -68,7 +68,7 @@ const Index = () => {
     {
       ID: 7,
       Name: "Rohit Sharma",
-      Rating: "4.9",
+      Rating: "4.2",
       Review: "Superb experience! Will definitely purchase again.",
       image: "https://randomuser.me/api/portraits/men/41.jpg",
     },
@@ -82,7 +82,7 @@ const Index = () => {
     {
       ID: 9,
       Name: "Aditya Raj",
-      Rating: "4.9",
+      Rating: "5",
       Review: "Fantastic product and timely delivery. Recommended!",
       image: "https://randomuser.me/api/portraits/men/22.jpg",
     },

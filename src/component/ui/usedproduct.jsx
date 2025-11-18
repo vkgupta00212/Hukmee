@@ -92,6 +92,32 @@ const UsedProduct = () => {
     navigate("/productmainpage", { state: { subService: service } });
   };
 
+  const CartWithBadge = ({ count }) => (
+    <div className="relative">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="w-4 h-4 text-gray-700"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <circle cx="8" cy="21" r="2" />
+        <circle cx="20" cy="21" r="2" />
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+      </svg>
+      {count > 0 && (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="absolute -top-4 -right-3 bg-red-500 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1 shadow-lg border-2 border-white"
+        >
+          {count > 99 ? "99+" : count}
+        </motion.div>
+      )}
+    </div>
+  );
+
   // Skeleton Card
   const SkeletonCard = () => (
     <Card className="flex flex-col h-[360px] rounded-xl shadow-lg border animate-pulse bg-white">
@@ -119,8 +145,8 @@ const UsedProduct = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-gray-50">
       {/* === FIXED HEADER === */}
-      <header className="md:hidden fixed top-0 left-0 right-0 bg-white shadow-md z-50 border-b border-gray-200">
-        <div className="px-4 py-3 sm:px-6">
+      <header className="md:hidden sticky top-0 left-0 right-0 bg-white shadow-md z-50 border-b border-gray-200 ">
+        <div className=" py-3">
           <div className="flex items-center justify-between gap-3">
             {/* Back Button + Title */}
             <div className="flex items-center gap-3 flex-1">
@@ -157,38 +183,6 @@ const UsedProduct = () => {
           </div>
 
           {/* Search Bar */}
-          <div className="flex justify-between items-center">
-            <motion.div
-              variants={headerVariants}
-              initial="hidden"
-              animate="visible"
-              transition={{ duration: 0.5 }}
-              className="mt-3"
-            >
-              <div className="w-[280px] flex items-center border border-gray-300 rounded-lg px-4 py-2.5 bg-gray-50 shadow-sm">
-                <FiSearch className="text-gray-500 mr-3" size={20} />
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search products..."
-                  className="flex-grow outline-none text-gray-700 placeholder-gray-400 bg-transparent text-sm"
-                />
-              </div>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => navigate("/cartpage")}
-              className="flex items-center gap-1 text-gray-700 hover:text-orange-600 cursor-pointer"
-              aria-label="View cart"
-            >
-              <div className="p-2 border border-gray-400 rounded-full">
-                <ShoppingCart size={18} />
-              </div>
-            </motion.div>
-          </div>
         </div>
       </header>
 
@@ -226,7 +220,6 @@ const UsedProduct = () => {
                 <div className="p-2 border border-gray-400 rounded-full">
                   <ShoppingCart size={18} />
                 </div>
-                <span className="text-xs font-medium">Cart</span>
               </motion.div>
             </div>
           </div>
@@ -234,7 +227,44 @@ const UsedProduct = () => {
       )}
 
       {/* === MAIN CONTENT (Starts below header) === */}
-      <main className="pt-[120px] md:pt-6 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+
+      <div>
+        <div className="md:hidden flex justify-between items-center px-[25px] mt-1">
+          <motion.div
+            variants={headerVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ duration: 0.5 }}
+            className="mt-1"
+          >
+            <div className="flex items-center bg-gray-50 border border-gray-300 rounded-xl px-5 py-3 shadow-sm focus-within:ring-2 focus-within:ring-orange-400 transition-all">
+              <FiSearch className="text-gray-500 mr-[1px] " size={20} />
+              <input
+                type="text"
+                placeholder="Search brands..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="flex bg-transparent outline-none text-gray-700 placeholder-gray-400 font-normal ml-[10px]"
+              />
+            </div>
+          </motion.div>
+
+          <div className="">
+            <button
+              onClick={() => navigate("/cartpage")}
+              className="m-[1px]-1 p-[10px] rounded-full border b "
+            >
+              {isLoading ? (
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <CartWithBadge count={2} />
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <main className="pt-[5px] md:pt-6 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Error */}
         {error && (
           <motion.div

@@ -39,7 +39,7 @@ const HeroSection = () => {
         >
           {/* Left */}
           <div className="w-full lg:w-[95%] flex flex-col items-center lg:items-start text-center lg:text-left gap-1 ">
-            <div className="mt-[10px]">{isMobile && <MobileHeader />}</div>
+            <div className="p-[10px]">{isMobile && <MobileHeader />}</div>
             <MobileDetect />
             <ServiceCard onServiceSelect={handleServiceClick} />
           </div>

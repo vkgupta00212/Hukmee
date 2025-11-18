@@ -134,11 +134,11 @@ const MobileHeader = () => {
 
         {/* Main Header */}
         <header className="sticky top-0 z-10 bg-white shadow-sm border-b border-gray-200">
-          <div className="flex items-center justify-between px-5 py-[5px]">
+          <div className="flex items-center justify-between px-[1px] py-[5px]">
             {/* Search Bar */}
             <div className="flex mx-3 relative" ref={dropdownRef}>
               <div
-                className="flex items-center bg-gray-50 border border-gray-300 rounded-2xl px-3 py-3 shadow-sm focus-within:ring-2 focus-within:ring-orange-400 transition-all"
+                className="flex items-center bg-gray-50 border border-gray-300 rounded-xl px-[20px] py-3 shadow-sm focus-within:ring-2 focus-within:ring-orange-400 transition-all"
                 onClick={() => setIsDropdownOpen(true)}
               >
                 <FiSearch className="text-gray-500 mr-[1px]" size={20} />
@@ -148,7 +148,7 @@ const MobileHeader = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onFocus={() => setIsDropdownOpen(true)}
-                  className="flex bg-transparent outline-none text-gray-700 placeholder-gray-400 font-normal"
+                  className="flex bg-transparent outline-none text-gray-700 placeholder-gray-400 font-normal ml-[10px] "
                 />
               </div>
 
