@@ -166,7 +166,7 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen p-[5px] ">
       <section className="relative bg-white">
         <HeroSection />
       </section>

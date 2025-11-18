@@ -35,7 +35,7 @@ const HeroSection = () => {
         {/* Hero Main Section */}
         <section
           id="home"
-          className="min-h-screen flex flex-col lg:flex-row items-center justify-between w-full lg:px-20 pt-[64px] lg:py-24"
+          className="min-h-screen flex flex-col lg:flex-row items-center justify-between w-full lg:px-20 pt-[20px] lg:py-24"
         >
           {/* Left */}
           <div className="w-full lg:w-[95%] flex flex-col items-center lg:items-start text-center lg:text-left gap-1 ">

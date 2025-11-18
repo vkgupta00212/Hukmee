@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import GetOrder from "../../backend/order/getorderid";
 import GetSubCategory from "../../backend/homepageimage/getcategory";
 import { FiSearch } from "react-icons/fi";
+import logo from "../../assets/hukmee.png";
 import WomensSalonCard from "./womensaloonCard";
 
 const CartWithBadge = ({ count }) => (
@@ -119,93 +120,106 @@ const MobileHeader = () => {
   // ✅ Handle selecting a search result
 
   return (
-    <header className="w-full rounded-[10px] border-b border-gray-300 flex justify-between py-2 px-2 bg-inherit sm:px-6 sm:py-4 sticky top-0 z-50">
-      {/* 🔍 Search Section */}
-      <div className="flex flex-col mx-auto relative" ref={dropdownRef}>
-        <div className="w-[300px] mx-auto p-[1px]">
-          <div
-            className="flex items-center border border-gray-300 rounded-[10px] px-2 py-2 bg-white cursor-text"
-            onClick={() => setIsDropdownOpen(true)}
-          >
-            <FiSearch className="text-gray-400 mr-3" size={20} />
-            <input
-              type="text"
-              placeholder="Search for ‘Brands’"
-              value={searchTerm}
-              onFocus={() => setIsDropdownOpen(true)}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-grow outline-none text-gray-600 placeholder-gray-400 bg-transparent"
-            />
+    <div>
+      <div
+        onClick={() => navigate("/")}
+        className="flex items-center cursor-pointer group space-x-1 px-[10px]"
+      >
+        <img
+          src={logo}
+          alt="WePrettify Logo"
+          className="w-45 h-30 rounded-full object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+      </div>
+      <header className="w-full rounded-[10px] border-b border-gray-300 flex justify-between py-2 px-2 bg-inherit sm:px-6 sm:py-4 sticky top-0 z-50">
+        {/* 🔍 Search Section */}
+
+        <div className="flex flex-col mx-auto relative" ref={dropdownRef}>
+          <div className="w-[300px] mx-auto p-[1px]">
+            <div
+              className="flex items-center border border-gray-300 rounded-[10px] px-2 py-2 bg-white cursor-text"
+              onClick={() => setIsDropdownOpen(true)}
+            >
+              <FiSearch className="text-gray-400 mr-3" size={20} />
+              <input
+                type="text"
+                placeholder="Search for ‘Brands’"
+                value={searchTerm}
+                onFocus={() => setIsDropdownOpen(true)}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="flex-grow outline-none text-gray-600 placeholder-gray-400 bg-transparent"
+              />
+            </div>
           </div>
+
+          {/* 🧭 Dropdown Results */}
+          {isDropdownOpen && (
+            <div className="absolute top-[60px] left-0 w-[300px] bg-white border border-gray-200 rounded-[10px] shadow-xl z-50 max-h-[250px] overflow-y-auto">
+              {filteredResults.length > 0 ? (
+                filteredResults.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-3 p-2 hover:bg-gray-100 cursor-pointer transition-colors"
+                    onClick={() => handleServiceClick(item)} // ✅ use function
+                  >
+                    <img
+                      src={`https://api.hukmee.in/${item.ServiceImage}`}
+                      alt={item.ServiceName}
+                      className="w-8 h-8 rounded-full object-cover border"
+                    />
+                    <span className="text-gray-800 font-medium">
+                      {item.ServiceName}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="p-3 text-gray-500 text-center text-sm">
+                  No matching results found
+                </div>
+              )}
+            </div>
+          )}
+
+          <AnimatePresence>
+            {activeModal === "category" && (
+              <motion.div
+                key="modal-category"
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0, y: 50 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0.8, opacity: 0, y: 100 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                >
+                  <WomensSalonCard
+                    onClose={() => setActiveModal(null)}
+                    service={selectedService}
+                  />
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        {/* 🧭 Dropdown Results */}
-        {isDropdownOpen && (
-          <div className="absolute top-[60px] left-0 w-[300px] bg-white border border-gray-200 rounded-[10px] shadow-xl z-50 max-h-[250px] overflow-y-auto">
-            {filteredResults.length > 0 ? (
-              filteredResults.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center gap-3 p-2 hover:bg-gray-100 cursor-pointer transition-colors"
-                  onClick={() => handleServiceClick(item)} // ✅ use function
-                >
-                  <img
-                    src={`https://api.hukmee.in/${item.ServiceImage}`}
-                    alt={item.ServiceName}
-                    className="w-8 h-8 rounded-full object-cover border"
-                  />
-                  <span className="text-gray-800 font-medium">
-                    {item.ServiceName}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <div className="p-3 text-gray-500 text-center text-sm">
-                No matching results found
-              </div>
-            )}
-          </div>
-        )}
-
-        <AnimatePresence>
-          {activeModal === "category" && (
-            <motion.div
-              key="modal-category"
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0, y: 50 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.8, opacity: 0, y: 100 }}
-                transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              >
-                <WomensSalonCard
-                  onClose={() => setActiveModal(null)}
-                  service={selectedService}
-                />
-              </motion.div>
-            </motion.div>
+        {/* 🛒 Cart Section */}
+        <button
+          onClick={() => navigate("/cartpage")}
+          className="w-12 h-12 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-50 active:bg-gray-100 transition-all duration-200"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <div className="w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+          ) : (
+            <CartWithBadge count={cartCount} />
           )}
-        </AnimatePresence>
-      </div>
-
-      {/* 🛒 Cart Section */}
-      <button
-        onClick={() => navigate("/cartpage")}
-        className="w-12 h-12 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-50 active:bg-gray-100 transition-all duration-200"
-        disabled={isLoading}
-      >
-        {isLoading ? (
-          <div className="w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
-        ) : (
-          <CartWithBadge count={cartCount} />
-        )}
-      </button>
-    </header>
+        </button>
+      </header>
+    </div>
   );
 };
 
