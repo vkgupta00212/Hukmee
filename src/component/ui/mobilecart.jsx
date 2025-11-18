@@ -131,7 +131,7 @@ const MobileCartSummary = () => {
   const CartWithBadge = ({ count }) => (
     <div className="relative p-3 bg-white/20 backdrop-blur-sm rounded-full shadow-lg border border-white/30">
       <svg
-        className="w-7 h-7 text-white"
+        className="w-5 h-5 text-white"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -226,7 +226,7 @@ const MobileCartSummary = () => {
             <div className="flex items-center gap-3">
               <button
                 onClick={openPaymentModal}
-                className="flex-1 text-center bg-orange-500 hover:bg-orange-600 text-white px-6 py-4 rounded-2xl font-medium text-lg shadow-2xl active:scale-98 transition-all border border-white/30"
+                className="flex-1 text-center bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-medium text-lg shadow-2xl active:scale-98 transition-all border border-white/30"
               >
                 Update Items ({pending1Qty} Item{pending1Qty !== 1 ? "s" : ""})
               </button>
@@ -239,7 +239,7 @@ const MobileCartSummary = () => {
             <div className="flex items-center gap-3">
               <button
                 onClick={handleProceed}
-                className="flex-1 text-center bg-orange-500 hover:bg-orange-600 text-white px-6 py-4 rounded-2xl font-medium text-lg shadow-2xl active:scale-98 transition-all border border-white/30"
+                className="flex-1 text-center bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-medium text-lg shadow-2xl active:scale-98 transition-all border border-white/30"
               >
                 Cart Items ({cartQty} Item{cartQty !== 1 ? "s" : ""})
               </button>
