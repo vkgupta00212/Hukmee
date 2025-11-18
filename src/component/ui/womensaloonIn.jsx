@@ -472,7 +472,7 @@ const WomenSaloonIn = () => {
 
         await fetchCartOrders();
         alert(`${item.servicename || item.ItemName} added to cart.`);
-        window.location.reload();
+        // window.location.reload();
       }
     } catch (err) {
       console.error("addToCart error:", err);
