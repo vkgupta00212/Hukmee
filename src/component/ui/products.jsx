@@ -149,7 +149,7 @@ const UsedProduct = () => {
               <h1
                 className={`text-xl font-bold bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} bg-clip-text text-transparent`}
               >
-                Used Products
+                New Products
               </h1>
             </div>
 
@@ -187,7 +187,6 @@ const UsedProduct = () => {
               <div className="p-2 border border-gray-400 rounded-full">
                 <ShoppingCart size={18} />
               </div>
-              <span className="text-xs font-medium">Cart</span>
             </motion.div>
           </div>
         </div>

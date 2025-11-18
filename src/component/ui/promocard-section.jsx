@@ -32,15 +32,6 @@ const ServicePromoCard = ({ title, subtitle, image }) => {
           </div>
 
           {/* Book Now Button */}
-          <button
-            className="mt-4 w-max px-5 py-2.5 bg-white text-black font-medium 
-                       text-sm sm:text-base rounded-full 
-                       shadow-lg hover:shadow-xl 
-                       transform transition-all duration-200 
-                       hover:scale-105 active:scale-95"
-          >
-            Book Now
-          </button>
         </div>
 
         {/* Subtle shine effect on hover */}

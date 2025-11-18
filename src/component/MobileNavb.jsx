@@ -32,7 +32,7 @@ const navItems = [
     label: "Used",
     icon: <MdAlarm className={`w-7 h-7`} />,
     component: <UsedProduct />,
-    notification: true,
+    notification: false,
   },
   {
     label: "Profile",

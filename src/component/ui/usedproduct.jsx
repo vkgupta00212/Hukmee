@@ -187,7 +187,6 @@ const UsedProduct = () => {
               <div className="p-2 border border-gray-400 rounded-full">
                 <ShoppingCart size={18} />
               </div>
-              <span className="text-xs font-medium">Cart</span>
             </motion.div>
           </div>
         </div>
