@@ -47,22 +47,6 @@ const CartSummary = ({
   }, []);
 
   if (!cartItems || cartItems.length === 0) return null;
-
-  // Mobile Sticky Bottom Bar
-  const MobileSummary = () => (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-white border-t border-gray-300 shadow-2xl">
-      <button
-        onClick={handleClick}
-        className={`w-full flex items-center justify-between bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} text-white px-5 py-3.5 rounded-xl font-semibold text-base shadow-lg hover:shadow-xl transition-all`}
-      >
-        <span>
-          {totalItemsQty} Item{totalItemsQty !== 1 ? "s" : ""}
-        </span>
-        <span>{customButtonText || "View Cart →"}</span>
-      </button>
-    </div>
-  );
-
   // Desktop Summary (inside cart drawer)
   const DesktopSummary = () => (
     <div className="w-full p-5 bg-white border-t border-gray-200">
@@ -103,7 +87,7 @@ const CartSummary = ({
     </div>
   );
 
-  return isMobile ? <MobileSummary /> : <DesktopSummary />;
+  return <DesktopSummary />;
 };
 
 export default CartSummary;

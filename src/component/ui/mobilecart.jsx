@@ -103,6 +103,10 @@ const MobileCartSummary = () => {
     });
   };
 
+  const handlecart = () => {
+    navigate("/cartpage");
+  };
+
   const openPaymentModal = () => {
     const orderId = pending1[0]?.OrderID || "N/A";
     setPaymentOrderId(orderId);
@@ -230,7 +234,9 @@ const MobileCartSummary = () => {
               >
                 Update Items ({pending1Qty} Item{pending1Qty !== 1 ? "s" : ""})
               </button>
-              <CartWithBadge count={pending1Qty} />
+              <button onClick={handlecart}>
+                <CartWithBadge count={cartQty} />
+              </button>
             </div>
           )}
 
@@ -243,7 +249,9 @@ const MobileCartSummary = () => {
               >
                 Cart Items ({cartQty} Item{cartQty !== 1 ? "s" : ""})
               </button>
-              <CartWithBadge count={cartQty} />
+              <button onClick={handlecart}>
+                <CartWithBadge count={cartQty} />
+              </button>
             </div>
           )}
         </div>

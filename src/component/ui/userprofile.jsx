@@ -14,6 +14,7 @@ import {
   FaShieldAlt,
   FaCircle,
 } from "react-icons/fa";
+import { IoIosWallet } from "react-icons/io";
 import { IoMdLogOut } from "react-icons/io";
 import AddressDetails from "./addressDetailsh.jsx";
 import PersonalDetails from "./personalDetailsh.jsx";
@@ -29,6 +30,7 @@ import OtpVerification from "./otpverification.jsx";
 import RegisterUser from "../../backend/authentication/register.js";
 import MyOrder from "../ui/myorders.jsx";
 import Colors from "../../core/constant.js";
+import Wallet from "../ui/transactions.jsx";
 
 // Custom hooks
 const useWindowSize = () => {
@@ -232,10 +234,12 @@ const UserProfile = () => {
         <AddressDetails key={addressRefreshKey} onRefresh={refreshAddresses} />
       ),
     },
+
     { id: 3, title: "My Orders", Component: <MyOrder /> },
-    { id: 4, title: "About Us", Component: <AboutUs /> },
+    { id: 4, title: "Wallet Transactions", Component: <Wallet /> },
     { id: 5, title: "Terms & Conditions", Component: <TermsPage /> },
     { id: 6, title: "Privacy Policy", Component: <PrivacyAndPolicy /> },
+    { id: 7, title: "About Us", Component: <AboutUs /> },
   ];
 
   const getIcon = (title, size = 18) => {
@@ -245,6 +249,8 @@ const UserProfile = () => {
         return <FaUser {...props} />;
       case "Saved Addresses":
         return <FaMapMarkerAlt {...props} />;
+      case "Wallet Transactions":
+        return <IoIosWallet {...props} />;
       case "My Orders":
         return <FaShoppingBag {...props} />;
       case "About Us":
