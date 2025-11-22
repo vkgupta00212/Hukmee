@@ -1,30 +1,23 @@
 import axios from "axios";
 
-class GetFormsModel {
-  constructor(id, formHeading, formDescription) {
+class GetSliderImageModel {
+  constructor(id, Img) {
     this.id = id;
-    this.formHeading = formHeading;
-    this.formDescription = formDescription;
+    this.Img = Img;
   }
 
   static fromJson(json) {
-    return new GetFormsModel(
-      json.id || "",
-      json.FormHeading || "",
-      json.FormDescription || ""
-    );
+    return new GetSliderImageModel(json.id || 0, json.Img || "");
   }
 }
 
-const GetForms = async (formtype) => {
+const GetSliderImage = async (type) => {
   const formData = new URLSearchParams();
   formData.append("token", "SWNCMPMSREMXAMCKALVAALI");
-  formData.append("FormHeading", formtype);
-  formData.append("Type", "User");
 
   try {
     const response = await axios.post(
-      "https://api.hukmee.in/APIs/APIs.asmx/GetForms",
+      "https://api.hukmee.in/APIs/APIs.asmx/ShowSlider",
       formData,
       {
         headers: {
@@ -35,6 +28,7 @@ const GetForms = async (formtype) => {
 
     let rawData = response.data;
 
+    // Sometimes ASMX wraps JSON as string
     if (typeof rawData === "string") {
       try {
         rawData = JSON.parse(rawData);
@@ -50,11 +44,11 @@ const GetForms = async (formtype) => {
       return [];
     }
 
-    return rawData.map((item) => GetFormsModel.fromJson(item));
+    return rawData.map((item) => GetSliderImageModel.fromJson(item));
   } catch (error) {
     console.error("API Error (GetInTouch):", error);
     return [];
   }
 };
 
-export default GetForms;
+export default GetSliderImage;

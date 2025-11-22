@@ -15,7 +15,7 @@ const CartMain = () => {
       <motion.header
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-white/80 shadow-lg border-b border-white/20"
+        className="md:hidden fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-white/80 shadow-lg border-b border-white/20"
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-start gap-3 h-16">

@@ -13,6 +13,8 @@ import {
   FaFileAlt,
   FaShieldAlt,
   FaCircle,
+  FaShareAlt,
+  FaQuestion,
 } from "react-icons/fa";
 import { IoIosWallet } from "react-icons/io";
 import { IoMdLogOut } from "react-icons/io";
@@ -31,6 +33,7 @@ import RegisterUser from "../../backend/authentication/register.js";
 import MyOrder from "../ui/myorders.jsx";
 import Colors from "../../core/constant.js";
 import Wallet from "../ui/transactions.jsx";
+import FAQ from "./faqs.jsx";
 
 // Custom hooks
 const useWindowSize = () => {
@@ -237,9 +240,12 @@ const UserProfile = () => {
 
     { id: 3, title: "My Orders", Component: <MyOrder /> },
     { id: 4, title: "Wallet Transactions", Component: <Wallet /> },
-    { id: 5, title: "Terms & Conditions", Component: <TermsPage /> },
-    { id: 6, title: "Privacy Policy", Component: <PrivacyAndPolicy /> },
-    { id: 7, title: "About Us", Component: <AboutUs /> },
+    { id: 5, title: "Refer & Earn", Component: <ReferAndEarn /> },
+    { id: 6, title: "Enter Refer Code", Component: <EnterReferCode /> },
+    { id: 7, title: "FAQ", Component: <FAQ /> },
+    { id: 8, title: "Terms & Conditions", Component: <TermsPage /> },
+    { id: 9, title: "Privacy Policy", Component: <PrivacyAndPolicy /> },
+    { id: 10, title: "About Us", Component: <AboutUs /> },
   ];
 
   const getIcon = (title, size = 18) => {
@@ -251,6 +257,12 @@ const UserProfile = () => {
         return <FaMapMarkerAlt {...props} />;
       case "Wallet Transactions":
         return <IoIosWallet {...props} />;
+      case "Refer & Earn":
+        return <FaShareAlt {...props} />;
+      case "Enter Refer Code":
+        return <FaShareAlt {...props} />;
+      case "FAQ":
+        return <FaQuestion {...props} />;
       case "My Orders":
         return <FaShoppingBag {...props} />;
       case "About Us":

@@ -77,7 +77,7 @@ const CartSummary = ({
 
       <button
         onClick={handleClick}
-        className={`w-full bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3`}
+        className={`w-full bg-gradient-to-r ${Colors.primaryFrom} ${Colors.primaryTo} text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3 hover:cursor-pointer `}
       >
         <span>₹{Number(total).toFixed(2)}</span>
         <span className="border-l border-white/30 pl-3">

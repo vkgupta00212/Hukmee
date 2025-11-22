@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import { Minus, Plus, Trash2, X, IndianRupee } from "lucide-react";
 import PaymentCard from "./paymentCard";
 import PaymentCard2 from "./paymentCard2";
 import PaymentCardButton from "./paymentCardButton";
@@ -50,6 +51,9 @@ const PaymentPage = () => {
     Array.isArray(incomingCartItems) ? incomingCartItems : []
   );
 
+  const [orderType, setOrderType] = useState(null);
+  const isProduct = orderType === "Product";
+
   const UserID = localStorage.getItem("userPhone");
 
   useEffect(() => {
@@ -62,6 +66,90 @@ const PaymentPage = () => {
   const [orders, setOrders] = useState([]);
   const [orderId, setOrderId] = useState(null);
 
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentOrderId, setPaymentOrderId] = useState("");
+  const [paymentAmount, setPaymentAmount] = useState(0);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      if (!UserID) {
+        setOrderId(null);
+        setCartItems([]);
+        return;
+      }
+
+      try {
+        const rawItems = await GetOrder(UserID, "Pending");
+        console.log("Raw pending items from backend:", rawItems);
+
+        if (!Array.isArray(rawItems) || rawItems.length === 0) {
+          setOrderId(null);
+          setCartItems([]);
+          return;
+        }
+
+        // Group by OrderID (in case user has multiple pending orders — rare but safe)
+        const ordersMap = {};
+
+        rawItems.forEach((item) => {
+          const oid = item.OrderID;
+          if (!ordersMap[oid]) {
+            ordersMap[oid] = {
+              OrderID: oid,
+              Address: item.Address,
+              Slot: item.Slot,
+              SlotDatetime: item.SlotDatetime,
+              items: [],
+            };
+          }
+          ordersMap[oid].items.push(item);
+        });
+
+        // Take the first (and usually only) pending order
+        const orderIds = Object.keys(ordersMap);
+        const firstOrderId = orderIds[0];
+        const pendingOrder = ordersMap[firstOrderId];
+
+        setOrderId(firstOrderId);
+
+        // Convert backend items → clean cart items
+        const cartItemsFromBackend = pendingOrder.items.map((item, index) => ({
+          id: item.ID || `item-${index}`,
+          name: item.ItemName || "Service",
+          price: Number(item.Price) || 0,
+          quantity: Number(item.Quantity) || 1,
+          image: item.ItemImages || null,
+          orderId: item.OrderID,
+        }));
+
+        setCartItems(cartItemsFromBackend);
+
+        // Auto-fill address
+        if (pendingOrder.Address) {
+          setSelectedAddress({
+            FullAddress: pendingOrder.Address,
+            Name: "", // not available in this model
+            Phone: UserID,
+          });
+        }
+
+        console.log("Cart loaded successfully:", cartItemsFromBackend);
+        console.log("Total items:", cartItemsFromBackend.length);
+        console.log("Total quantity:", getTotalQuantity(cartItemsFromBackend));
+      } catch (err) {
+        console.error("Failed to load pending order:", err);
+        setCartItems([]);
+        setOrderId(null);
+      }
+    };
+
+    fetchOrders();
+  }, [UserID]);
+
+  const getTotalQuantity = () => {
+    return cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
+  };
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -69,11 +157,15 @@ const PaymentPage = () => {
         console.log("Fetched orders:", res);
 
         if (Array.isArray(res) && res.length > 0) {
-          setOrders(res); // store full array
-          setOrderId(res[0].OrderID); // use first order's OrderID
+          setOrders(res);
+          setOrderId(res[0].OrderID);
+
+          // SET ORDER TYPE HERE
+          setOrderType(res[0].OrderType || null);
         } else {
           setOrders([]);
           setOrderId(null);
+          setOrderType(null);
         }
       } catch (err) {
         console.error("Error fetching order id:", err);
@@ -191,6 +283,57 @@ const PaymentPage = () => {
     }
   };
 
+  const handleServiceProceed = async () => {
+    // your existing full slot + address + assign leads logic
+    handleproceed();
+  };
+
+  const handleProductProceed = async () => {
+    if (!isLoggedIn) {
+      alert("Please login to continue.");
+      return;
+    }
+
+    if (!selectedAddress) {
+      alert("Please select an address.");
+      setShowAddressModal(true);
+      return;
+    }
+
+    // No slot logic for product
+    console.log("Proceeding as PRODUCT order:", orderId);
+
+    try {
+      setLoading(true);
+
+      const updateResponse = await UpdateOrder({
+        OrderID: orderId,
+        Price: calculateTotal(),
+        Quantity: getTotalQuantity(),
+        Address: selectedAddress.FullAddress,
+        Slot: "N/A",
+        Status: "Placed",
+      });
+
+      console.log("Product Update Response:", updateResponse);
+
+      alert("Product order Placed!");
+      navigate("/");
+    } catch (err) {
+      console.error("Product proceed error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMainProceed = () => {
+    if (isProduct) {
+      openPaymentModal(calculateTotal());
+    } else {
+      handleServiceProceed();
+    }
+  };
+
   const goBack = () => {
     // Check if user can go back in history
     if (window.history.state && window.history.state.idx > 0) {
@@ -199,6 +342,78 @@ const PaymentPage = () => {
       navigate("/"); // fallback route
     }
   };
+
+  const openPaymentModal = () => {
+    setPaymentOrderId(orderId || "N/A");
+    setPaymentAmount(calculateTotal());
+    setShowPaymentModal(true);
+  };
+
+  const PaymentModal = ({ isOpen, onClose }) => (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0.9 }}
+            className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full text-center relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={onClose}
+              className="absolute top-3 right-3 text-gray-500 hover:text-red-600"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <IndianRupee className="text-blue-600" size={32} />
+            </div>
+
+            <h3 className="text-lg font-semibold mb-2">Payment Method?</h3>
+            <p className="text-sm text-gray-600 mb-5">
+              Order #{orderId} • ₹{calculateTotal()}
+            </p>
+
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => {
+                  onClose();
+                  handleProductProceed();
+                }}
+                disabled={loading}
+                className="bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl font-medium hover:shadow-lg transition text-sm disabled:opacity-70"
+              >
+                {loading ? "Processing..." : "Cash on Delivery"}
+              </button>
+
+              <button
+                onClick={() => {
+                  onClose();
+                  handleproceed();
+                }}
+                disabled={loading}
+                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 rounded-xl font-medium hover:shadow-lg transition text-sm disabled:opacity-70"
+              >
+                Pay Online
+              </button>
+            </div>
+
+            <p className="text-xs text-gray-500 mt-4">
+              You can pay when our expert arrives
+            </p>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
@@ -233,7 +448,6 @@ const PaymentPage = () => {
             </h2>
           </div>
         </div>
-
         {/* <div className="pt-[35px] mb-[10px]">
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -248,13 +462,12 @@ const PaymentPage = () => {
             </div>
           </div>
         </div> */}
-
         <div className="w-full mt-[30px] max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <PaymentCard
               onSelectAddress={() => setShowAddressModal(true)}
               onSelectSlot={() => setShowSlotFirst(true)}
-              onProceed={handleproceed}
+              onProceed={handleMainProceed}
               selectedAddress={selectedAddress}
               selectedSlot={selectedSlot}
               calculateTotal={calculateTotal}
@@ -277,7 +490,11 @@ const PaymentPage = () => {
             />
           </div>
         </div>
-
+        <PaymentModal
+          isOpen={showPaymentModal}
+          onClose={() => setShowPaymentModal(false)}
+        />
+        ;
         {showAddressModal && (
           <AnimatePresence>
             <motion.div
@@ -324,7 +541,6 @@ const PaymentPage = () => {
             </motion.div>
           </AnimatePresence>
         )}
-
         {showSlotModal && (
           <AnimatePresence>
             <motion.div
@@ -366,7 +582,6 @@ const PaymentPage = () => {
             </motion.div>
           </AnimatePresence>
         )}
-
         {showNow && (
           <AnimatePresence>
             <motion.div
@@ -400,7 +615,6 @@ const PaymentPage = () => {
             </motion.div>
           </AnimatePresence>
         )}
-
         {showSlotFirst && (
           <AnimatePresence>
             <motion.div

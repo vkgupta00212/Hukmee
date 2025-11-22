@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { FaLocationDot } from "react-icons/fa6";
 import { IoIosTime } from "react-icons/io";
 import { MdEdit } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import Colors from "../../core/constant";
+import GetOrder from "../../backend/order/getorderid";
 
 const PaymentCard = ({
   onSelectAddress,
@@ -16,6 +17,9 @@ const PaymentCard = ({
   const [isMobile, setIsMobile] = useState(false);
   const [isLoggedIn] = useState(localStorage.getItem("isLoggedIn") === "true");
   const navigate = useNavigate();
+  const [orders, setOrders] = useState([]);
+  const UserID = localStorage.getItem("userPhone");
+  const [orderType, setOrderType] = useState(null);
 
   // ---------- Detect mobile ----------
   useEffect(() => {
@@ -25,16 +29,51 @@ const PaymentCard = ({
     return () => window.removeEventListener("resize", check);
   }, []);
 
+  const fetchCartOrders = useCallback(async () => {
+    if (!UserID) {
+      setOrders([]);
+      setOrderType(null);
+      return;
+    }
+
+    try {
+      const data = await GetOrder(UserID, "Pending");
+
+      if (Array.isArray(data) && data.length > 0) {
+        setOrders(data);
+
+        // Pick first item OrderType (all items same order)
+        setOrderType(data[0].OrderType || null);
+      } else {
+        setOrders([]);
+        setOrderType(null);
+      }
+    } catch (err) {
+      console.error("Error fetching cart:", err);
+      setOrders([]);
+      setOrderType(null);
+    }
+  }, [UserID]);
+
+  useEffect(() => {
+    fetchCartOrders();
+  }, [fetchCartOrders]);
+
   // ---------- Button state ----------
+  const isProduct = orderType === "Product";
   const needAddress = !selectedAddress;
-  const needSlot = !selectedSlot;
-  const canProceed = selectedAddress && selectedSlot;
+  const needSlot = !isProduct && !selectedSlot;
+  const canProceed = isProduct
+    ? selectedAddress // only address needed
+    : selectedAddress && selectedSlot; // both needed for service
 
   const getButtonLabel = () => {
     if (!isLoggedIn) return "Login to Continue";
-    if (needAddress) return "Select Address";
-    if (needSlot) return "Select Slot";
-    return `Proceed`;
+    if (!selectedAddress) return "Select Address";
+
+    if (!isProduct && !selectedSlot) return "Select Slot";
+
+    return "Proceed";
   };
 
   const handleMainClick = () => {
@@ -97,46 +136,47 @@ const PaymentCard = ({
         </div>
 
         {/* Slot */}
-        <div>
-          <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-3">
-            <IoIosTime className="w-5 h-5 text-indigo-600" />
-            Slot
-          </h3>
+        {!isProduct && (
+          <div>
+            <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-3">
+              <IoIosTime className="w-5 h-5 text-indigo-600" />
+              Slot
+            </h3>
 
-          {selectedSlot ? (
-            <div
-              onClick={onSelectSlot}
-              className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl cursor-pointer hover:bg-indigo-100 transition"
-            >
-              <p className="font-medium text-gray-800">
-                {selectedSlot.day?.label} {selectedSlot.day?.date}
-              </p>
-              <p className="text-sm text-gray-600 mt-1">
-                Time: {selectedSlot.time?.time}
-              </p>
-              {selectedSlot.day?.recommended && (
-                <p className="text-xs text-amber-600 mt-2">Recommended</p>
-              )}
-              <p className="text-xs text-indigo-600 mt-2 flex items-center gap-1">
-                <MdEdit className="w-3.5 h-3.5" />
-                Change
-              </p>
-            </div>
-          ) : (
-            <button
-              onClick={onSelectSlot}
-              disabled={needAddress}
-              className={`w-full py-3 rounded-xl font-medium transition-all ${
-                needAddress
-                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                  : `bg-${Colors.primaryMain} text-white shadow-md hover:shadow-lg`
-              }`}
-            >
-              Select Slot
-            </button>
-          )}
-        </div>
-
+            {selectedSlot ? (
+              <div
+                onClick={onSelectSlot}
+                className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl cursor-pointer hover:bg-indigo-100 transition"
+              >
+                <p className="font-medium text-gray-800">
+                  {selectedSlot.day?.label} {selectedSlot.day?.date}
+                </p>
+                <p className="text-sm text-gray-600 mt-1">
+                  Time: {selectedSlot.time?.time}
+                </p>
+                {selectedSlot.day?.recommended && (
+                  <p className="text-xs text-amber-600 mt-2">Recommended</p>
+                )}
+                <p className="text-xs text-indigo-600 mt-2 flex items-center gap-1">
+                  <MdEdit className="w-3.5 h-3.5" />
+                  Change
+                </p>
+              </div>
+            ) : (
+              <button
+                onClick={onSelectSlot}
+                disabled={needAddress}
+                className={`w-full py-3 rounded-xl font-medium transition-all ${
+                  needAddress
+                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    : `bg-${Colors.primaryMain} text-white shadow-md hover:shadow-lg`
+                }`}
+              >
+                Select Slot
+              </button>
+            )}
+          </div>
+        )}
         {/* Proceed */}
         <button
           onClick={handleMainClick}

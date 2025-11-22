@@ -1,30 +1,31 @@
 import axios from "axios";
 
-class GetFormsModel {
-  constructor(id, formHeading, formDescription) {
+class FAQModel {
+  constructor(id, Questions, ANSWER, Type) {
     this.id = id;
-    this.formHeading = formHeading;
-    this.formDescription = formDescription;
+    this.Questions = Questions;
+    this.ANSWER = ANSWER;
+    this.Type = Type;
   }
 
   static fromJson(json) {
-    return new GetFormsModel(
-      json.id || "",
-      json.FormHeading || "",
-      json.FormDescription || ""
+    return new FAQModel(
+      json.id || 0,
+      json.Questions || "",
+      json.ANSWER || "",
+      json.Type || ""
     );
   }
 }
 
-const GetForms = async (formtype) => {
+const FAQAPI = async (type) => {
   const formData = new URLSearchParams();
   formData.append("token", "SWNCMPMSREMXAMCKALVAALI");
-  formData.append("FormHeading", formtype);
-  formData.append("Type", "User");
+  formData.append("Type", type);
 
   try {
     const response = await axios.post(
-      "https://api.hukmee.in/APIs/APIs.asmx/GetForms",
+      "https://api.hukmee.in/APIs/APIs.asmx/ShowFAQ",
       formData,
       {
         headers: {
@@ -35,6 +36,7 @@ const GetForms = async (formtype) => {
 
     let rawData = response.data;
 
+    // Sometimes ASMX wraps JSON as string
     if (typeof rawData === "string") {
       try {
         rawData = JSON.parse(rawData);
@@ -50,11 +52,11 @@ const GetForms = async (formtype) => {
       return [];
     }
 
-    return rawData.map((item) => GetFormsModel.fromJson(item));
+    return rawData.map((item) => FAQModel.fromJson(item));
   } catch (error) {
     console.error("API Error (GetInTouch):", error);
     return [];
   }
 };
 
-export default GetForms;
+export default FAQAPI;
